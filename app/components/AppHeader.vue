@@ -1,49 +1,52 @@
 <script setup lang="ts">
-const links = ['O nas', 'Edukacja', 'Wydarzenia', 'Turystyka', 'Aktualności', 'Kontakt']
+const links = [
+  { label: 'O nas', href: '#' },
+  { label: 'Edukacja', href: '#' },
+  { label: 'Wydarzenia', href: '#wydarzenia' },
+  { label: 'Turystyka', href: '#' },
+  { label: 'Aktualności', href: '#wydarzenia' },
+  { label: 'Kontakt', href: '#kontakt' },
+]
 const menuOpen = ref(false)
+const scrolled = useScrolled()
 </script>
 
 <template>
-  <header class="header">
+  <header class="header" :class="{ scrolled }">
     <TopBar />
 
     <div class="main-row">
-      <div class="logo">
-        <span class="logo-badge">NB</span>
-        <span>NOWOCZESNE<br />BIESZCZADY</span>
-      </div>
+      <a href="#" class="logo-badge">NB</a>
 
       <div class="nav-group">
         <nav class="nav" :class="{ open: menuOpen }">
-          <a v-for="(link, i) in links" :key="link" href="#" :class="{ active: i === 0 }">{{ link }}</a>
+          <a v-for="(link, i) in links" :key="link.label" :href="link.href" :class="{ active: i === 0 }">{{ link.label }}</a>
         </nav>
 
         <div class="tools">
-          <button class="icon-btn" aria-label="Szukaj">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="7" />
-              <path d="M21 21l-4.3-4.3" />
-            </svg>
-          </button>
           <a href="#" class="lang">PL <span class="chevron">⌄</span></a>
         </div>
       </div>
 
-      <button class="burger" :class="{ open: menuOpen }" aria-label="Menu" @click="menuOpen = !menuOpen">
-        <span /><span /><span />
-      </button>
+      <BurgerButton :open="menuOpen" @toggle="menuOpen = !menuOpen" />
     </div>
   </header>
 </template>
 
 <style scoped>
 .header {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 10;
   color: #fff;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.header.scrolled {
+  background: var(--ink);
 }
 
 .main-row {
@@ -56,25 +59,17 @@ const menuOpen = ref(false)
   position: relative;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-weight: 700;
-  font-size: 0.85rem;
-  letter-spacing: 0.05em;
-  line-height: 1.2;
-}
-
 .logo-badge {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   border: 1.5px solid rgba(255, 255, 255, 0.85);
-  font-size: 0.7rem;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -106,22 +101,13 @@ const menuOpen = ref(false)
 
 .nav a.active {
   color: #fff;
-  border-color: #e8672c;
+  border-color: var(--amber);
 }
 
 .tools {
   display: flex;
   align-items: center;
   gap: 1rem;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  padding: 0;
 }
 
 .lang {
@@ -134,27 +120,6 @@ const menuOpen = ref(false)
 .chevron {
   display: inline-block;
   margin-left: 0.1rem;
-}
-
-.burger {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  width: 28px;
-  height: 28px;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  justify-self: end;
-}
-
-.burger span {
-  display: block;
-  width: 100%;
-  height: 2px;
-  background: #fff;
 }
 
 @media (max-width: 800px) {
@@ -173,7 +138,7 @@ const menuOpen = ref(false)
     right: 0;
     flex-direction: column;
     gap: 0;
-    background: #12181f;
+    background: var(--ink);
   }
 
   .nav.open {
@@ -187,10 +152,6 @@ const menuOpen = ref(false)
 
   .tools {
     display: none;
-  }
-
-  .burger {
-    display: flex;
   }
 }
 </style>

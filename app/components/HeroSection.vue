@@ -9,7 +9,7 @@ withDefaults(
   {
     image: '/images/hero.avif',
     title: 'NOWOCZESNE BIESZCZADY',
-    subtitle: 'Innowacja. Edukacja. Przygoda w górach.',
+    subtitle: 'Tworzymy wydarzenia, konkursy i inicjatywy, które budują tożsamość regionu.',
     cta: 'DOWIEDZ SIĘ WIĘCEJ',
   },
 )
@@ -31,9 +31,6 @@ withDefaults(
   position: relative;
   min-height: 480px;
   height: 62vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background-size: cover;
   background-position: center;
   text-align: center;
@@ -46,7 +43,11 @@ withDefaults(
 }
 
 .content {
-  position: relative;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   color: #fff;
   padding: 0 1.5rem;
 }
@@ -56,17 +57,19 @@ h1 {
   font-size: clamp(2.5rem, 6vw, 5rem);
   font-weight: 800;
   letter-spacing: 0.02em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
 }
 
 p {
   margin: 1rem 0 2rem;
   font-size: clamp(1.1rem, 2vw, 1.5rem);
   font-weight: 300;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
 }
 
 .cta {
   display: inline-block;
-  background: #e8672c;
+  background: var(--amber);
   color: #fff;
   text-decoration: none;
   font-weight: 700;
@@ -76,30 +79,31 @@ p {
 }
 
 .cta:hover {
-  background: #d1571f;
+  background: #a8551f;
 }
 
 @media (max-width: 800px) {
   .hero {
-    min-height: 100svh;
-    height: auto;
-    justify-content: flex-end;
+    min-height: 380px;
+    height: 56svh;
     text-align: left;
-    padding-bottom: 4rem;
   }
 
   .content {
+    top: auto;
+    bottom: 4.5rem;
+    transform: none;
     padding: 0 1.5rem;
   }
 
   h1 {
-    font-size: 2.1rem;
+    font-size: 1.9rem;
     line-height: 1.15;
   }
 
   p {
-    font-size: 1rem;
-    margin: 0.75rem 0 1.5rem;
+    font-size: 0.95rem;
+    margin: 0.6rem 0 1.25rem;
   }
 
   .cta {
