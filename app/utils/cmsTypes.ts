@@ -84,10 +84,12 @@ export interface Peak {
 
 export interface FestivalEdition {
   id: number
+  slug: string
   year: string
   title: string
   description: string
   image: string
+  gallery: string
   featured: boolean
 }
 
@@ -95,6 +97,7 @@ export interface Contest {
   id: number
   title: string
   description: string
+  fundingNote: string
   image: string
 }
 

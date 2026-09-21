@@ -4,9 +4,6 @@ useHead({ title: 'Inicjatywy społeczne i edukacja — Nowoczesne Bieszczady' })
 
 const heroStats = ['Warsztaty podcastowe', 'Cykliczne debaty', 'Otwarte dla mieszkańców']
 
-const { data: podcastsData } = await useCmsCollection<Podcast>('podcasts', { order: 'order' })
-const podcasts = computed(() => podcastsData.value?.records ?? [])
-
 const content = usePageContent()
 </script>
 
@@ -26,13 +23,6 @@ const content = usePageContent()
           <span class="kicker">Projekt warsztatowy</span>
           <h2 class="section-title">{{ content.title('inicjatywy-eterze') }}</h2>
           <p v-for="(paragraph, i) in content.paragraphs('inicjatywy-eterze')" :key="i" class="lead paragraph">{{ paragraph }}</p>
-
-          <h3>Wyemitowane podcasty uczestników</h3>
-          <ul class="podcast-list">
-            <li v-for="podcast in podcasts" :key="podcast.id">
-              <a :href="podcast.href || '#'">▶ {{ podcast.title }}</a>
-            </li>
-          </ul>
         </div>
         <img :src="content.image('inicjatywy-eterze', '/images/hero.avif')" alt="Bieszczady w eterze" class="side-image" />
       </div>
@@ -87,26 +77,6 @@ h3 {
   margin: 2rem 0 1rem;
   font-family: var(--font-display);
   font-size: 1.3rem;
-}
-
-.podcast-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.podcast-list a {
-  color: var(--alpine);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.92rem;
-}
-
-.podcast-list a:hover {
-  text-decoration: underline;
 }
 
 @media (max-width: 900px) {

@@ -298,12 +298,9 @@ watch(menuOpen, (open) => {
   z-index: 50;
   display: none;
   flex-direction: column;
-  background: linear-gradient(165deg, var(--ink-light) 0%, var(--ink) 65%);
-  background-image: linear-gradient(165deg, var(--ink-light) 0%, var(--ink) 65%),
-    repeating-radial-gradient(circle at 88% 12%, transparent 0, transparent 26px, rgba(255, 255, 255, 0.035) 27px, transparent 28px),
-    repeating-radial-gradient(circle at 8% 85%, transparent 0, transparent 34px, rgba(201, 145, 90, 0.05) 35px, transparent 36px);
-  color: #fff;
-  overflow-y: auto;
+  background: #fff;
+  color: var(--ink);
+  overflow: hidden;
 }
 
 @media (max-width: 800px) {
@@ -317,7 +314,7 @@ watch(menuOpen, (open) => {
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #eee9dd;
   flex-shrink: 0;
 }
 
@@ -328,9 +325,9 @@ watch(menuOpen, (open) => {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #fff;
+  background: var(--stone);
+  border: 1px solid #e9e5db;
+  color: var(--ink);
   cursor: pointer;
 }
 
@@ -339,12 +336,13 @@ watch(menuOpen, (open) => {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: 0.5rem 1.5rem 1rem;
+  padding: 0.5rem 0 1rem;
   min-height: 0;
+  overflow-y: auto;
 }
 
 .mobile-nav-item {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid #eee9dd;
   opacity: 0;
   transform: translateY(10px);
   animation: nav-item-in 0.4s ease forwards;
@@ -352,7 +350,7 @@ watch(menuOpen, (open) => {
 }
 
 .mobile-nav-item:first-child {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid #eee9dd;
 }
 
 @keyframes nav-item-in {
@@ -367,30 +365,34 @@ watch(menuOpen, (open) => {
   align-items: center;
   gap: 1.1rem;
   width: 100%;
-  padding: 1.3rem 0;
+  padding: 1.3rem 1.5rem;
   background: none;
   border: none;
-  color: #fff;
+  color: var(--ink);
   text-decoration: none;
   font-size: 1.3rem;
   font-weight: 700;
   font-family: var(--font-display);
   text-align: left;
   cursor: pointer;
-  transition: padding-left 0.15s, color 0.15s;
+  transition: color 0.15s;
 }
 
 .mobile-nav-link:active,
 .mobile-nav-link:hover {
-  padding-left: 0.4rem;
-  color: var(--amber);
+  color: var(--ink);
+}
+
+.mobile-nav-item:has(.mobile-nav-link:hover),
+.mobile-nav-item:has(.mobile-nav-link:active) {
+  background: var(--mist);
 }
 
 .idx {
   font-family: var(--font-display);
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--amber);
+  color: #7a8a7e;
   flex-shrink: 0;
 }
 
@@ -400,7 +402,7 @@ watch(menuOpen, (open) => {
 
 .chev {
   flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.5);
+  color: #b7c2b7;
   transition: transform 0.25s;
 }
 
@@ -410,26 +412,25 @@ watch(menuOpen, (open) => {
 }
 
 .mobile-submenu {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.3s ease;
-  padding-left: 2.6rem;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
 }
 
 .mobile-submenu.open {
-  grid-template-rows: 1fr;
+  max-height: 480px;
   padding-bottom: 0.75rem;
 }
 
 .mobile-submenu-inner {
-  overflow: hidden;
-  min-height: 0;
+  padding-left: 4.1rem;
+  padding-right: 1.5rem;
 }
 
 .mobile-sublink {
   display: block;
   overflow: hidden;
-  color: rgba(255, 255, 255, 0.7);
+  color: #5a6a62;
   text-decoration: none;
   font-size: 0.92rem;
   font-weight: 500;
@@ -437,7 +438,7 @@ watch(menuOpen, (open) => {
 }
 
 .mobile-sublink:hover {
-  color: #fff;
+  color: var(--ink);
 }
 
 .mobile-menu-footer {
@@ -446,14 +447,14 @@ watch(menuOpen, (open) => {
   flex-direction: column;
   gap: 0.9rem;
   padding: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--stone);
 }
 
 .mobile-menu-footer a {
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--ink);
   text-decoration: none;
   font-size: 0.88rem;
   font-weight: 600;

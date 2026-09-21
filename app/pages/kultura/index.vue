@@ -49,7 +49,7 @@ const cultureStats = computed(() => [
         </div>
 
         <div class="grid-3">
-          <div v-for="edition in festivalEditions" :key="edition.id" class="edition-card card-surface">
+          <NuxtLink v-for="edition in festivalEditions" :key="edition.id" :to="`/kultura/edycje/${edition.slug}`" class="edition-card card-surface">
             <div class="edition-image-wrap">
               <img :src="edition.image" :alt="edition.title" />
               <span v-if="edition.featured" class="featured-badge">Najnowsza</span>
@@ -58,9 +58,9 @@ const cultureStats = computed(() => [
               <span class="year">{{ edition.year }}</span>
               <h3>{{ edition.title }}</h3>
               <p>{{ edition.description }}</p>
-              <a href="#" class="link">Zobacz relację foto/wideo →</a>
+              <span class="link">Zobacz opis i galerię →</span>
             </div>
-          </div>
+          </NuxtLink>
         </div>
 
         <div class="note-card">
@@ -94,7 +94,8 @@ const cultureStats = computed(() => [
             <div class="contest-body">
               <h3>{{ contest.title }}</h3>
               <p>{{ contest.description }}</p>
-              <a href="#" class="link">Zobacz galerię prac →</a>
+              <p v-if="contest.fundingNote" class="funding-note">{{ contest.fundingNote }}</p>
+              <NuxtLink to="/aktualnosci" class="link">Śledź aktualności →</NuxtLink>
             </div>
           </div>
         </div>
@@ -146,6 +147,8 @@ const cultureStats = computed(() => [
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  text-decoration: none;
+  color: inherit;
 }
 
 .edition-card:hover,
@@ -158,13 +161,21 @@ const cultureStats = computed(() => [
 .contest-image-wrap {
   position: relative;
   overflow: hidden;
+  background: var(--stone);
 }
 
-.edition-image-wrap img,
-.contest-image-wrap img {
+.edition-image-wrap img {
   width: 100%;
   height: 180px;
   object-fit: cover;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.contest-image-wrap img {
+  width: 100%;
+  height: 320px;
+  object-fit: contain;
   display: block;
   transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -195,6 +206,7 @@ const cultureStats = computed(() => [
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  flex: 1;
 }
 
 .year {
@@ -219,8 +231,17 @@ const cultureStats = computed(() => [
   line-height: 1.5;
 }
 
+.contest-body p.funding-note {
+  color: #8a938c;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  padding-top: 0.25rem;
+  border-top: 1px solid #eee9dd;
+}
+
 .link {
-  margin-top: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
   color: var(--alpine);
   font-weight: 700;
   font-size: 0.82rem;
