@@ -1,43 +1,18 @@
 <script setup lang="ts">
-const tiles = [
-  {
-    title: 'Edukacja',
-    description: 'Programy i szkolenia z outdoor leadership oraz nowych technologii w górach.',
-    image: '/images/bieszczady.avif',
-    back: 'Warsztaty, szkolenia i mentoring dla mieszkańców regionu — od kompetencji cyfrowych po liderstwo w terenie. Uczymy się razem, żeby działać skuteczniej.',
-    moreHref: '#edukacja',
-  },
-  {
-    title: 'Wydarzenia',
-    description: 'Innowacja. Edukacja. Przygoda w górach.',
-    image: '/images/bieszczady.avif',
-    image2: '/images/hero.avif',
-    buttonLabel: 'Kalendarz Wydarzeń',
-  },
-  {
-    title: 'Turystyka',
-    description: 'Dynamiczne trasy rowerowe i piesze odkrywające Bieszczady na nowo.',
-    image: '/images/bieszczady.avif',
-    partnerImage: '/images/partner-bieszczady-plus.jpg',
-    partnerHref: 'https://bieszczady.plus/odkrywaj',
-  },
-]
+const { data } = await useCmsCollection<FlagshipTile>('flagship-tiles', { order: 'order' })
+const tiles = computed(() => data.value?.records ?? [])
 </script>
 
 <template>
   <section class="tiles">
     <FeatureTile
       v-for="tile in tiles"
-      :key="tile.title"
+      :key="tile.id"
       :image="tile.image"
-      :image2="tile.image2"
       :title="tile.title"
       :description="tile.description"
-      :button-label="tile.buttonLabel"
       :back="tile.back"
       :more-href="tile.moreHref"
-      :partner-image="tile.partnerImage"
-      :partner-href="tile.partnerHref"
     />
   </section>
 </template>

@@ -1,44 +1,22 @@
 <script setup lang="ts">
-const events = [
-  {
-    title: 'Rajd Rowerowy Bieszczady',
-    date: '14 czerwca 2026',
-    time: '09:00',
-    place: 'Ustrzyki Dolne, Rynek',
-    image: '/images/bieszczady.avif',
-    freeEntry: true,
-  },
-  {
-    title: 'Warsztaty Fotografii Górskiej',
-    date: '22 czerwca 2026',
-    time: '16:00',
-    place: 'Dom Kultury, Ustrzyki Dolne',
-    image: '/images/hero.avif',
-    freeEntry: true,
-  },
-  {
-    title: 'Koncert pod Gwiazdami',
-    date: '5 lipca 2026',
-    time: '20:00',
-    place: 'Amfiteatr, Ustrzyki Dolne',
-    image: '/images/bieszczady.avif',
-    freeEntry: false,
-    ticketsHref: '#bilety',
-  },
-]
+const { data } = useCmsCollection<EventItem>('events', { order: 'id' })
+const events = computed(() => (data.value?.records ?? []).filter((e) => e.tag !== 'sport').slice(0, 3))
 </script>
 
 <template>
   <section id="wydarzenia" class="events">
-    <div class="header">
-      <h2>Wyróżnione wydarzenia</h2>
-      <a href="#" class="all-link">Zobacz wszystkie wydarzenia</a>
+    <div class="section-head-row">
+      <div>
+        <span class="kicker">Kalendarz</span>
+        <h2>Wyróżnione wydarzenia</h2>
+      </div>
+      <NuxtLink to="/aktualnosci" class="all-link">Zobacz wszystkie wydarzenia</NuxtLink>
     </div>
 
     <div class="grid">
       <EventCard
         v-for="event in events"
-        :key="event.title"
+        :key="event.id"
         :image="event.image"
         :title="event.title"
         :date="event.date"
@@ -59,11 +37,11 @@ const events = [
   padding: 5rem 3rem;
 }
 
-.header {
+.section-head-row {
   max-width: 1200px;
   margin: 0 auto 2.5rem;
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 1.5rem;
 }
@@ -101,7 +79,7 @@ h2 {
     padding: 3rem 1.5rem;
   }
 
-  .header {
+  .section-head-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;

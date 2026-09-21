@@ -53,9 +53,17 @@ defineProps<{
 <style scoped>
 .card {
   background: #fff;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(26, 36, 32, 0.08);
   display: flex;
   flex-direction: column;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 48px rgba(26, 36, 32, 0.14);
 }
 
 .image-wrap {
@@ -127,6 +135,8 @@ h3 {
   font-size: 0.8rem;
   font-weight: 700;
   padding: 0.65rem 1.25rem;
+  border-radius: 10px;
+  transition: background 0.15s, color 0.15s;
 }
 
 .btn-outline {

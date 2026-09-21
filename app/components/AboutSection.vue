@@ -1,6 +1,7 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
+    kicker?: string
     title?: string
     paragraph1?: string
     paragraph2?: string
@@ -8,6 +9,7 @@ withDefaults(
     image?: string
   }>(),
   {
+    kicker: 'Stowarzyszenie',
     title: 'Krótko o nas',
     paragraph1:
       'Stowarzyszenie Nowoczesne Bieszczady powstało w 2016 roku w Ustrzykach Dolnych. Prowadzimy działalność doradczą, edukacyjną i kulturalną — wspieramy ekonomię społeczną, edukację demokracji lokalnej, aktywność kulturalną oraz rozwój Ustrzyk Dolnych i Powiatu Bieszczadzkiego.',
@@ -22,6 +24,7 @@ withDefaults(
 <template>
   <section class="about">
     <div class="about-text">
+      <span class="kicker">{{ kicker }}</span>
       <h2>{{ title }}</h2>
       <p>{{ paragraph1 }}</p>
       <p>{{ paragraph2 }}</p>
@@ -46,6 +49,10 @@ withDefaults(
   gap: 1.25rem;
   padding: 4rem 5vw;
   max-width: 640px;
+}
+
+.about-text .kicker {
+  margin-bottom: -0.5rem;
 }
 
 h2 {

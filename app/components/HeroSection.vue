@@ -2,15 +2,19 @@
 withDefaults(
   defineProps<{
     image?: string
+    kicker?: string
     title?: string
     subtitle?: string
     cta?: string
+    ctaHref?: string
   }>(),
   {
     image: '/images/hero.avif',
+    kicker: 'Ustrzyki Dolne · Bieszczady',
     title: 'NOWOCZESNE BIESZCZADY',
     subtitle: 'Tworzymy wydarzenia, konkursy i inicjatywy, które budują tożsamość regionu.',
-    cta: 'DOWIEDZ SIĘ WIĘCEJ',
+    cta: 'Dowiedz się więcej',
+    ctaHref: '/o-nas/misja',
   },
 )
 </script>
@@ -19,9 +23,16 @@ withDefaults(
   <section class="hero" :style="{ backgroundImage: `url(${image})` }">
     <div class="overlay" />
     <div class="content">
+      <div class="kicker-row">
+        <span class="dash-line" />
+        <span class="kicker-dot" />
+        <span class="kicker">{{ kicker }}</span>
+        <span class="kicker-dot" />
+        <span class="dash-line" />
+      </div>
       <h1>{{ title }}</h1>
       <p>{{ subtitle }}</p>
-      <a href="#" class="cta">{{ cta }}</a>
+      <NuxtLink :to="ctaHref" class="btn btn-amber cta">{{ cta }}</NuxtLink>
     </div>
   </section>
 </template>
@@ -39,7 +50,7 @@ withDefaults(
 .overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10, 14, 18, 0.85) 0%, rgba(10, 14, 18, 0.15) 35%, rgba(10, 14, 18, 0.55) 100%);
+  background: linear-gradient(180deg, rgba(10, 14, 18, 0.82) 0%, rgba(15, 22, 19, 0.32) 40%, rgba(10, 14, 18, 0.6) 100%);
 }
 
 .content {
@@ -50,36 +61,63 @@ withDefaults(
   transform: translateY(-50%);
   color: #fff;
   padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.kicker-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.kicker-row .kicker {
+  margin: 0;
+  color: #fff;
+  font-size: 0.78rem;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.kicker-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--amber);
+  flex-shrink: 0;
+}
+
+.dash-line {
+  width: 36px;
+  height: 0;
+  border-top: 1.5px dashed rgba(255, 255, 255, 0.45);
 }
 
 h1 {
   margin: 0;
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  font-weight: 800;
-  letter-spacing: 0.02em;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 6vw, 4.75rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
   text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
 }
 
 p {
   margin: 1rem 0 2rem;
-  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  max-width: 600px;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
   font-weight: 300;
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
 }
 
 .cta {
-  display: inline-block;
-  background: var(--amber);
-  color: #fff;
-  text-decoration: none;
-  font-weight: 700;
   font-size: 0.85rem;
-  letter-spacing: 0.05em;
-  padding: 0.9rem 2rem;
-}
-
-.cta:hover {
-  background: #a8551f;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.9rem 2.2rem;
 }
 
 @media (max-width: 800px) {
@@ -94,6 +132,15 @@ p {
     bottom: 4.5rem;
     transform: none;
     padding: 0 1.5rem;
+    align-items: flex-start;
+  }
+
+  .kicker-row {
+    justify-content: flex-start;
+  }
+
+  .dash-line:last-child {
+    display: none;
   }
 
   h1 {

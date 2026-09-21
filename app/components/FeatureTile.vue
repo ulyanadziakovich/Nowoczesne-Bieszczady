@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
-  image: string
+  image?: string
   image2?: string
   title: string
   description: string
@@ -9,6 +9,7 @@ const props = defineProps<{
   moreHref?: string
   partnerImage?: string
   partnerHref?: string
+  plain?: boolean
 }>()
 
 const flipped = ref(false)
@@ -19,7 +20,10 @@ const flippable = computed(() => !!(props.back || props.partnerImage))
   <article v-if="flippable" class="tile flip">
     <div class="tile-inner" :class="{ flipped }" @click="flipped = !flipped">
       <div class="face face-front">
-        <div class="tile-image-wrap">
+        <div v-if="plain" class="tile-image-wrap tile-plain">
+          <span class="plain-label">{{ title }}</span>
+        </div>
+        <div v-else class="tile-image-wrap">
           <img :src="image" :alt="title" class="tile-image" />
         </div>
         <div class="tile-body">
@@ -35,7 +39,7 @@ const flippable = computed(() => !!(props.back || props.partnerImage))
           <h3>{{ title }}</h3>
           <p>{{ back }}</p>
         </div>
-        <a v-if="moreHref" :href="moreHref" class="tile-button" @click.stop>Więcej</a>
+        <NuxtLink v-if="moreHref" :to="moreHref" class="tile-button" @click.stop>Więcej</NuxtLink>
       </div>
     </div>
   </article>
@@ -56,6 +60,8 @@ const flippable = computed(() => !!(props.back || props.partnerImage))
 <style scoped>
 .tile {
   background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
 }
 
@@ -71,6 +77,23 @@ const flippable = computed(() => !!(props.back || props.partnerImage))
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.tile-plain {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--green) 0%, var(--alpine) 100%);
+  text-align: center;
+  padding: 1rem;
+}
+
+.plain-label {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.01em;
 }
 
 .tile-image-alt {
@@ -114,6 +137,7 @@ p {
 }
 
 .tile.flip {
+  height: 340px;
   background: none;
   box-shadow: none;
   perspective: 1500px;
@@ -138,6 +162,8 @@ p {
   flex-direction: column;
   backface-visibility: hidden;
   background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
 }
 
