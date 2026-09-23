@@ -4,9 +4,10 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   runtimeConfig: {
     public: {
-      // Base URL of the Pruvious CMS project (see ../nb-cms). Override with
-      // NUXT_PUBLIC_CMS_URL in production once the CMS is deployed.
-      cmsUrl: 'http://localhost:4321',
+      // Base URL of the Pruvious CMS (see ../nb-cms), deployed at nb.dexint.xyz.
+      // Override with NUXT_PUBLIC_CMS_URL (e.g. in .env) to point at a local
+      // CMS dev server (http://localhost:4321) instead.
+      cmsUrl: 'https://nb.dexint.xyz',
     },
   },
   app: {

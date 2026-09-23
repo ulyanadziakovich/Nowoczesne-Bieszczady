@@ -19,8 +19,7 @@ interface CmsCollectionOptions {
 
 /** Fetch a multi-entry collection (e.g. "trails", "news", "events"). */
 export function useCmsCollection<T = Record<string, any>>(name: string, opts: CmsCollectionOptions = {}) {
-  const config = useRuntimeConfig()
-  return useFetch<CmsListResponse<T>>(`${config.public.cmsUrl}/api/collections/${name}`, {
+  return useFetch<CmsListResponse<T>>(`/api/cms/collections/${name}`, {
     key: `cms-${name}`,
     query: { limit: opts.limit ?? 100, ...(opts.order ? { order: opts.order } : {}) },
   })
@@ -28,8 +27,7 @@ export function useCmsCollection<T = Record<string, any>>(name: string, opts: Cm
 
 /** Fetch a single-entry (singleton) collection (e.g. "home", "site-settings"). */
 export function useCmsSingle<T = Record<string, any>>(name: string) {
-  const config = useRuntimeConfig()
-  return useFetch<T>(`${config.public.cmsUrl}/api/collections/${name}`, { key: `cms-${name}` })
+  return useFetch<T>(`/api/cms/collections/${name}`, { key: `cms-${name}` })
 }
 
 export interface PageContentBlock {
