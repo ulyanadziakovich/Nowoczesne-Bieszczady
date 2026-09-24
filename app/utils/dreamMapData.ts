@@ -20,7 +20,7 @@ export interface DreamMapPoint {
 export const CATEGORY_COLORS: Record<DreamMapCategory, string> = {
   ekologia: '#135e24',
   turystyka: '#1f6fa8',
-  mlodziez: '#c9672e',
+  mlodziez: '#a8551f',
   seniorzy: '#0f6e56',
   infrastruktura: '#8a4a2e',
 }

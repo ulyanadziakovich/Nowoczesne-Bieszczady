@@ -113,7 +113,7 @@ function resetFilters() {
           <span class="filter-divider" />
 
           <div class="filter filter-range">
-            <span class="filter-label">Maks. długość <strong>{{ maxLength }} km</strong></span>
+            <label class="filter-label" for="length">Maks. długość <strong>{{ maxLength }} km</strong></label>
             <input id="length" v-model.number="maxLength" type="range" :min="sliderMin" :max="sliderMax" step="2" :style="sliderStyle" />
           </div>
 

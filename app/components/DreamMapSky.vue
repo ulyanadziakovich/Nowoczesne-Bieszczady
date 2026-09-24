@@ -107,6 +107,7 @@ function clampX(x: number) {
 // (clamped so it also can't poke out above the hero's top edge).
 async function onStarHoverEnter(id: number, evt: MouseEvent) {
   if (!isHoverCapable.value) return
+  cancelScheduledClose()
   openStar(id)
   const starRect = (evt.currentTarget as HTMLElement).getBoundingClientRect()
   const x = clampX(starRect.left + starRect.width / 2)
@@ -125,8 +126,34 @@ async function onStarHoverEnter(id: number, evt: MouseEvent) {
   }
 }
 
+// WCAG 1.4.13 (Content on Hover or Focus) requires hover-revealed content
+// to stay open if the pointer moves onto it — closing the instant the
+// star itself is left would fail that. A short delay bridges the gap
+// between the star and the popover so crossing it doesn't close things,
+// and hovering the popover itself (see onPopoverEnter/Leave) cancels the
+// close outright.
+let closeTimer: ReturnType<typeof setTimeout> | undefined
+
+function scheduleClose() {
+  if (!isHoverCapable.value) return
+  clearTimeout(closeTimer)
+  closeTimer = setTimeout(closeModal, 200)
+}
+
+function cancelScheduledClose() {
+  clearTimeout(closeTimer)
+}
+
 function onStarHoverLeave() {
-  if (isHoverCapable.value) closeModal()
+  scheduleClose()
+}
+
+function onPopoverEnter() {
+  cancelScheduledClose()
+}
+
+function onPopoverLeave() {
+  scheduleClose()
 }
 
 function onKeydown(e: KeyboardEvent) {
@@ -320,6 +347,8 @@ onUnmounted(() => {
         class="star-popover"
         :class="{ above: popoverPos.above }"
         :style="{ left: popoverPos.x + 'px', top: popoverPos.y + 'px' }"
+        @mouseenter="onPopoverEnter"
+        @mouseleave="onPopoverLeave"
       >
         <div class="modal-accent-bar" :style="{ background: CATEGORY_COLORS[selected.category] }" />
         <div class="popover-body">
@@ -829,7 +858,7 @@ h2 {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #6b7a94;
+  color: #8b98b0;
   margin: 0.9rem 0 0.3rem;
 }
 
@@ -870,7 +899,11 @@ h2 {
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  pointer-events: none;
+  /* Auto, not none: WCAG 1.4.13 requires hover-revealed content to stay
+     open if the pointer moves onto it — it's anchored clear of the star
+     itself (never overlapping it), so this can't reintroduce the old
+     self-stealing-hover bug that pointer-events:none was fixing before. */
+  pointer-events: auto;
   animation: popover-in 0.15s ease-out;
   /* Teleported to <body>, so it no longer sits inside .sky and can't
      inherit its color: #f0ead6 — without this the title (which has no
@@ -952,7 +985,7 @@ h2 {
 
 .info-credit {
   font-size: 0.75rem;
-  color: #6b7a94;
+  color: #8b98b0;
   margin-top: 0.9rem;
   padding-top: 0.9rem;
   border-top: 1px solid rgba(255, 255, 255, 0.06);

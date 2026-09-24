@@ -16,7 +16,7 @@
   --alpine: #135e24;
   --green: #23ab41;
   --leaf: #89be3a;
-  --amber: #c9672e;
+  --amber: #a8551f;
   --stone: #f3f1ea;
   --mist: #eff2ef;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -113,7 +113,7 @@ body {
 }
 
 .btn-amber:hover {
-  background: #a8551f;
+  background: #8f4a1c;
 }
 
 .btn-ink {
