@@ -370,9 +370,9 @@ onUnmounted(() => {
     <div class="filter-strip-inner">
       <button
         type="button"
-        class="filter-btn"
+        class="filter-btn filter-btn-all"
         :class="{ active: activeFilter === 'all' }"
-        style="--cat-color: #ffd89b; border-color: rgba(255, 255, 255, 0.25); color: #f0ead6"
+        :style="{ '--cat-color': '#ffd89b', borderColor: 'rgba(255, 255, 255, 0.25)', color: '#f0ead6' }"
         @click="activeFilter = 'all'"
       >
         <span class="dot" style="background: #f0ead6" />Wszystkie
@@ -719,6 +719,18 @@ h2 {
 }
 
 .filter-btn.active .dot {
+  background: #060a14 !important;
+}
+
+/* Hardcoded (no custom-property indirection) so "Wszystkie" — active by
+   default on page load — is guaranteed readable from the very first
+   paint, instead of depending on --cat-color/var() resolving in time. */
+.filter-btn-all.active {
+  background: #ffd89b !important;
+  color: #060a14 !important;
+}
+
+.filter-btn-all.active .dot {
   background: #060a14 !important;
 }
 
