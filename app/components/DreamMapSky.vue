@@ -872,6 +872,12 @@ h2 {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   pointer-events: none;
   animation: popover-in 0.15s ease-out;
+  /* Teleported to <body>, so it no longer sits inside .sky and can't
+     inherit its color: #f0ead6 — without this the title (which has no
+     color of its own) falls back to the page's dark body text color and
+     goes near-invisible on this dark card. */
+  color: #f0ead6;
+  font-family: var(--font-body);
 }
 
 .star-popover.above {
