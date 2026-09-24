@@ -20,7 +20,6 @@ const tiles = computed(() => data.value?.records ?? [])
 .tiles {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  align-items: start;
   gap: 2rem;
   max-width: 1200px;
   margin: -4rem auto 4rem;
@@ -31,6 +30,7 @@ const tiles = computed(() => data.value?.records ?? [])
 @media (max-width: 900px) {
   .tiles {
     display: flex;
+    align-items: start;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
