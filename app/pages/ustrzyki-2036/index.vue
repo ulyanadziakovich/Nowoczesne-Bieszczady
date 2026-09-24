@@ -31,6 +31,10 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
           <h2 class="section-title">Skąd wzięła się ta mapa</h2>
         </div>
 
+        <div v-if="aboutImageUrl" class="about-image-wrap">
+          <img :src="aboutImageUrl" alt="Warsztat „Ustrzyki 2036” — mieszkańcy pracują nad mapą przyszłości miasta" class="about-image" />
+        </div>
+
         <div class="about">
           <div class="about-text">
             <p class="lead">
@@ -61,10 +65,6 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
               NOWEFIO na lata 2021–2030, za pośrednictwem Stowarzyszenia „Pro Carpathia”.
             </p>
           </div>
-
-          <div v-if="aboutImageUrl" class="about-image-wrap">
-            <img :src="aboutImageUrl" alt="Warsztat „Ustrzyki 2036” — mieszkańcy pracują nad mapą przyszłości miasta" class="about-image" />
-          </div>
         </div>
       </div>
     </section>
@@ -87,16 +87,8 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
 }
 
 .about {
-  display: flex;
-  align-items: center;
-  gap: 3.5rem;
-  max-width: 1100px;
+  max-width: 760px;
   margin: 0 auto;
-}
-
-.about-text {
-  flex: 1.15;
-  min-width: 0;
 }
 
 .about-text p {
@@ -107,7 +99,8 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
 }
 
 .about-image-wrap {
-  flex: 1;
+  max-width: 900px;
+  margin: 0 auto 3rem;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 24px 48px rgba(26, 36, 32, 0.16);
@@ -120,14 +113,8 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
 }
 
 @media (max-width: 900px) {
-  .about {
-    flex-direction: column;
-    gap: 2rem;
-  }
-
   .about-image-wrap {
-    order: -1;
-    width: 100%;
+    margin-bottom: 2rem;
   }
 }
 
