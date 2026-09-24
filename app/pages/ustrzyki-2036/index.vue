@@ -108,8 +108,6 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
 
 .about-image-wrap {
   flex: 1;
-  align-self: stretch;
-  min-height: 420px;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 24px 48px rgba(26, 36, 32, 0.16);
@@ -117,8 +115,7 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
 
 .about-image {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
   display: block;
 }
 
@@ -131,7 +128,6 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
   .about-image-wrap {
     order: -1;
     width: 100%;
-    min-height: 260px;
   }
 }
 
