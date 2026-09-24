@@ -133,4 +133,31 @@ h3 {
 .tile:hover .tile-cta svg {
   transform: translateX(3px);
 }
+
+/* Desktop only — noticeably smaller cards, matching the old flip-tile's
+   compact footprint, with room left below the row before the next
+   section instead of the cards themselves filling the space. */
+@media (min-width: 901px) {
+  .image-wrap {
+    height: 140px;
+  }
+
+  .body {
+    padding: 1.1rem 1.25rem 1.25rem;
+    gap: 0.6rem;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+  }
+
+  .teaser {
+    font-size: 0.83rem;
+  }
+
+  .tile-cta {
+    padding: 0.55rem 1.1rem;
+    font-size: 0.78rem;
+  }
+}
 </style>

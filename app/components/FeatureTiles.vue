@@ -22,7 +22,7 @@ const tiles = computed(() => data.value?.records ?? [])
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   max-width: 1200px;
-  margin: -4rem auto 4rem;
+  margin: -4rem auto 6rem;
   padding: 0 1.5rem;
   position: relative;
 }
