@@ -17,6 +17,9 @@ const cultureStats = computed(() => [
   ...content.pairs('kultura-stats'),
   { label: 'Konkursy cykliczne', value: String(contests.value.length) },
 ])
+
+const announcementText =
+  'Z dumą zapraszamy na Festiwal „Granie Bez Granic” — nowe wydarzenie, którego jesteśmy organizatorem. Połączenie koncertów, astronomii i ekologii, w sercu Ustrzyk Dolnych, tam gdzie niebo naprawdę jest ciemne.'
 </script>
 
 <template>
@@ -61,6 +64,22 @@ const cultureStats = computed(() => [
               <span class="link">Zobacz opis i galerię →</span>
             </div>
           </NuxtLink>
+
+          <!-- Not an edition — a standalone announcement for the upcoming
+               festival, shown alongside them in the same grid/card style. -->
+          <article class="edition-card card-surface announcement-card">
+            <div class="edition-image-wrap announcement-image-wrap">
+              <img
+                :src="resolveCmsUrl('/uploads/festival-editions/granie-bez-granic-2026-zapowiedz.jpg')"
+                alt="Zapowiedź: Festiwal Granie Bez Granic, 12–13 lipca, Bieszczadzkie Centrum Dziedzictwa Kulturowego „Fanto”"
+                class="announcement-image"
+              />
+              <span class="featured-badge">Zapowiedź</span>
+            </div>
+            <div class="edition-body">
+              <p class="announcement-text">{{ announcementText }}</p>
+            </div>
+          </article>
         </div>
 
         <div class="note-card">
@@ -175,7 +194,7 @@ const cultureStats = computed(() => [
 .contest-image-wrap img {
   width: 100%;
   height: 320px;
-  object-fit: contain;
+  object-fit: cover;
   display: block;
   transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -229,14 +248,52 @@ const cultureStats = computed(() => [
   color: #5a6a62;
   font-size: 0.88rem;
   line-height: 1.5;
+  /* Card teaser only — descriptions can run much longer now that the
+     same field also fills the full detail-page article body (edition
+     cards) or is a long-form announcement (this card), so the card
+     itself always stays compact regardless of length. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
+.edition-body p.funding-note,
 .contest-body p.funding-note {
   color: #8a938c;
   font-size: 0.76rem;
   line-height: 1.5;
   padding-top: 0.25rem;
   border-top: 1px solid #eee9dd;
+}
+
+/* Preserves the line breaks from the original announcement text instead
+   of collapsing it into one dense block. */
+.announcement-text {
+  white-space: pre-line;
+}
+
+/* Not a link — no lift/shadow hover or pointer cursor, that would imply
+   it's clickable. */
+.announcement-card {
+  cursor: default;
+}
+
+.announcement-card:hover {
+  transform: none;
+  box-shadow: inherit;
+}
+
+/* The banner has its own baked-in text/logo — cropping any of it off
+   would break the design, so it's shown whole instead of filling a
+   fixed-height box. */
+.announcement-image-wrap {
+  background: #060a14;
+}
+
+.announcement-image {
+  height: auto !important;
+  object-fit: contain !important;
 }
 
 .link {

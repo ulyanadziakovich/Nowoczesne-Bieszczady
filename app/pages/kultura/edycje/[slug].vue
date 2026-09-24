@@ -22,9 +22,7 @@ const gallery = computed(() => (edition.value?.gallery || '').split('\n').map((s
       <div class="container article">
         <p class="lead paragraph">{{ edition.description }}</p>
 
-        <div v-if="gallery.length" class="gallery">
-          <img v-for="(img, i) in gallery" :key="i" :src="resolveCmsUrl(img)" :alt="`${edition.title} — zdjęcie ${i + 1}`" />
-        </div>
+        <GalleryLightbox :images="gallery" :alt-prefix="edition.title" />
 
         <NuxtLink to="/kultura" class="back-link">← Wróć do Kultury</NuxtLink>
       </div>
@@ -39,26 +37,7 @@ const gallery = computed(() => (edition.value?.gallery || '').split('\n').map((s
 
 .paragraph {
   margin: 0 0 2rem;
-}
-
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.gallery img {
-  width: 100%;
-  border-radius: 16px;
-  box-shadow: 0 16px 36px rgba(26, 36, 32, 0.1);
-  display: block;
-}
-
-@media (max-width: 700px) {
-  .gallery {
-    grid-template-columns: 1fr;
-  }
+  white-space: pre-line;
 }
 
 .back-link {

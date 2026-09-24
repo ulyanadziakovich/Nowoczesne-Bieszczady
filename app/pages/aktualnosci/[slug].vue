@@ -10,6 +10,7 @@ if (!post.value) {
 useHead({ title: `${post.value.title} — Aktualności — Nowoczesne Bieszczady` })
 
 const bodyParagraphs = computed(() => (post.value?.body || '').split(/\n\s*\n/).filter(Boolean))
+const gallery = computed(() => (post.value?.gallery || '').split('\n').map((s) => s.trim()).filter(Boolean))
 </script>
 
 <template>
@@ -20,6 +21,8 @@ const bodyParagraphs = computed(() => (post.value?.body || '').split(/\n\s*\n/).
       <div class="container article-layout">
         <div class="article">
           <p v-for="(paragraph, i) in bodyParagraphs" :key="i" class="lead paragraph">{{ paragraph }}</p>
+
+          <GalleryLightbox :images="gallery" :alt-prefix="post.title" />
 
           <NuxtLink to="/aktualnosci" class="back-link">← Wróć do aktualności</NuxtLink>
         </div>

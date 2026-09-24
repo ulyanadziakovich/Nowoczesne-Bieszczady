@@ -12,59 +12,69 @@ const content = usePageContent()
     <h2>Zarząd i Zespół</h2>
     <p>{{ content.body('zarzad-intro') }}</p>
 
-    <div class="team">
-      <div v-for="member in teamMembers" :key="member.id" class="member-card card-surface">
-        <div class="avatar">{{ member.name.charAt(0) }}</div>
-        <h3>{{ member.name }}</h3>
-        <p>{{ member.role }}</p>
-      </div>
-    </div>
+    <ul class="team">
+      <li v-for="member in teamMembers" :key="member.id" class="member-row">
+        <svg class="avatar" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
+        </svg>
+        <span class="name">{{ member.name }}</span>
+        <span class="role">{{ member.role }}</span>
+      </li>
+    </ul>
   </div>
 </template>
 
 <style scoped>
 .team {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-  margin-top: 1.5rem;
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  max-width: 560px;
 }
 
-.member-card {
-  padding: 1.75rem;
-  text-align: center;
+.member-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid #eee9dd;
+}
+
+.member-row:first-child {
+  border-top: 1px solid #eee9dd;
 }
 
 .avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--alpine);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin: 0 auto 1rem;
+  flex-shrink: 0;
+  color: var(--alpine);
 }
 
-.member-card h3 {
-  margin: 0 0 0.35rem;
-  font-size: 1rem;
-  font-weight: 800;
+.name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ink);
 }
 
-.member-card p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #5a6a62;
+.role {
+  margin-left: auto;
+  padding-left: 1rem;
+  font-size: 0.82rem;
+  color: #8a978f;
+  text-align: right;
+  white-space: nowrap;
 }
 
-@media (max-width: 600px) {
-  .team {
-    grid-template-columns: 1fr;
+@media (max-width: 480px) {
+  .member-row {
+    flex-wrap: wrap;
+  }
+
+  .role {
+    margin-left: calc(18px + 0.75rem);
+    padding-left: 0;
+    text-align: left;
+    flex-basis: 100%;
   }
 }
 </style>

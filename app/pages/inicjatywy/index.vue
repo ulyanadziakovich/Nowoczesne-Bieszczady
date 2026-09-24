@@ -24,13 +24,13 @@ const content = usePageContent()
           <h2 class="section-title">{{ content.title('inicjatywy-eterze') }}</h2>
           <p v-for="(paragraph, i) in content.paragraphs('inicjatywy-eterze')" :key="i" class="lead paragraph">{{ paragraph }}</p>
         </div>
-        <img :src="content.image('inicjatywy-eterze', '/images/hero.avif')" alt="Bieszczady w eterze" class="side-image" />
+        <img :src="resolveCmsUrl(content.image('inicjatywy-eterze'))" alt="Bieszczady w eterze" class="side-image" />
       </div>
     </section>
 
     <section class="section section-alt">
       <div class="container two-col reverse">
-        <img :src="content.image('inicjatywy-burza', '/images/bieszczady.avif')" alt="Bieszczadzka Burza Mózgów" class="side-image" />
+        <img :src="resolveCmsUrl(content.image('inicjatywy-burza'))" alt="Bieszczadzka Burza Mózgów" class="side-image" />
         <div>
           <span class="kicker">Debaty społeczne</span>
           <h2 class="section-title">{{ content.title('inicjatywy-burza') }}</h2>

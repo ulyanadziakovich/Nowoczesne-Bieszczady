@@ -33,6 +33,7 @@ export interface NewsPost {
   image: CmsImage | null
   excerpt: string
   body?: string
+  gallery?: string
 }
 
 export interface EventItem {
