@@ -29,6 +29,23 @@ defineProps<{ point: DreamMapPoint }>()
   flex-direction: column;
 }
 
+/* Flashed when this card is reached by clicking its star on the sky map
+   above (desktop only) — fades out on its own after a couple seconds. */
+.card.highlighted {
+  outline: 3px solid var(--amber);
+  outline-offset: 3px;
+  animation: card-flash 2.4s ease-out;
+}
+
+@keyframes card-flash {
+  from {
+    outline-color: var(--amber);
+  }
+  to {
+    outline-color: transparent;
+  }
+}
+
 .card-pill {
   display: inline-flex;
   align-self: flex-start;

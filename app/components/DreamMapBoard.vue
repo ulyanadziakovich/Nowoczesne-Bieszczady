@@ -2,7 +2,7 @@
 import { CATEGORY_COLORS, CATEGORY_NAMES, type DreamMapCategory } from '~/utils/dreamMapData'
 import { useDreamMapPoints } from '~/composables/useDreamMapPoints'
 
-const { points } = useDreamMapPoints()
+const { points, highlightedId } = useDreamMapPoints()
 
 const CATEGORIES = Object.keys(CATEGORY_NAMES) as DreamMapCategory[]
 const activeFilter = ref<'all' | DreamMapCategory>('all')
@@ -10,6 +10,21 @@ const activeFilter = ref<'all' | DreamMapCategory>('all')
 const filtered = computed(() =>
   activeFilter.value === 'all' ? points.value : points.value.filter((p) => p.category === activeFilter.value),
 )
+
+// Set when a star is clicked on the sky map above (desktop only — see
+// DreamMapSky.vue's onStarClick). Show every category so the card is
+// guaranteed to actually be in the grid, then scroll to and flash it.
+let unhighlightTimer: ReturnType<typeof setTimeout> | undefined
+watch(highlightedId, async (id) => {
+  if (id == null) return
+  activeFilter.value = 'all'
+  await nextTick()
+  document.getElementById(`postulat-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  clearTimeout(unhighlightTimer)
+  unhighlightTimer = setTimeout(() => {
+    if (highlightedId.value === id) highlightedId.value = null
+  }, 2600)
+})
 
 /** Same 18 postulates, grouped by category — used for the mobile layout,
  * where each category is its own sideways-scrolling row instead of one
@@ -65,7 +80,13 @@ const grouped = computed(() =>
         </nav>
 
         <div class="grid-3 board">
-          <DreamMapCard v-for="p in filtered" :key="p.id" :point="p" />
+          <DreamMapCard
+            v-for="p in filtered"
+            :id="`postulat-${p.id}`"
+            :key="p.id"
+            :point="p"
+            :class="{ highlighted: highlightedId === p.id }"
+          />
         </div>
       </div>
 

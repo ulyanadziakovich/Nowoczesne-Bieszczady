@@ -9,7 +9,7 @@ import {
 } from '~/utils/dreamMapData'
 import { useDreamMapPoints } from '~/composables/useDreamMapPoints'
 
-const { points } = useDreamMapPoints()
+const { points, highlightedId } = useDreamMapPoints()
 
 const { data: settings } = await useCmsSingle<{ heroImage?: CmsImage | null }>('dream-map-settings')
 const heroBackgroundImage = computed(
@@ -70,6 +70,20 @@ function openStar(id: number) {
 
 function closeModal() {
   selectedId.value = null
+}
+
+// Desktop: hovering already shows the info popover, so a click does
+// something else useful instead of re-opening the same thing — it jumps
+// down to that postulate's card in the full list below (DreamMapBoard.vue
+// picks up highlightedId and scrolls/highlights it). Touch has no hover,
+// so tapping there still opens the full modal as before.
+function onStarClick(id: number) {
+  if (isHoverCapable.value) {
+    closeModal()
+    highlightedId.value = id
+  } else {
+    openStar(id)
+  }
 }
 
 // Desktop/trackpad: show the star's info on hover, hide it when the mouse
@@ -268,7 +282,7 @@ onUnmounted(() => {
             animationDelay: (p.id % 7) * 0.35 + 's',
           }"
           :aria-label="`${p.title}, ${CATEGORY_NAMES[p.category]}`"
-          @click="openStar(p.id)"
+          @click="onStarClick(p.id)"
           @mouseenter="onStarHoverEnter(p.id, $event)"
           @mouseleave="onStarHoverLeave"
         >
