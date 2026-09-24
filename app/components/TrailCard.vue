@@ -8,7 +8,7 @@ const bikeTypes = computed(() => trailBikeTypes(props.trail))
 <template>
   <NuxtLink :to="`/szlaki/${trail.slug}`" class="trail-card">
     <div class="image-wrap">
-      <img :src="trail.image" :alt="trail.title" />
+      <img :src="resolveCmsUrl(trail.image?.src)" :alt="trail.title" />
       <span class="badge-pill"><i :class="dotClass" />{{ difficultyLabels[trail.difficulty] }}</span>
     </div>
 

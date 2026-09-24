@@ -29,7 +29,7 @@ export interface Trail {
   surfaceAsfalt: number
   surfaceSzuter: number
   surfaceTeren: number
-  image: string
+  image: CmsImage | null
   teaser: string
   description?: string
   highlights?: string
@@ -37,6 +37,8 @@ export interface Trail {
   safety?: string
   gallery?: string
   gpxAvailable: boolean
+  routeMapImage?: CmsImage | null
+  elevationProfileImage?: CmsImage | null
 }
 
 export function trailBikeTypes(trail: Pick<Trail, 'bikeTypes'>): TrailBikeType[] {

@@ -1,6 +1,7 @@
 // Shared TypeScript shapes for records coming from the Pruvious CMS.
 
 export interface HomeContent {
+  heroImage?: CmsImage | null
   heroKicker?: string
   heroTitle: string
   heroSubtitle: string
@@ -11,10 +12,11 @@ export interface HomeContent {
   aboutParagraph1: string
   aboutParagraph2: string
   aboutTagline?: string
-  aboutImage?: string
+  aboutImage?: CmsImage | null
 }
 
 export interface SiteSettings {
+  logo?: CmsImage | null
   email: string
   phone: string
   address: string
@@ -28,7 +30,7 @@ export interface NewsPost {
   title: string
   date: string
   category: string
-  image: string
+  image: CmsImage | null
   excerpt: string
   body?: string
 }
@@ -39,7 +41,7 @@ export interface EventItem {
   date: string
   time: string
   place: string
-  image: string
+  image: CmsImage | null
   freeEntry: boolean
   ticketsHref?: string
   tag?: string
@@ -55,7 +57,7 @@ export interface TeamMember {
 export interface Partner {
   id: number
   name: string
-  logo?: string
+  logo?: CmsImage | null
   order?: number
 }
 
@@ -88,7 +90,7 @@ export interface FestivalEdition {
   year: string
   title: string
   description: string
-  image: string
+  image: CmsImage | null
   gallery: string
   featured: boolean
 }
@@ -98,7 +100,7 @@ export interface Contest {
   title: string
   description: string
   fundingNote: string
-  image: string
+  image: CmsImage | null
 }
 
 export interface FlagshipTile {
@@ -106,7 +108,7 @@ export interface FlagshipTile {
   title: string
   description: string
   back: string
-  image: string
+  image: CmsImage | null
   moreHref: string
   order?: number
 }

@@ -75,7 +75,7 @@ const heroStats = computed(() => [`${peaks.value.length} szczytów w pętli`, ..
           <EventCard
             v-for="event in sportEvents"
             :key="event.id"
-            :image="event.image"
+            :image="resolveCmsUrl(event.image?.src)"
             :title="event.title"
             :date="event.date"
             :time="event.time"

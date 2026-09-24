@@ -8,7 +8,7 @@ const tiles = computed(() => data.value?.records ?? [])
     <FeatureTile
       v-for="tile in tiles"
       :key="tile.id"
-      :image="tile.image"
+      :image="resolveCmsUrl(tile.image?.src)"
       :title="tile.title"
       :description="tile.description"
       :back="tile.back"
@@ -38,6 +38,12 @@ const tiles = computed(() => data.value?.records ?? [])
     margin: -3rem 0 1.5rem;
     padding: 0;
     scroll-padding-left: 1.25rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .tiles::-webkit-scrollbar {
+    display: none;
   }
 
   .tiles :deep(.tile) {

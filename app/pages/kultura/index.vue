@@ -51,7 +51,7 @@ const cultureStats = computed(() => [
         <div class="grid-3">
           <NuxtLink v-for="edition in festivalEditions" :key="edition.id" :to="`/kultura/edycje/${edition.slug}`" class="edition-card card-surface">
             <div class="edition-image-wrap">
-              <img :src="edition.image" :alt="edition.title" />
+              <img :src="resolveCmsUrl(edition.image?.src)" :alt="edition.title" />
               <span v-if="edition.featured" class="featured-badge">Najnowsza</span>
             </div>
             <div class="edition-body">
@@ -89,7 +89,7 @@ const cultureStats = computed(() => [
         <div class="grid-2">
           <div v-for="contest in contests" :key="contest.id" class="contest-card card-surface">
             <div class="contest-image-wrap">
-              <img :src="contest.image" :alt="contest.title" />
+              <img :src="resolveCmsUrl(contest.image?.src)" :alt="contest.title" />
             </div>
             <div class="contest-body">
               <h3>{{ contest.title }}</h3>

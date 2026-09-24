@@ -17,7 +17,7 @@ const events = computed(() => (data.value?.records ?? []).filter((e) => e.tag !=
       <EventCard
         v-for="event in events"
         :key="event.id"
-        :image="event.image"
+        :image="resolveCmsUrl(event.image?.src)"
         :title="event.title"
         :date="event.date"
         :time="event.time"

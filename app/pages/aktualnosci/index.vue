@@ -21,7 +21,7 @@ const content = usePageContent()
       <div class="container">
         <div class="grid-3">
           <NuxtLink v-for="post in newsPosts" :key="post.slug" :to="`/aktualnosci/${post.slug}`" class="post-card card-surface">
-            <img :src="post.image" :alt="post.title" />
+            <img :src="resolveCmsUrl(post.image?.src)" :alt="post.title" />
             <div class="body">
               <span class="meta">{{ post.date }} · {{ post.category }}</span>
               <h3>{{ post.title }}</h3>

@@ -9,7 +9,6 @@ withDefaults(
     ctaHref?: string
   }>(),
   {
-    image: '/images/hero.avif',
     kicker: 'Ustrzyki Dolne · Bieszczady',
     title: 'NOWOCZESNE BIESZCZADY',
     subtitle: 'Tworzymy wydarzenia, konkursy i inicjatywy, które budują tożsamość regionu.',
@@ -136,10 +135,6 @@ p {
   }
 
   .kicker-row {
-    justify-content: flex-start;
-  }
-
-  .dash-line:last-child {
     display: none;
   }
 

@@ -23,7 +23,7 @@ const gallery = computed(() => (edition.value?.gallery || '').split('\n').map((s
         <p class="lead paragraph">{{ edition.description }}</p>
 
         <div v-if="gallery.length" class="gallery">
-          <img v-for="(img, i) in gallery" :key="i" :src="img" :alt="`${edition.title} — zdjęcie ${i + 1}`" />
+          <img v-for="(img, i) in gallery" :key="i" :src="resolveCmsUrl(img)" :alt="`${edition.title} — zdjęcie ${i + 1}`" />
         </div>
 
         <NuxtLink to="/kultura" class="back-link">← Wróć do Kultury</NuxtLink>

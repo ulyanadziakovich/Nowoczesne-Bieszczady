@@ -108,7 +108,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
           </div>
 
           <div v-if="gallery.length" class="gallery gallery-top">
-            <img v-for="(img, i) in gallery" :key="i" :src="img" :alt="`${trail.title} — zdjęcie ${i + 1}`" />
+            <img v-for="(img, i) in gallery" :key="i" :src="resolveCmsUrl(img)" :alt="`${trail.title} — zdjęcie ${i + 1}`" />
           </div>
 
           <h2 class="section-title small first">Podstawowe informacje</h2>
@@ -125,7 +125,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
 
           <h2 class="section-title small">Profil wysokościowy</h2>
           <div class="elevation card-surface">
-            <img v-if="trail.elevationProfileImage" :src="trail.elevationProfileImage" :alt="`Profil wysokościowy — ${trail.title}`" class="elevation-image" />
+            <img v-if="trail.elevationProfileImage" :src="resolveCmsUrl(trail.elevationProfileImage.src)" :alt="`Profil wysokościowy — ${trail.title}`" class="elevation-image" />
             <template v-else>
               <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="elevation-svg">
                 <polygon :points="elevationArea" fill="url(#elevGradient)" />
@@ -144,7 +144,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
           <template v-if="trail.routeMapImage">
             <h2 class="section-title small">Mapa przebiegu trasy</h2>
             <div class="route-map card-surface">
-              <img :src="trail.routeMapImage" :alt="`Mapa przebiegu trasy — ${trail.title}`" />
+              <img :src="resolveCmsUrl(trail.routeMapImage.src)" :alt="`Mapa przebiegu trasy — ${trail.title}`" />
             </div>
           </template>
 

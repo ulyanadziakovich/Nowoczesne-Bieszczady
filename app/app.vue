@@ -27,8 +27,13 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
+  overflow-x: hidden;
   font-family: var(--font-body);
   background: var(--mist);
   color: var(--ink);

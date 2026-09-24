@@ -14,7 +14,7 @@ const content = usePageContent()
 
     <div class="partners">
       <div v-for="partner in partners" :key="partner.id" class="partner-badge">
-        <img v-if="partner.logo" :src="partner.logo" :alt="partner.name" />
+        <img v-if="partner.logo" :src="resolveCmsUrl(partner.logo.src)" :alt="partner.name" />
         <span v-else>{{ partner.name }}</span>
       </div>
     </div>

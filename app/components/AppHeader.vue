@@ -22,6 +22,8 @@ const links = [
   { label: 'Kontakt', to: '/kontakt' },
 ]
 
+const { data: settings } = await useCmsSingle<SiteSettings>('site-settings')
+
 const menuOpen = ref(false)
 const openMobileGroup = ref<string | null>(null)
 const scrolled = useScrolled()
@@ -60,7 +62,7 @@ watch(menuOpen, (open) => {
 
     <div class="main-row">
       <NuxtLink to="/" class="logo-badge">
-        <img src="/images/logo-icon.png" alt="Nowoczesne Bieszczady" />
+        <img :src="resolveCmsUrl(settings?.logo?.src)" alt="Nowoczesne Bieszczady" />
       </NuxtLink>
 
       <div class="nav-group">
@@ -86,7 +88,7 @@ watch(menuOpen, (open) => {
         <div v-if="menuOpen" class="mobile-menu">
           <div class="mobile-menu-top">
             <NuxtLink to="/" class="logo-badge" @click="closeMenu">
-              <img src="/images/logo-icon.png" alt="Nowoczesne Bieszczady" />
+              <img :src="resolveCmsUrl(settings?.logo?.src)" alt="Nowoczesne Bieszczady" />
             </NuxtLink>
             <button class="close-btn" aria-label="Zamknij menu" @click="closeMenu">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -281,12 +283,13 @@ watch(menuOpen, (open) => {
   .main-row {
     display: flex;
     justify-content: space-between;
-    padding: 0.85rem 1.25rem;
+    align-items: center;
+    padding: 0.7rem 1.25rem;
     border-bottom: none;
   }
 
   .logo-badge img {
-    height: 28px;
+    height: 22px;
   }
 }
 

@@ -8,6 +8,7 @@ const { data: home } = await useCmsSingle<HomeContent>('home')
   <div>
     <HeroSection
       v-if="home"
+      :image="resolveCmsUrl(home.heroImage?.src)"
       :kicker="home.heroKicker"
       :title="home.heroTitle"
       :subtitle="home.heroSubtitle"
@@ -23,7 +24,7 @@ const { data: home } = await useCmsSingle<HomeContent>('home')
       :paragraph1="home.aboutParagraph1"
       :paragraph2="home.aboutParagraph2"
       :tagline="home.aboutTagline"
-      :image="home.aboutImage"
+      :image="resolveCmsUrl(home.aboutImage?.src)"
     />
     <FeaturedEvents />
   </div>

@@ -24,7 +24,7 @@ const bodyParagraphs = computed(() => (post.value?.body || '').split(/\n\s*\n/).
           <NuxtLink to="/aktualnosci" class="back-link">← Wróć do aktualności</NuxtLink>
         </div>
 
-        <img v-if="post.image" :src="post.image" :alt="post.title" class="article-image" />
+        <img v-if="post.image" :src="resolveCmsUrl(post.image.src)" :alt="post.title" class="article-image" />
       </div>
     </section>
   </div>

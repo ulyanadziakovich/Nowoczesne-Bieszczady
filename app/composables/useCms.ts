@@ -12,6 +12,15 @@ export interface CmsListResponse<T> {
   total: number
 }
 
+/** A populated Pruvious `image` field — the file lives on the CMS, not this repo. */
+export interface CmsImage {
+  src: string
+  alt: string
+  width: number
+  height: number
+  type: string
+}
+
 interface CmsCollectionOptions {
   limit?: number
   order?: string
@@ -21,13 +30,28 @@ interface CmsCollectionOptions {
 export function useCmsCollection<T = Record<string, any>>(name: string, opts: CmsCollectionOptions = {}) {
   return useFetch<CmsListResponse<T>>(`/api/cms/collections/${name}`, {
     key: `cms-${name}`,
-    query: { limit: opts.limit ?? 100, ...(opts.order ? { order: opts.order } : {}) },
+    query: { limit: opts.limit ?? 100, populate: true, ...(opts.order ? { order: opts.order } : {}) },
   })
 }
 
 /** Fetch a single-entry (singleton) collection (e.g. "home", "site-settings"). */
 export function useCmsSingle<T = Record<string, any>>(name: string) {
-  return useFetch<T>(`/api/cms/collections/${name}`, { key: `cms-${name}` })
+  return useFetch<T>(`/api/cms/collections/${name}`, { key: `cms-${name}`, query: { populate: true } })
+}
+
+/**
+ * Image fields and multi-line "gallery" text fields both store paths
+ * relative to the CMS's own domain (e.g. "/uploads/news/photo.jpg") — this
+ * turns one into a URL the browser can actually load, wherever the CMS is
+ * deployed.
+ */
+export function resolveCmsUrl(path: string | undefined | null) {
+  // Undefined (not '') on empty input, so it composes with a component prop's
+  // own `default` — passing '' would count as "provided" and skip it.
+  if (!path) return undefined
+  if (/^https?:\/\//.test(path)) return path
+  const config = useRuntimeConfig()
+  return `${config.public.cmsUrl}${path}`
 }
 
 export interface PageContentBlock {

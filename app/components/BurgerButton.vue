@@ -15,23 +15,17 @@ defineEmits<{ toggle: [] }>()
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 4px;
-  width: 34px;
-  height: 34px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 50%;
+  gap: 3px;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
   padding: 0;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.burger:hover {
-  background: rgba(255, 255, 255, 0.14);
 }
 
 .burger span {
-  width: 14px;
+  width: 18px;
 }
 
 .burger span {
@@ -44,7 +38,7 @@ defineEmits<{ toggle: [] }>()
 }
 
 .burger.open span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
+  transform: translateY(5px) rotate(45deg);
 }
 
 .burger.open span:nth-child(2) {
@@ -52,7 +46,7 @@ defineEmits<{ toggle: [] }>()
 }
 
 .burger.open span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
+  transform: translateY(-5px) rotate(-45deg);
 }
 
 @media (max-width: 800px) {

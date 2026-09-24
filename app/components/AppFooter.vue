@@ -20,7 +20,7 @@ const documents = computed(() => documentsData.value?.records ?? [])
     <div class="top">
       <div class="brand">
         <NuxtLink to="/" class="logo-badge">
-          <img src="/images/logo-icon.png" alt="Nowoczesne Bieszczady" />
+          <img :src="resolveCmsUrl(settings?.logo?.src)" alt="Nowoczesne Bieszczady" />
         </NuxtLink>
         <div>
           <p class="name">NOWOCZESNE BIESZCZADY</p>
