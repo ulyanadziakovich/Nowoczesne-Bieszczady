@@ -4,6 +4,7 @@ import {
   CATEGORY_CONSTELLATIONS,
   CATEGORY_LINES,
   CATEGORY_NAMES,
+  CATEGORY_TAIL,
   type DreamMapCategory,
 } from '~/utils/dreamMapData'
 import { useDreamMapPoints } from '~/composables/useDreamMapPoints'
@@ -21,11 +22,11 @@ const heroBackgroundImage = computed(
 const CATEGORIES = Object.keys(CATEGORY_NAMES) as DreamMapCategory[]
 
 const CONST_LABEL_POS: Record<DreamMapCategory, { x: number; y: number }> = {
-  turystyka: { x: 60, y: 20 },
-  ekologia: { x: 66, y: 30 },
-  infrastruktura: { x: 14, y: 24 },
-  seniorzy: { x: 47, y: 40 },
-  mlodziez: { x: 22, y: 58 },
+  turystyka: { x: 80, y: 18 },
+  ekologia: { x: 40, y: 44 },
+  infrastruktura: { x: 4, y: 50 },
+  seniorzy: { x: 14, y: 66 },
+  mlodziez: { x: 38, y: 2 },
 }
 
 const STAR_RADIUS = 9
@@ -39,14 +40,23 @@ function isDimmed(cat: DreamMapCategory) {
 }
 
 const lines = computed(() => {
-  const segments: { x1: number; y1: number; x2: number; y2: number; color: string; cat: DreamMapCategory }[] = []
+  const segments: { x1: number; y1: number; x2: number; y2: number; color: string; cat: DreamMapCategory; tail?: boolean }[] = []
   for (const cat of CATEGORIES) {
-    const ids = CATEGORY_LINES[cat]
-    for (let i = 0; i < ids.length - 1; i++) {
-      const a = points.value.find((p) => p.id === ids[i])
-      const b = points.value.find((p) => p.id === ids[i + 1])
+    // Each category's shape is a fixed list of edges (star-id pairs) —
+    // not "connect them in order" — so it can trace an actual figure
+    // (a dipper's bowl-and-handle, a cross, a diamond...) rather than a
+    // generic zig-zag or polygon.
+    for (const [fromId, toId] of CATEGORY_LINES[cat]) {
+      const a = points.value.find((p) => p.id === fromId)
+      const b = points.value.find((p) => p.id === toId)
       if (!a || !b) continue
       segments.push({ x1: a.px, y1: a.py, x2: b.px, y2: b.py, color: CATEGORY_COLORS[cat], cat })
+    }
+    // Decorative tail flourish, like real constellation drawings have.
+    const tail = CATEGORY_TAIL[cat]
+    const tailFrom = points.value.find((p) => p.id === tail.fromId)
+    if (tailFrom) {
+      segments.push({ x1: tailFrom.px, y1: tailFrom.py, x2: tail.x, y2: tail.y, color: CATEGORY_COLORS[cat], cat, tail: true })
     }
   }
   return segments
@@ -60,6 +70,49 @@ function openStar(id: number) {
 
 function closeModal() {
   selectedId.value = null
+}
+
+// Desktop/trackpad: show the star's info on hover, hide it when the mouse
+// leaves — no click needed. Touch devices (phone/tablet) have no real
+// "hover", so they keep the tap-to-open/tap-to-close behavior untouched.
+const isHoverCapable = ref(false)
+const popoverPos = ref<{ x: number; y: number; above: boolean } | null>(null)
+const skyEl = ref<HTMLElement | null>(null)
+const popoverEl = ref<HTMLElement | null>(null)
+const POPOVER_HALF_WIDTH = 170 // half of .star-popover's width + a little breathing room
+
+function clampX(x: number) {
+  return Math.min(Math.max(x, POPOVER_HALF_WIDTH + 8), window.innerWidth - POPOVER_HALF_WIDTH - 8)
+}
+
+// Everything must stay inside the hero section — never spill into the
+// section below and never get clipped. We place it below the star first
+// (best guess before it exists in the DOM), then once it's actually
+// rendered we know its real height and can tell whether it still fits
+// above the hero's own bottom edge; if not, flip it above the star instead
+// (clamped so it also can't poke out above the hero's top edge).
+async function onStarHoverEnter(id: number, evt: MouseEvent) {
+  if (!isHoverCapable.value) return
+  openStar(id)
+  const starRect = (evt.currentTarget as HTMLElement).getBoundingClientRect()
+  const x = clampX(starRect.left + starRect.width / 2)
+  popoverPos.value = { x, y: starRect.bottom + 12, above: false }
+
+  await nextTick()
+  const heroRect = skyEl.value?.getBoundingClientRect()
+  if (!heroRect) return
+  const popH = popoverEl.value?.offsetHeight ?? 300
+
+  if (starRect.bottom + 12 + popH <= heroRect.bottom - 8) {
+    popoverPos.value = { x, y: starRect.bottom + 12, above: false }
+  } else {
+    const y = Math.max(starRect.top - 12, heroRect.top + popH + 8)
+    popoverPos.value = { x, y, above: true }
+  }
+}
+
+function onStarHoverLeave() {
+  if (isHoverCapable.value) closeModal()
 }
 
 function onKeydown(e: KeyboardEvent) {
@@ -137,6 +190,7 @@ function scheduleShoot() {
 
 onMounted(() => {
   reducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  isHoverCapable.value = window.matchMedia('(hover: hover) and (pointer: fine)').matches
   document.addEventListener('keydown', onKeydown)
 
   const canvas = canvasEl.value
@@ -162,6 +216,7 @@ onUnmounted(() => {
 <template>
   <div class="hero-block">
   <section
+    ref="skyEl"
     class="sky"
     aria-label="Cyfrowa Mapa Marzeń — interaktywna mapa postulatów mieszkańców"
     :style="{ backgroundImage: heroBackgroundImage }"
@@ -182,7 +237,7 @@ onUnmounted(() => {
           :x2="`${seg.x2}%`"
           :y2="`${seg.y2}%`"
           :style="{ color: seg.color }"
-          :class="{ highlight: activeFilter === seg.cat, dim: isDimmed(seg.cat) }"
+          :class="{ highlight: activeFilter === seg.cat, dim: isDimmed(seg.cat), tail: seg.tail }"
         />
       </svg>
 
@@ -214,6 +269,8 @@ onUnmounted(() => {
           }"
           :aria-label="`${p.title}, ${CATEGORY_NAMES[p.category]}`"
           @click="openStar(p.id)"
+          @mouseenter="onStarHoverEnter(p.id, $event)"
+          @mouseleave="onStarHoverLeave"
         >
           <span
             class="star-core"
@@ -225,6 +282,7 @@ onUnmounted(() => {
           <span class="star-label">{{ p.title }}</span>
         </button>
       </div>
+
     </div>
 
     <header class="sky-header">
@@ -235,8 +293,39 @@ onUnmounted(() => {
       </div>
     </header>
 
-    <!-- MODAL -->
-    <div class="modal-overlay" :class="{ visible: selected }" @click.self="closeModal">
+    <!-- Desktop hover preview: a compact card anchored to the star's real
+         on-screen position, teleported to <body> and fixed-positioned so
+         no ancestor's overflow:hidden can clip it — but always kept inside
+         the hero section's own bounds (flips above the star, clamped, if
+         it wouldn't otherwise fit — see onStarHoverEnter). Opens/closes
+         purely by hovering the star. -->
+    <Teleport to="body">
+      <div
+        v-if="isHoverCapable && selected && popoverPos"
+        ref="popoverEl"
+        class="star-popover"
+        :class="{ above: popoverPos.above }"
+        :style="{ left: popoverPos.x + 'px', top: popoverPos.y + 'px' }"
+      >
+        <div class="modal-accent-bar" :style="{ background: CATEGORY_COLORS[selected.category] }" />
+        <div class="popover-body">
+          <span
+            class="modal-cat-badge"
+            :style="{ background: CATEGORY_COLORS[selected.category] + '1a', color: CATEGORY_COLORS[selected.category] }"
+          >
+            {{ CATEGORY_NAMES[selected.category] }}
+          </span>
+          <h2>{{ selected.title }}</h2>
+          <p class="modal-label">Wyzwanie</p>
+          <p class="modal-text">{{ selected.challenge }}</p>
+          <p class="modal-label">Propozycja rozwiązania</p>
+          <p class="modal-text">{{ selected.solution }}</p>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- MODAL (touch only — desktop uses the hover popover above instead) -->
+    <div v-if="!isHoverCapable" class="modal-overlay" :class="{ visible: selected }" @click.self="closeModal">
       <div v-if="selected" class="modal-card">
         <div class="modal-accent-bar" :style="{ background: CATEGORY_COLORS[selected.category] }" />
         <button type="button" class="modal-close" aria-label="Zamknij" @click="closeModal">×</button>
@@ -386,6 +475,16 @@ h2 {
   opacity: 0.06;
 }
 
+.const-svg line.tail {
+  opacity: 0.3;
+  stroke-dasharray: 2 5;
+}
+
+.const-svg line.tail.highlight {
+  opacity: 0.55;
+  stroke-width: 1.2;
+}
+
 .const-labels {
   position: absolute;
   inset: 0;
@@ -464,15 +563,23 @@ h2 {
   }
 }
 
-.star:hover,
 .star:focus-visible {
   transform: scale(1.6);
   z-index: 6;
   outline: none;
+  box-shadow: 0 0 0 3px #ffd89b !important;
 }
 
-.star:focus-visible {
-  box-shadow: 0 0 0 3px #ffd89b !important;
+/* Hover-only visuals gated behind an actual hover-capable pointer — on
+   touch, matching :hover on a clickable element makes mobile Safari
+   consume the first tap just to satisfy :hover (showing the label) and
+   require a second tap to fire the real click that opens the modal. */
+@media (hover: hover) and (pointer: fine) {
+  .star:hover {
+    transform: scale(1.6);
+    z-index: 6;
+    outline: none;
+  }
 }
 
 .star.dimmed {
@@ -497,9 +604,14 @@ h2 {
   text-overflow: ellipsis;
 }
 
-.star:hover .star-label,
 .star:focus-visible .star-label {
   opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .star:hover .star-label {
+    opacity: 1;
+  }
 }
 
 .sky-header {
@@ -715,6 +827,49 @@ h2 {
   font-size: 1.1rem;
   cursor: pointer;
   line-height: 1;
+}
+
+/* Desktop hover dropdown — teleported to <body> and fixed-positioned at
+   the star's real on-screen coordinates (see popoverPos), so it's never
+   clipped by .sky's overflow:hidden and can freely overlap the section
+   below when a star sits near the bottom of the hero. */
+.star-popover {
+  position: fixed;
+  transform: translateX(-50%);
+  width: 320px;
+  max-width: calc(100vw - 48px);
+  z-index: 500;
+  background: linear-gradient(145deg, rgba(19, 32, 64, 0.98), rgba(12, 21, 39, 0.99));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  animation: popover-in 0.15s ease-out;
+}
+
+.star-popover.above {
+  transform: translate(-50%, -100%);
+}
+
+@keyframes popover-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.popover-body {
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.popover-body h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 0.6rem;
 }
 
 /* INFO */

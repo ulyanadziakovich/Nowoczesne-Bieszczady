@@ -10,8 +10,7 @@ const tiles = computed(() => data.value?.records ?? [])
       :key="tile.id"
       :image="resolveCmsUrl(tile.image?.src)"
       :title="tile.title"
-      :description="tile.description"
-      :back="tile.back"
+      :description="tile.back"
       :more-href="tile.moreHref"
     />
   </section>
@@ -21,6 +20,7 @@ const tiles = computed(() => data.value?.records ?? [])
 .tiles {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  align-items: start;
   gap: 2rem;
   max-width: 1200px;
   margin: -4rem auto 4rem;
@@ -35,7 +35,7 @@ const tiles = computed(() => data.value?.records ?? [])
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     gap: 1rem;
-    margin: -3rem 0 1.5rem;
+    margin: -8rem 0 1.5rem;
     padding: 0;
     scroll-padding-left: 1.25rem;
     scrollbar-width: none;

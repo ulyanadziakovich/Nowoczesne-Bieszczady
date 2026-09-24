@@ -127,8 +127,8 @@ p {
   }
 
   .content {
-    top: auto;
-    bottom: 4.5rem;
+    top: 5rem;
+    bottom: auto;
     transform: none;
     padding: 0 1.5rem;
     align-items: flex-start;
@@ -149,7 +149,7 @@ p {
   }
 
   .cta {
-    padding: 0.8rem 1.5rem;
+    display: none;
   }
 }
 </style>

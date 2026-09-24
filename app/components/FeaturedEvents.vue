@@ -90,7 +90,26 @@ h2 {
   }
 
   .grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    grid-template-columns: unset;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 1rem;
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem;
+    scroll-padding-left: 1.5rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .grid :deep(.card) {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
   }
 }
 </style>

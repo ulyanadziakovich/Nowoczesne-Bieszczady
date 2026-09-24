@@ -1,209 +1,136 @@
 <script setup lang="ts">
 const props = defineProps<{
   image?: string
-  image2?: string
   title: string
   description: string
-  buttonLabel?: string
-  back?: string
-  moreHref?: string
-  partnerImage?: string
-  partnerHref?: string
-  plain?: boolean
+  moreHref: string
 }>()
 
-const flipped = ref(false)
-const flippable = computed(() => !!(props.back || props.partnerImage))
+const TILE_META: Record<string, { tags: string[]; cta: string }> = {
+  '/szlaki': { tags: ['Pliki GPX', 'Filtry trudności'], cta: 'Zobacz trasy' },
+  '/ustrzyki-2036': { tags: ['18 postulatów', 'Mapa marzeń'], cta: 'Zobacz mapę marzeń' },
+  '/korona-gor': { tags: ['Szczyty', 'Kalendarz rajdów'], cta: 'Zobacz szczyty' },
+}
+const DEFAULT_META = { tags: [] as string[], cta: 'Zobacz więcej' }
+
+const meta = computed(() => TILE_META[props.moreHref] ?? DEFAULT_META)
 </script>
 
 <template>
-  <article v-if="flippable" class="tile flip">
-    <div class="tile-inner" :class="{ flipped }" @click="flipped = !flipped">
-      <div class="face face-front">
-        <div v-if="plain" class="tile-image-wrap tile-plain">
-          <span class="plain-label">{{ title }}</span>
-        </div>
-        <div v-else class="tile-image-wrap">
-          <img :src="image" :alt="title" class="tile-image" />
-        </div>
-        <div class="tile-body">
-          <h3>{{ title }}</h3>
-          <p>{{ description }}</p>
-        </div>
-        <span class="hint">Klik</span>
-      </div>
-
-      <PartnerFace v-if="partnerImage" :image="partnerImage" :href="partnerHref" />
-      <div v-else class="face face-back">
-        <div class="tile-body">
-          <h3>{{ title }}</h3>
-          <p>{{ back }}</p>
-        </div>
-        <NuxtLink v-if="moreHref" :to="moreHref" class="tile-button" @click.stop>Więcej</NuxtLink>
-      </div>
+  <NuxtLink :to="moreHref" class="tile">
+    <div class="image-wrap">
+      <img :src="image" :alt="title" class="image" />
     </div>
-  </article>
 
-  <article v-else class="tile">
-    <div class="tile-image-wrap">
-      <img :src="image" :alt="title" class="tile-image" />
-      <img v-if="image2" :src="image2" :alt="title" class="tile-image tile-image-alt" />
-    </div>
-    <div class="tile-body">
+    <div class="body">
       <h3>{{ title }}</h3>
-      <p>{{ description }}</p>
-      <a v-if="buttonLabel" href="#" class="tile-button">{{ buttonLabel }}</a>
+      <p class="teaser">{{ description }}</p>
+
+      <div v-if="meta.tags.length" class="tags">
+        <span v-for="tag in meta.tags" :key="tag" class="tag">{{ tag }}</span>
+      </div>
+
+      <span class="btn btn-amber tile-cta">
+        {{ meta.cta }}
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </span>
     </div>
-  </article>
+  </NuxtLink>
 </template>
 
 <style scoped>
 .tile {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
   background: #fff;
   border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 16px 36px rgba(26, 36, 32, 0.08);
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
 }
 
-.tile-image-wrap {
+.tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 48px rgba(26, 36, 32, 0.14);
+}
+
+.image-wrap {
   position: relative;
-  height: 190px;
+  height: 200px;
   overflow: hidden;
-  flex-shrink: 0;
 }
 
-.tile-image {
+.image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.tile-plain {
+.tile:hover .image {
+  transform: scale(1.06);
+}
+
+.body {
+  padding: 1.5rem;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--green) 0%, var(--alpine) 100%);
-  text-align: center;
-  padding: 1rem;
-}
-
-.plain-label {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: #fff;
-  letter-spacing: 0.01em;
-}
-
-.tile-image-alt {
-  position: absolute;
-  inset: 0;
-  clip-path: polygon(38% 0, 100% 0, 100% 100%, 58% 100%);
-  box-shadow: -2px 0 0 rgba(255, 255, 255, 0.9);
-}
-
-.tile-body {
-  padding: 1.25rem 1.5rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
 }
 
 h3 {
-  margin: 0 0 0.5rem;
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
-p {
+.teaser {
   margin: 0;
   color: #5a6a62;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   line-height: 1.5;
-}
-
-.tile-button {
-  display: inline-block;
-  margin-top: 1.25rem;
-  background: var(--ink);
-  color: #fff;
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.65rem 1.25rem;
-}
-
-.tile-button:hover {
-  background: var(--amber);
-}
-
-.tile.flip {
-  height: 340px;
-  background: none;
-  box-shadow: none;
-  perspective: 1500px;
-}
-
-.tile-inner {
-  position: relative;
-  height: 100%;
-  cursor: pointer;
-  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
-  transform-style: preserve-3d;
-}
-
-.tile-inner.flipped {
-  transform: rotateY(180deg);
-}
-
-.face {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  backface-visibility: hidden;
-  background: #fff;
-  border-radius: 18px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
 }
 
-.face-back {
-  transform: rotateY(180deg);
-}
-
-.face-back h3 {
-  color: var(--alpine);
-}
-
-.face-back .tile-body {
-  flex: 1;
+.tags {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
-.face-back .tile-button {
-  align-self: center;
-  margin: 0 0 1.25rem;
-}
-
-.hint {
-  margin: 0.25rem 0 1.25rem;
-  align-self: center;
-  color: #9aa39c;
-  font-size: 0.7rem;
+.tag {
+  background: var(--mist);
+  color: var(--ink);
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  animation: pulse 1.8s ease-in-out infinite;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
 }
 
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
+.tile-cta {
+  margin-top: auto;
+  align-self: flex-start;
+  font-size: 0.82rem;
+  padding: 0.7rem 1.3rem;
+}
+
+.tile-cta svg {
+  transition: transform 0.15s;
+}
+
+.tile:hover .tile-cta svg {
+  transform: translateX(3px);
 }
 </style>
