@@ -15,6 +15,17 @@ export interface DreamMapPoint {
   /** Position on the night-sky map, in % of the sky area. */
   px: number
   py: number
+  /** Vote count, fetched from the CMS at runtime — see useDreamMapPoints.ts. */
+  votes: number
+}
+
+/** Polish plural of "głos" (vote) for the given count — used in aria-labels. */
+export function voteWord(n: number): string {
+  if (n === 1) return 'głos'
+  const lastDigit = n % 10
+  const lastTwo = n % 100
+  if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwo >= 12 && lastTwo <= 14)) return 'głosy'
+  return 'głosów'
 }
 
 export const CATEGORY_COLORS: Record<DreamMapCategory, string> = {
@@ -92,7 +103,9 @@ export const CATEGORY_TAIL: Record<DreamMapCategory, { fromId: number; x: number
   infrastruktura: { fromId: 15, x: 36, y: 2 }, // continues the handle's curve past Alkaid
 }
 
-export const DREAM_MAP_POINTS: DreamMapPoint[] = [
+/** Editorial content only — `votes` isn't part of this static source, it's
+ * merged in at runtime from the CMS (see useDreamMapPoints.ts). */
+export const DREAM_MAP_POINTS: Omit<DreamMapPoint, 'votes'>[] = [
   {
     id: 1,
     category: 'infrastruktura',

@@ -5,11 +5,12 @@ import {
   CATEGORY_LINES,
   CATEGORY_NAMES,
   CATEGORY_TAIL,
+  voteWord,
   type DreamMapCategory,
 } from '~/utils/dreamMapData'
 import { useDreamMapPoints } from '~/composables/useDreamMapPoints'
 
-const { points, highlightedId } = useDreamMapPoints()
+const { points, highlightedId, hasVoted, voteFor } = useDreamMapPoints()
 
 const { data: settings } = await useCmsSingle<{ heroImage?: CmsImage | null }>('dream-map-settings')
 const heroBackgroundImage = computed(
@@ -352,12 +353,28 @@ onUnmounted(() => {
       >
         <div class="modal-accent-bar" :style="{ background: CATEGORY_COLORS[selected.category] }" />
         <div class="popover-body">
-          <span
-            class="modal-cat-badge"
-            :style="{ background: CATEGORY_COLORS[selected.category] + '1a', color: CATEGORY_COLORS[selected.category] }"
-          >
-            {{ CATEGORY_NAMES[selected.category] }}
-          </span>
+          <div class="modal-head-row">
+            <span
+              class="modal-cat-badge"
+              :style="{ background: CATEGORY_COLORS[selected.category] + '1a', color: CATEGORY_COLORS[selected.category] }"
+            >
+              {{ CATEGORY_NAMES[selected.category] }}
+            </span>
+            <button
+              type="button"
+              class="sky-vote-btn"
+              :class="{ voted: hasVoted(selected.id) }"
+              :disabled="hasVoted(selected.id)"
+              :aria-pressed="hasVoted(selected.id)"
+              :aria-label="hasVoted(selected.id) ? `Zagłosowano, ${selected.votes} ${voteWord(selected.votes)}` : `Zagłosuj, obecnie ${selected.votes} ${voteWord(selected.votes)}`"
+              @click="voteFor(selected.id)"
+            >
+              <svg viewBox="0 0 24 24" width="13" height="13" :fill="hasVoted(selected.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
+                <path d="M12 20.5s-7.5-4.6-10-9.3C.4 8 1.8 4.8 4.9 3.8c2.1-.7 4.3.1 5.6 1.9l1.5 2 1.5-2c1.3-1.8 3.5-2.6 5.6-1.9 3.1 1 4.5 4.2 2.9 7.4-2.5 4.7-10 9.3-10 9.3z" />
+              </svg>
+              {{ selected.votes }}
+            </button>
+          </div>
           <h2>{{ selected.title }}</h2>
           <p class="modal-label">Wyzwanie</p>
           <p class="modal-text">{{ selected.challenge }}</p>
@@ -373,12 +390,28 @@ onUnmounted(() => {
         <div class="modal-accent-bar" :style="{ background: CATEGORY_COLORS[selected.category] }" />
         <button type="button" class="modal-close" aria-label="Zamknij" @click="closeModal">×</button>
         <div class="modal-body">
-          <span
-            class="modal-cat-badge"
-            :style="{ background: CATEGORY_COLORS[selected.category] + '1a', color: CATEGORY_COLORS[selected.category] }"
-          >
-            {{ CATEGORY_NAMES[selected.category] }}
-          </span>
+          <div class="modal-head-row">
+            <span
+              class="modal-cat-badge"
+              :style="{ background: CATEGORY_COLORS[selected.category] + '1a', color: CATEGORY_COLORS[selected.category] }"
+            >
+              {{ CATEGORY_NAMES[selected.category] }}
+            </span>
+            <button
+              type="button"
+              class="sky-vote-btn"
+              :class="{ voted: hasVoted(selected.id) }"
+              :disabled="hasVoted(selected.id)"
+              :aria-pressed="hasVoted(selected.id)"
+              :aria-label="hasVoted(selected.id) ? `Zagłosowano, ${selected.votes} ${voteWord(selected.votes)}` : `Zagłosuj, obecnie ${selected.votes} ${voteWord(selected.votes)}`"
+              @click="voteFor(selected.id)"
+            >
+              <svg viewBox="0 0 24 24" width="13" height="13" :fill="hasVoted(selected.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
+                <path d="M12 20.5s-7.5-4.6-10-9.3C.4 8 1.8 4.8 4.9 3.8c2.1-.7 4.3.1 5.6 1.9l1.5 2 1.5-2c1.3-1.8 3.5-2.6 5.6-1.9 3.1 1 4.5 4.2 2.9 7.4-2.5 4.7-10 9.3-10 9.3z" />
+              </svg>
+              {{ selected.votes }}
+            </button>
+          </div>
           <h2>{{ selected.title }}</h2>
           <p class="modal-label">Wyzwanie</p>
           <p class="modal-text">{{ selected.challenge }}</p>
@@ -835,6 +868,14 @@ h2 {
   padding: 1.6rem 1.75rem 1.75rem;
 }
 
+.modal-head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
 .modal-cat-badge {
   display: inline-flex;
   padding: 0.25rem 0.75rem;
@@ -843,7 +884,51 @@ h2 {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
+}
+
+.sky-vote-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(240, 234, 214, 0.35);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f0ead6;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.15s,
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.sky-vote-btn:hover:not(:disabled) {
+  border-color: #ffd89b;
+  color: #ffd89b;
+}
+
+.sky-vote-btn.voted {
+  background: #ffd89b;
+  border-color: #ffd89b;
+  color: #060a14;
+  cursor: default;
+}
+
+.sky-vote-btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.sky-vote-btn svg {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sky-vote-btn.voted svg {
+  transform: scale(1.15);
 }
 
 .modal-body h2 {
