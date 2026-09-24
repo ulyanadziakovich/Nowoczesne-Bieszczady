@@ -41,6 +41,7 @@ const grouped = computed(() =>
             type="button"
             class="filter-chip"
             :class="{ active: activeFilter === 'all' }"
+            :style="activeFilter === 'all' ? { background: 'var(--ink)', borderColor: 'var(--ink)' } : {}"
             @click="activeFilter = 'all'"
           >
             Wszystkie
