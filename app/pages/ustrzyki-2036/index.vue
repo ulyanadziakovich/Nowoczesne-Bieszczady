@@ -3,13 +3,16 @@ useHead({ title: 'Ustrzyki 2036: Warsztat Przyszłości — Nowoczesne Bieszczad
 
 // Same key/collection as DreamMapSky.vue — Nuxt dedupes this to one fetch,
 // so the SSR fallback below can show the real CMS photo too, not a blank one.
-const { data: heroSettings } = await useCmsSingle<{ heroImage?: CmsImage | null }>('dream-map-settings')
+const { data: heroSettings } = await useCmsSingle<{ heroImage?: CmsImage | null; aboutImage?: CmsImage | null }>(
+  'dream-map-settings',
+)
 const fallbackBackgroundImage = computed(
   () =>
     `linear-gradient(180deg, rgba(4, 7, 14, 0.72) 0%, rgba(4, 7, 14, 0.15) 30%, rgba(4, 7, 14, 0.2) 58%, rgba(4, 7, 14, 0.8) 100%), ` +
     `linear-gradient(200deg, rgba(201, 103, 46, 0.22) 0%, transparent 42%), ` +
     `url('${resolveCmsUrl(heroSettings.value?.heroImage?.src)}')`,
 )
+const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImage?.src))
 </script>
 
 <template>
@@ -58,6 +61,10 @@ const fallbackBackgroundImage = computed(
               NOWEFIO na lata 2021–2030, za pośrednictwem Stowarzyszenia „Pro Carpathia”.
             </p>
           </div>
+
+          <div v-if="aboutImageUrl" class="about-image-wrap">
+            <img :src="aboutImageUrl" alt="Warsztat „Ustrzyki 2036” — mieszkańcy pracują nad mapą przyszłości miasta" class="about-image" />
+          </div>
         </div>
       </div>
     </section>
@@ -80,8 +87,16 @@ const fallbackBackgroundImage = computed(
 }
 
 .about {
-  max-width: 760px;
+  display: flex;
+  align-items: center;
+  gap: 3.5rem;
+  max-width: 1100px;
   margin: 0 auto;
+}
+
+.about-text {
+  flex: 1.15;
+  min-width: 0;
 }
 
 .about-text p {
@@ -89,6 +104,35 @@ const fallbackBackgroundImage = computed(
   font-size: 1rem;
   line-height: 1.75;
   margin: 0 0 1.25rem;
+}
+
+.about-image-wrap {
+  flex: 1;
+  align-self: stretch;
+  min-height: 420px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 24px 48px rgba(26, 36, 32, 0.16);
+}
+
+.about-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .about {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .about-image-wrap {
+    order: -1;
+    width: 100%;
+    min-height: 260px;
+  }
 }
 
 .funding-note {
