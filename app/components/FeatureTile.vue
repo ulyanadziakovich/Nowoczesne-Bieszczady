@@ -139,7 +139,7 @@ h3 {
    section instead of the cards themselves filling the space. */
 @media (min-width: 901px) {
   .image-wrap {
-    height: 140px;
+    height: 175px;
   }
 
   .body {
