@@ -2,7 +2,7 @@
 const links = [
   { label: 'Szlaki rowerowe', to: '/szlaki' },
   { label: 'Ustrzyki 2036', to: '/ustrzyki-2036' },
-  { label: 'Korona Gór', to: '/korona-gor' },
+  { label: 'Korona Ustrzyckich Gór', to: '/korona-gor' },
   { label: 'Kultura', to: '/kultura' },
   { label: 'Inicjatywy', to: '/inicjatywy' },
   {
