@@ -99,6 +99,7 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
 }
 
 .about-image-wrap {
+  display: none;
   max-width: 900px;
   margin: 0 auto 3rem;
   border-radius: 20px;
@@ -114,6 +115,7 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
 
 @media (max-width: 900px) {
   .about-image-wrap {
+    display: block;
     margin-bottom: 2rem;
   }
 }
