@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const props = defineProps<{ images: string[]; altPrefix: string }>()
+const props = withDefaults(defineProps<{ images: string[]; altPrefix: string; layout?: 'grid' | 'scroll' }>(), {
+  layout: 'grid',
+})
 
 const openIndex = ref<number | null>(null)
 
@@ -33,7 +35,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
-  <div v-if="images.length" class="gallery">
+  <div v-if="images.length" class="gallery" :class="{ 'gallery-scroll': layout === 'scroll' }">
     <button
       v-for="(img, i) in images"
       :key="i"
@@ -115,6 +117,36 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 @media (max-width: 700px) {
   .gallery {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Horizontal filmstrip variant — for tall, page-like image sets (e.g. a
+   scanned document) where a 2-column grid isn't a natural fit. */
+.gallery-scroll {
+  display: flex;
+  grid-template-columns: unset;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  gap: 0.85rem;
+  scroll-padding-left: 0.25rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.gallery-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.gallery-scroll .gallery-item {
+  flex: 0 0 auto;
+  width: 160px;
+  scroll-snap-align: start;
+}
+
+@media (max-width: 700px) {
+  .gallery-scroll {
+    grid-template-columns: unset;
   }
 }
 

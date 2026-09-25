@@ -11,7 +11,7 @@ const { data: settings } = await useCmsSingle<SiteSettings>('site-settings')
     <h2>Deklaracja członkowska</h2>
     <p>{{ content.body('deklaracja-intro') }}</p>
 
-    <a :href="content.image('deklaracja-intro')" class="btn btn-amber" download>Pobierz deklarację członkowską (PDF)</a>
+    <button type="button" class="btn btn-amber is-disabled" disabled>Formularz wkrótce dostępny</button>
 
     <div class="steps">
       <div class="step">

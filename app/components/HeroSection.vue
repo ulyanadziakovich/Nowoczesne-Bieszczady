@@ -127,7 +127,7 @@ p {
   }
 
   .content {
-    top: 5rem;
+    top: 8.5rem;
     bottom: auto;
     transform: none;
     padding: 0 1.5rem;

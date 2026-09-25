@@ -79,7 +79,7 @@ p {
 .about-image {
   flex: 1;
   background-size: cover;
-  background-position: center;
+  background-position: center 75%;
   clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
 }
 

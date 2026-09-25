@@ -10,6 +10,7 @@ const TILE_META: Record<string, { tags: string[]; cta: string }> = {
   '/szlaki': { tags: ['Pliki GPX', 'Filtry trudności'], cta: 'Zobacz trasy' },
   '/ustrzyki-2036': { tags: ['18 postulatów', 'Mapa marzeń'], cta: 'Zobacz mapę marzeń' },
   '/korona-gor': { tags: ['Szczyty', 'Kalendarz rajdów'], cta: 'Zobacz szczyty' },
+  '/inicjatywy': { tags: ['Warsztaty', 'Debaty społeczne'], cta: 'Zobacz inicjatywy' },
 }
 const DEFAULT_META = { tags: [] as string[], cta: 'Zobacz więcej' }
 

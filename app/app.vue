@@ -1,10 +1,12 @@
 <template>
-  <div>
+  <div class="app-shell">
     <NuxtRouteAnnouncer />
     <AppHeader />
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
+    <main class="app-main">
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </main>
     <AppFooter />
   </div>
 </template>
@@ -37,6 +39,20 @@ body {
   font-family: var(--font-body);
   background: var(--mist);
   color: var(--ink);
+}
+
+/* Sticky footer: on tall/large viewports where the page content is
+   shorter than the screen, .app-main grows to fill the remaining space
+   instead of leaving the footer floating right under short content. */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1 0 auto;
 }
 
 /* ---- Shared page/design-system utilities (used across all subpages) ---- */
