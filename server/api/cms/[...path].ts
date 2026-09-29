@@ -47,16 +47,29 @@ export default defineEventHandler(async (event) => {
   // No query forwarding: the upstream serves these as static files, so a query
   // string could only muddy the cache key. `$fetch` would parse a JSON or text
   // body, which mangles binary files — take the raw stream instead.
+  //
+  // `ignoreResponseError` keeps ofetch from throwing on a non-2xx upstream: that
+  // throw happens before any of the code below runs, so a deleted file would
+  // surface to the browser as a 500 instead of the CMS's own 404.
   const upstream = await $fetch.raw(`${config.public.cmsUrl}/${path}`, {
     responseType: 'stream',
     redirect: 'error',
+    ignoreResponseError: true,
   })
+
+  if (!upstream.ok) {
+    throw createError({
+      statusCode: upstream.status,
+      statusMessage: upstream.status === 404 ? 'Not found' : 'Upstream error',
+    })
+  }
 
   for (const header of FORWARDED_HEADERS) {
     const value = upstream.headers.get(header)
     if (value) setResponseHeader(event, header, value)
   }
 
+  // Only a successful response is safe to cache for a year.
   setResponseHeader(event, 'cache-control', UPLOAD_CACHE_CONTROL)
 
   return upstream._data

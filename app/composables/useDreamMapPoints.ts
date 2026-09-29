@@ -19,10 +19,14 @@ interface DreamMapPointRecord {
  * prop-drilling through the page. */
 const highlightedId = ref<number | null>(null)
 
-/** Vote counts that differ from what the CMS fetch returned — optimistic
- * bumps and the server's authoritative answer. Kept apart from the fetched
- * records (which are shared, cached and may be re-fetched) so a vote can be
- * rolled back by simply dropping the override again. */
+/** Per-postulate vote *floors* — the highest count this browser knows about
+ * (an optimistic bump, then the server's authoritative answer). Kept apart
+ * from the fetched records (which are shared, cached and may be re-fetched)
+ * so a vote can be rolled back by simply dropping the floor again.
+ * A floor is deliberately not a hard overwrite: `points` renders
+ * `max(cmsVotes, floor)`, so once a later collection fetch catches up — e.g.
+ * because other visitors voted too — the fresher CMS value wins and the
+ * counter never freezes at our own stale number. */
 const voteOverrides = ref(new Map<number, number>())
 
 /** One-vote-per-postulate-per-browser — not a real auth system, just
@@ -66,7 +70,8 @@ export function useDreamMapPoints() {
       px: row.px,
       py: row.py,
       connectsTo: row.connectsTo ?? '',
-      votes: voteOverrides.value.get(row.pointNumber) ?? row.votes ?? 0,
+      // Floor semantics: whichever of the two is fresher/higher wins.
+      votes: Math.max(row.votes ?? 0, voteOverrides.value.get(row.pointNumber) ?? 0),
     })),
   )
 
@@ -82,7 +87,8 @@ export function useDreamMapPoints() {
     // Optimistic update — feels instant, rolled back below if the request
     // actually fails.
     const previousOverride = voteOverrides.value.get(id)
-    voteOverrides.value.set(id, point.votes + 1)
+    const optimisticVotes = point.votes + 1
+    voteOverrides.value.set(id, optimisticVotes)
     votedIds.value.add(id)
     persistVotedIds()
 
@@ -91,7 +97,9 @@ export function useDreamMapPoints() {
         method: 'POST',
         body: { pointNumber: id },
       })
-      voteOverrides.value.set(id, result.votes)
+      // Take the server's authoritative count, but never step back below the
+      // optimistic bump we already painted — that would flicker.
+      voteOverrides.value.set(id, Math.max(result.votes, optimisticVotes))
     } catch {
       if (previousOverride === undefined) voteOverrides.value.delete(id)
       else voteOverrides.value.set(id, previousOverride)
