@@ -245,6 +245,23 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
   align-items: start;
 }
 
+/* Grid items default to `min-width: auto`, so the main column and the sidebar
+   refuse to shrink below their content's min-content width and push the whole
+   page past the viewport on narrow phones. Let both tracks take exactly the
+   width the grid gives them, and break the long, unhyphenatable place names
+   and URLs that arrive from the CMS instead of widening the layout. */
+.main,
+.sidebar {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* CMS images must never exceed their column. */
+.main img,
+.sidebar img {
+  max-width: 100%;
+}
+
 .section-title.small {
   font-size: 1.4rem;
   margin-top: 2.5rem;
@@ -295,6 +312,12 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
   flex-wrap: wrap;
   padding: 1.5rem 1.75rem;
   margin-bottom: 1.5rem;
+}
+
+/* Flex item: without this the heading's min-content width keeps the banner
+   from fitting the column. */
+.gpx-banner-text {
+  min-width: 0;
 }
 
 .gpx-banner-text h3 {
@@ -457,7 +480,10 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
   padding: 0;
   margin: 0.75rem 0 0;
   display: flex;
-  gap: 1.25rem;
+  /* Three legend entries do not fit on one line below ~400px; the row gap only
+     applies once they wrap, so desktop keeps its single-line layout. */
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
   font-size: 0.82rem;
   color: #4a4a44;
 }
@@ -510,6 +536,11 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
   background: #fff;
   color: var(--amber);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Flex item next to the fixed-width icon: must be allowed to shrink. */
+.final-recommendation > div:last-child {
+  min-width: 0;
 }
 
 .final-recommendation p {
@@ -602,6 +633,66 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
 
   .sidebar {
     position: static;
+  }
+}
+
+@media (max-width: 520px) {
+  /* At 320px the two-column table spends 204px on label + gap + padding and
+     leaves ~68px for the value, which single words like "Bieszczadzka" cannot
+     fit. Stack label over value and keep the label visually subordinate
+     (smaller, uppercase, muted) so it still reads as a table, not prose. */
+  .info-row {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .info-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .info-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .wp-row {
+    padding: 0.75rem 1rem;
+  }
+
+  .gpx-banner {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  /* Stacked banner: a full-width button beats one squeezed beside the copy,
+     and gives a proper tap target. */
+  .gpx-banner .gpx-btn {
+    width: 100%;
+  }
+
+  .elevation,
+  .route-map,
+  .sidebar-card {
+    padding: 1.25rem;
+  }
+
+  .final-recommendation {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .audit-notes {
+    padding: 1rem;
+  }
+
+  /* 0.85rem inline link is a ~17px tall tap target; raise it to 44px. */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 }
 </style>
