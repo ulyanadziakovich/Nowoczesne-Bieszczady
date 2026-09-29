@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { categoryColor, categoryName, voteWord, type DreamMapPoint } from '~/utils/dreamMapData'
+import { voteWord, type DreamMapPoint } from '~/utils/dreamMapData'
+import { useDreamMapCategories } from '~/composables/useDreamMapCategories'
 
 defineProps<{ point: DreamMapPoint }>()
 
+const { categoryColor, categoryName } = useDreamMapCategories()
 const { hasVoted, voteFor } = useDreamMapPoints()
 </script>
 

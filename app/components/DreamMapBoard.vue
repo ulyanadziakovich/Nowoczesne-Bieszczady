@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { categoryColor, categoryName, categorySlugs } from '~/utils/dreamMapData'
 import { useDreamMapPoints } from '~/composables/useDreamMapPoints'
+import { useDreamMapCategories } from '~/composables/useDreamMapCategories'
 
+const { orderedCategories, categoryColor, categoryName } = useDreamMapCategories()
 const { points, highlightedId } = useDreamMapPoints()
 
 // Derived from the CMS data, so a category added there shows up here too.
-const CATEGORIES = computed(() => categorySlugs(points.value))
+const CATEGORIES = computed(() => orderedCategories(points.value))
 const activeFilter = ref<string>('all')
 
 const filtered = computed(() =>

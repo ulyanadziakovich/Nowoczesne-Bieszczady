@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import {
+import { voteWord } from '~/utils/dreamMapData'
+import { useDreamMapPoints } from '~/composables/useDreamMapPoints'
+import { useDreamMapCategories } from '~/composables/useDreamMapCategories'
+
+const {
+  orderedCategories,
   categoryColor,
   categoryConstellation,
-  categoryLines,
   categoryName,
-  categorySlugs,
+  categoryLabelPos,
   categoryTail,
-  voteWord,
-} from '~/utils/dreamMapData'
-import { useDreamMapPoints } from '~/composables/useDreamMapPoints'
+} = useDreamMapCategories()
 
 const { points, highlightedId, hasVoted, voteFor } = useDreamMapPoints()
 
@@ -21,21 +23,13 @@ const heroBackgroundImage = computed(
 )
 
 // Derived from the CMS data, so a category added there shows up here too.
-const CATEGORIES = computed(() => categorySlugs(points.value))
+const CATEGORIES = computed(() => orderedCategories(points.value))
 
-const CONST_LABEL_POS: Record<string, { x: number; y: number }> = {
-  turystyka: { x: 80, y: 18 },
-  ekologia: { x: 40, y: 44 },
-  infrastruktura: { x: 4, y: 50 },
-  seniorzy: { x: 14, y: 66 },
-  mlodziez: { x: 38, y: 2 },
-}
-
-// A category with no known label position simply gets no constellation
-// caption drawn — better than guessing a spot on top of the stars.
+// A category the CMS gives no label position for simply gets no
+// constellation caption drawn — better than guessing a spot on the stars.
 const constLabels = computed(() =>
   CATEGORIES.value.flatMap((cat) => {
-    const pos = CONST_LABEL_POS[cat]
+    const pos = categoryLabelPos(cat)
     return pos ? [{ cat, pos }] : []
   }),
 )
@@ -52,23 +46,32 @@ function isDimmed(cat: string) {
 
 const lines = computed(() => {
   const segments: { x1: number; y1: number; x2: number; y2: number; color: string; cat: string; tail?: boolean }[] = []
+  // Each star names the stars it links to (`connectsTo`), so a constellation
+  // traces an actual figure (a dipper's bowl-and-handle, a cross, a
+  // diamond...) rather than a generic zig-zag through its points in order.
+  // An edge listed from both ends must still be drawn once, hence the
+  // unordered-pair bookkeeping.
+  const drawn = new Set<string>()
+  for (const p of points.value) {
+    for (const part of p.connectsTo.split(',')) {
+      const trimmed = part.trim()
+      const toId = Number(trimmed)
+      if (!trimmed || !Number.isFinite(toId) || toId === p.id) continue
+      const target = points.value.find((q) => q.id === toId)
+      if (!target) continue
+      const pair = p.id < toId ? `${p.id}-${toId}` : `${toId}-${p.id}`
+      if (drawn.has(pair)) continue
+      drawn.add(pair)
+      segments.push({ x1: p.px, y1: p.py, x2: target.px, y2: target.py, color: categoryColor(p.category), cat: p.category })
+    }
+  }
+  // Decorative tail flourish, like real constellation drawings have.
   for (const cat of CATEGORIES.value) {
-    // Each category's shape is a fixed list of edges (star-id pairs) —
-    // not "connect them in order" — so it can trace an actual figure
-    // (a dipper's bowl-and-handle, a cross, a diamond...) rather than a
-    // generic zig-zag or polygon.
-    for (const [fromId, toId] of categoryLines(cat)) {
-      const a = points.value.find((p) => p.id === fromId)
-      const b = points.value.find((p) => p.id === toId)
-      if (!a || !b) continue
-      segments.push({ x1: a.px, y1: a.py, x2: b.px, y2: b.py, color: categoryColor(cat), cat })
-    }
-    // Decorative tail flourish, like real constellation drawings have.
     const tail = categoryTail(cat)
-    const tailFrom = tail && points.value.find((p) => p.id === tail.fromId)
-    if (tail && tailFrom) {
-      segments.push({ x1: tailFrom.px, y1: tailFrom.py, x2: tail.x, y2: tail.y, color: categoryColor(cat), cat, tail: true })
-    }
+    if (!tail) continue
+    const tailFrom = points.value.find((p) => p.id === tail.fromId)
+    if (!tailFrom) continue
+    segments.push({ x1: tailFrom.px, y1: tailFrom.py, x2: tail.x, y2: tail.y, color: categoryColor(cat), cat, tail: true })
   }
   return segments
 })

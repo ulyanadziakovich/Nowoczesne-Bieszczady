@@ -9,6 +9,7 @@ interface DreamMapPointRecord {
   solution: string
   px: number
   py: number
+  connectsTo: string | null
   votes: number | null
 }
 
@@ -64,6 +65,7 @@ export function useDreamMapPoints() {
       solution: row.solution,
       px: row.px,
       py: row.py,
+      connectsTo: row.connectsTo ?? '',
       votes: voteOverrides.value.get(row.pointNumber) ?? row.votes ?? 0,
     })),
   )
