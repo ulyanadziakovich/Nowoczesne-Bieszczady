@@ -32,6 +32,15 @@ export interface CmsFile {
   size: number
 }
 
+/**
+ * A brief CMS hiccup (pod restart, dropped connection) should heal before the
+ * render ever sees it, so every CMS read retries twice with a short pause.
+ * The proxy's stale cache is the second line of defence, for outages that
+ * outlast these retries.
+ */
+const CMS_RETRY = 2
+const CMS_RETRY_DELAY_MS = 300
+
 interface CmsCollectionOptions {
   limit?: number
   order?: string
@@ -42,12 +51,19 @@ export function useCmsCollection<T = Record<string, any>>(name: string, opts: Cm
   return useFetch<CmsListResponse<T>>(`/api/cms/collections/${name}`, {
     key: `cms-${name}`,
     query: { limit: opts.limit ?? 100, populate: true, ...(opts.order ? { order: opts.order } : {}) },
+    retry: CMS_RETRY,
+    retryDelay: CMS_RETRY_DELAY_MS,
   })
 }
 
 /** Fetch a single-entry (singleton) collection (e.g. "home", "site-settings"). */
 export function useCmsSingle<T = Record<string, any>>(name: string) {
-  return useFetch<T>(`/api/cms/collections/${name}`, { key: `cms-${name}`, query: { populate: true } })
+  return useFetch<T>(`/api/cms/collections/${name}`, {
+    key: `cms-${name}`,
+    query: { populate: true },
+    retry: CMS_RETRY,
+    retryDelay: CMS_RETRY_DELAY_MS,
+  })
 }
 
 /**

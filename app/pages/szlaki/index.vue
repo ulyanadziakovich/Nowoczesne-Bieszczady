@@ -6,9 +6,14 @@ const { data: trailsData } = await useCmsCollection<Trail>('trails')
 const trails = computed(() => trailsData.value?.records ?? [])
 const content = usePageContent()
 
+/** Upper bound of the length filter. Kept above the longest audited route so
+ * the slider starts wide open and no trail is hidden until the visitor
+ * narrows it down themselves. */
+const SLIDER_MAX = 300
+
 const difficultyFilter = ref<TrailDifficulty | 'all'>('all')
 const bikeFilter = ref<TrailBikeType | 'all'>('all')
-const maxLength = ref(60)
+const maxLength = ref(SLIDER_MAX)
 
 const difficultyOptions = [
   { value: 'all' as const, label: 'Wszystkie' },
@@ -30,7 +35,7 @@ const filtered = computed(() =>
 )
 
 const sliderMin = 10
-const sliderMax = 60
+const sliderMax = SLIDER_MAX
 const sliderFill = computed(() => ((maxLength.value - sliderMin) / (sliderMax - sliderMin)) * 100)
 const sliderStyle = computed(() => ({
   background: `linear-gradient(to right, var(--amber) ${sliderFill.value}%, #e9e5db ${sliderFill.value}%)`,
@@ -59,7 +64,7 @@ const difficultyGroups = computed(() =>
 function resetFilters() {
   difficultyFilter.value = 'all'
   bikeFilter.value = 'all'
-  maxLength.value = 60
+  maxLength.value = SLIDER_MAX
 }
 </script>
 
