@@ -346,8 +346,15 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+/**
+ * Leaflet gives its panes and controls z-indexes from 400 up to 1000, far above
+ * the site header's 20. `position: relative` alone does not contain them — only
+ * a stacking context does — so without this the map paints straight over the
+ * fixed header while scrolling past it.
+ */
 .map-shell {
   position: relative;
+  isolation: isolate;
   height: 520px;
   overflow: hidden;
   background: var(--mist);
