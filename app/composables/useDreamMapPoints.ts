@@ -1,12 +1,28 @@
-import { DREAM_MAP_POINTS, type DreamMapPoint } from '~/utils/dreamMapData'
+import type { DreamMapPoint } from '~/utils/dreamMapData'
 
-const points = ref<DreamMapPoint[]>(DREAM_MAP_POINTS.map((p) => ({ ...p, votes: 0 })))
+/** Shape of a "dream-map-points" row as the CMS returns it. */
+interface DreamMapPointRecord {
+  pointNumber: number
+  category: string
+  title: string
+  challenge: string
+  solution: string
+  px: number
+  py: number
+  votes: number | null
+}
 
 /** Set by the sky map when a star is clicked (desktop only — see
  * DreamMapSky.vue) so the card board below can scroll to and highlight
  * the matching card. Module-scoped so both components share it without
  * prop-drilling through the page. */
 const highlightedId = ref<number | null>(null)
+
+/** Vote counts that differ from what the CMS fetch returned — optimistic
+ * bumps and the server's authoritative answer. Kept apart from the fetched
+ * records (which are shared, cached and may be re-fetched) so a vote can be
+ * rolled back by simply dropping the override again. */
+const voteOverrides = ref(new Map<number, number>())
 
 /** One-vote-per-postulate-per-browser — not a real auth system, just
  * stops the same visitor from repeatedly clicking the same star. Loaded
@@ -33,23 +49,23 @@ function persistVotedIds() {
   }
 }
 
-/** Shared, module-scoped postulate list so the sky map and the card board
- * (both rendering the same 18 postulates) read from the same source. */
+/** Every postulate, straight from the CMS — the sky map and the card board
+ * both read from this one shared fetch (same dedup key), so nothing about
+ * the postulates lives in the frontend. */
 export function useDreamMapPoints() {
-  // Same dedup-by-key pattern already used for dream-map-settings: every
-  // component calling this composable shares one underlying fetch.
-  const { data } = useCmsCollection<{ pointNumber: number; votes: number }>('dream-map-points', { order: 'pointNumber' })
+  const { data } = useCmsCollection<DreamMapPointRecord>('dream-map-points', { order: 'pointNumber' })
 
-  watch(
-    data,
-    (res) => {
-      if (!res) return
-      for (const row of res.records) {
-        const point = points.value.find((p) => p.id === row.pointNumber)
-        if (point) point.votes = row.votes ?? 0
-      }
-    },
-    { immediate: true },
+  const points = computed<DreamMapPoint[]>(() =>
+    (data.value?.records ?? []).map((row) => ({
+      id: row.pointNumber,
+      category: row.category,
+      title: row.title,
+      challenge: row.challenge,
+      solution: row.solution,
+      px: row.px,
+      py: row.py,
+      votes: voteOverrides.value.get(row.pointNumber) ?? row.votes ?? 0,
+    })),
   )
 
   function hasVoted(id: number) {
@@ -63,7 +79,8 @@ export function useDreamMapPoints() {
 
     // Optimistic update — feels instant, rolled back below if the request
     // actually fails.
-    point.votes++
+    const previousOverride = voteOverrides.value.get(id)
+    voteOverrides.value.set(id, point.votes + 1)
     votedIds.value.add(id)
     persistVotedIds()
 
@@ -72,9 +89,10 @@ export function useDreamMapPoints() {
         method: 'POST',
         body: { pointNumber: id },
       })
-      point.votes = result.votes
+      voteOverrides.value.set(id, result.votes)
     } catch {
-      point.votes--
+      if (previousOverride === undefined) voteOverrides.value.delete(id)
+      else voteOverrides.value.set(id, previousOverride)
       votedIds.value.delete(id)
       persistVotedIds()
     }

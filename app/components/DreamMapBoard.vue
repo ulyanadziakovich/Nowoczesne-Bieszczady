@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { CATEGORY_COLORS, CATEGORY_NAMES, type DreamMapCategory } from '~/utils/dreamMapData'
+import { categoryColor, categoryName, categorySlugs } from '~/utils/dreamMapData'
 import { useDreamMapPoints } from '~/composables/useDreamMapPoints'
 
 const { points, highlightedId } = useDreamMapPoints()
 
-const CATEGORIES = Object.keys(CATEGORY_NAMES) as DreamMapCategory[]
-const activeFilter = ref<'all' | DreamMapCategory>('all')
+// Derived from the CMS data, so a category added there shows up here too.
+const CATEGORIES = computed(() => categorySlugs(points.value))
+const activeFilter = ref<string>('all')
 
 const filtered = computed(() =>
   activeFilter.value === 'all' ? points.value : points.value.filter((p) => p.category === activeFilter.value),
@@ -26,11 +27,11 @@ watch(highlightedId, async (id) => {
   }, 2600)
 })
 
-/** Same 18 postulates, grouped by category — used for the mobile layout,
+/** The same postulates, grouped by category — used for the mobile layout,
  * where each category is its own sideways-scrolling row instead of one
  * filterable grid. */
 const grouped = computed(() =>
-  CATEGORIES.map((cat) => ({
+  CATEGORIES.value.map((cat) => ({
     cat,
     items: points.value.filter((p) => p.category === cat),
   })).filter((g) => g.items.length),
@@ -41,7 +42,7 @@ const grouped = computed(() =>
   <section class="section section-alt">
     <div class="container">
       <div class="section-head">
-        <span class="kicker">18 postulatów mieszkańców</span>
+        <span class="kicker">{{ points.length }} postulatów mieszkańców</span>
         <h2 class="section-title">Wszystkie punkty mapy marzeń</h2>
         <p class="lead">
           Pełna lista wniosków i rekomendacji z warsztatów „Ustrzyki 2036” — wyzwanie i proponowane rozwiązanie przy
@@ -69,13 +70,13 @@ const grouped = computed(() =>
             :class="{ active: activeFilter === cat }"
             :style="
               activeFilter === cat
-                ? { background: CATEGORY_COLORS[cat], borderColor: CATEGORY_COLORS[cat] }
-                : { borderColor: CATEGORY_COLORS[cat], color: CATEGORY_COLORS[cat] }
+                ? { background: categoryColor(cat), borderColor: categoryColor(cat) }
+                : { borderColor: categoryColor(cat), color: categoryColor(cat) }
             "
             @click="activeFilter = cat"
           >
-            <span class="dot" :style="{ background: CATEGORY_COLORS[cat] }" />
-            {{ CATEGORY_NAMES[cat] }}
+            <span class="dot" :style="{ background: categoryColor(cat) }" />
+            {{ categoryName(cat) }}
           </button>
         </nav>
 
@@ -94,8 +95,8 @@ const grouped = computed(() =>
       <div class="mobile-board">
         <div v-for="group in grouped" :key="group.cat" class="category-row">
           <div class="category-row-head">
-            <span class="category-dot" :style="{ background: CATEGORY_COLORS[group.cat] }" />
-            <h3>{{ CATEGORY_NAMES[group.cat] }}</h3>
+            <span class="category-dot" :style="{ background: categoryColor(group.cat) }" />
+            <h3>{{ categoryName(group.cat) }}</h3>
             <span class="category-count">{{ group.items.length }}</span>
           </div>
           <div class="category-scroller">

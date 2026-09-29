@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {
-  CATEGORY_COLORS,
-  CATEGORY_CONSTELLATIONS,
-  CATEGORY_LINES,
-  CATEGORY_NAMES,
-  CATEGORY_TAIL,
+  categoryColor,
+  categoryConstellation,
+  categoryLines,
+  categoryName,
+  categorySlugs,
+  categoryTail,
   voteWord,
-  type DreamMapCategory,
 } from '~/utils/dreamMapData'
 import { useDreamMapPoints } from '~/composables/useDreamMapPoints'
 
@@ -20,9 +20,10 @@ const heroBackgroundImage = computed(
     `url('${resolveCmsUrl(settings.value?.heroImage?.src)}')`,
 )
 
-const CATEGORIES = Object.keys(CATEGORY_NAMES) as DreamMapCategory[]
+// Derived from the CMS data, so a category added there shows up here too.
+const CATEGORIES = computed(() => categorySlugs(points.value))
 
-const CONST_LABEL_POS: Record<DreamMapCategory, { x: number; y: number }> = {
+const CONST_LABEL_POS: Record<string, { x: number; y: number }> = {
   turystyka: { x: 80, y: 18 },
   ekologia: { x: 40, y: 44 },
   infrastruktura: { x: 4, y: 50 },
@@ -30,34 +31,43 @@ const CONST_LABEL_POS: Record<DreamMapCategory, { x: number; y: number }> = {
   mlodziez: { x: 38, y: 2 },
 }
 
+// A category with no known label position simply gets no constellation
+// caption drawn — better than guessing a spot on top of the stars.
+const constLabels = computed(() =>
+  CATEGORIES.value.flatMap((cat) => {
+    const pos = CONST_LABEL_POS[cat]
+    return pos ? [{ cat, pos }] : []
+  }),
+)
+
 const STAR_RADIUS = 9
 
-const activeFilter = ref<'all' | DreamMapCategory>('all')
+const activeFilter = ref<string>('all')
 const selectedId = ref<number | null>(null)
 const infoOpen = ref(false)
 
-function isDimmed(cat: DreamMapCategory) {
+function isDimmed(cat: string) {
   return activeFilter.value !== 'all' && activeFilter.value !== cat
 }
 
 const lines = computed(() => {
-  const segments: { x1: number; y1: number; x2: number; y2: number; color: string; cat: DreamMapCategory; tail?: boolean }[] = []
-  for (const cat of CATEGORIES) {
+  const segments: { x1: number; y1: number; x2: number; y2: number; color: string; cat: string; tail?: boolean }[] = []
+  for (const cat of CATEGORIES.value) {
     // Each category's shape is a fixed list of edges (star-id pairs) —
     // not "connect them in order" — so it can trace an actual figure
     // (a dipper's bowl-and-handle, a cross, a diamond...) rather than a
     // generic zig-zag or polygon.
-    for (const [fromId, toId] of CATEGORY_LINES[cat]) {
+    for (const [fromId, toId] of categoryLines(cat)) {
       const a = points.value.find((p) => p.id === fromId)
       const b = points.value.find((p) => p.id === toId)
       if (!a || !b) continue
-      segments.push({ x1: a.px, y1: a.py, x2: b.px, y2: b.py, color: CATEGORY_COLORS[cat], cat })
+      segments.push({ x1: a.px, y1: a.py, x2: b.px, y2: b.py, color: categoryColor(cat), cat })
     }
     // Decorative tail flourish, like real constellation drawings have.
-    const tail = CATEGORY_TAIL[cat]
-    const tailFrom = points.value.find((p) => p.id === tail.fromId)
-    if (tailFrom) {
-      segments.push({ x1: tailFrom.px, y1: tailFrom.py, x2: tail.x, y2: tail.y, color: CATEGORY_COLORS[cat], cat, tail: true })
+    const tail = categoryTail(cat)
+    const tailFrom = tail && points.value.find((p) => p.id === tail.fromId)
+    if (tail && tailFrom) {
+      segments.push({ x1: tailFrom.px, y1: tailFrom.py, x2: tail.x, y2: tail.y, color: categoryColor(cat), cat, tail: true })
     }
   }
   return segments
@@ -285,13 +295,13 @@ onUnmounted(() => {
 
       <div class="const-labels" aria-hidden="true">
         <span
-          v-for="cat in CATEGORIES"
-          :key="cat"
+          v-for="label in constLabels"
+          :key="label.cat"
           class="const-label"
-          :style="{ left: CONST_LABEL_POS[cat].x + '%', top: CONST_LABEL_POS[cat].y + '%', color: CATEGORY_COLORS[cat] }"
-          :class="{ highlight: activeFilter === cat, dim: isDimmed(cat) }"
+          :style="{ left: label.pos.x + '%', top: label.pos.y + '%', color: categoryColor(label.cat) }"
+          :class="{ highlight: activeFilter === label.cat, dim: isDimmed(label.cat) }"
         >
-          {{ CATEGORY_CONSTELLATIONS[cat] }}
+          {{ categoryConstellation(label.cat) }}
         </span>
       </div>
 
@@ -306,10 +316,10 @@ onUnmounted(() => {
           :style="{
             left: p.px + '%',
             top: p.py + '%',
-            color: CATEGORY_COLORS[p.category],
+            color: categoryColor(p.category),
             animationDelay: (p.id % 7) * 0.35 + 's',
           }"
-          :aria-label="`${p.title}, ${CATEGORY_NAMES[p.category]}`"
+          :aria-label="`${p.title}, ${categoryName(p.category)}`"
           @click="onStarClick(p.id)"
           @mouseenter="onStarHoverEnter(p.id, $event)"
           @mouseleave="onStarHoverLeave"
@@ -317,8 +327,8 @@ onUnmounted(() => {
           <span
             class="star-core"
             :style="{
-              background: `radial-gradient(circle at 38% 32%, #fff, ${CATEGORY_COLORS[p.category]}dd 40%, ${CATEGORY_COLORS[p.category]})`,
-              filter: `drop-shadow(0 0 ${STAR_RADIUS * 0.85}px ${CATEGORY_COLORS[p.category]}cc)`,
+              background: `radial-gradient(circle at 38% 32%, #fff, ${categoryColor(p.category)}dd 40%, ${categoryColor(p.category)})`,
+              filter: `drop-shadow(0 0 ${STAR_RADIUS * 0.85}px ${categoryColor(p.category)}cc)`,
             }"
           />
           <span class="star-label">{{ p.title }}</span>
@@ -351,14 +361,14 @@ onUnmounted(() => {
         @mouseenter="onPopoverEnter"
         @mouseleave="onPopoverLeave"
       >
-        <div class="modal-accent-bar" :style="{ background: CATEGORY_COLORS[selected.category] }" />
+        <div class="modal-accent-bar" :style="{ background: categoryColor(selected.category) }" />
         <div class="popover-body">
           <div class="modal-head-row">
             <span
               class="modal-cat-badge"
-              :style="{ background: CATEGORY_COLORS[selected.category] + '1a', color: CATEGORY_COLORS[selected.category] }"
+              :style="{ background: categoryColor(selected.category) + '1a', color: categoryColor(selected.category) }"
             >
-              {{ CATEGORY_NAMES[selected.category] }}
+              {{ categoryName(selected.category) }}
             </span>
             <button
               type="button"
@@ -387,15 +397,15 @@ onUnmounted(() => {
     <!-- MODAL (touch only — desktop uses the hover popover above instead) -->
     <div v-if="!isHoverCapable" class="modal-overlay" :class="{ visible: selected }" @click.self="closeModal">
       <div v-if="selected" class="modal-card">
-        <div class="modal-accent-bar" :style="{ background: CATEGORY_COLORS[selected.category] }" />
+        <div class="modal-accent-bar" :style="{ background: categoryColor(selected.category) }" />
         <button type="button" class="modal-close" aria-label="Zamknij" @click="closeModal">×</button>
         <div class="modal-body">
           <div class="modal-head-row">
             <span
               class="modal-cat-badge"
-              :style="{ background: CATEGORY_COLORS[selected.category] + '1a', color: CATEGORY_COLORS[selected.category] }"
+              :style="{ background: categoryColor(selected.category) + '1a', color: categoryColor(selected.category) }"
             >
-              {{ CATEGORY_NAMES[selected.category] }}
+              {{ categoryName(selected.category) }}
             </span>
             <button
               type="button"
@@ -436,7 +446,7 @@ onUnmounted(() => {
         </p>
         <div class="info-credit">
           <strong>Stowarzyszenie Nowoczesne Bieszczady</strong><br />
-          Projekt „Ustrzyki 2036: Warsztat Przyszłości” • 3 warsztaty kreatywne • 18 postulatów mieszkańców
+          Projekt „Ustrzyki 2036: Warsztat Przyszłości” • 3 warsztaty kreatywne • {{ points.length }} postulatów mieszkańców
         </div>
       </div>
     </div>
@@ -459,10 +469,10 @@ onUnmounted(() => {
         type="button"
         class="filter-btn"
         :class="{ active: activeFilter === cat }"
-        :style="{ '--cat-color': CATEGORY_COLORS[cat], borderColor: CATEGORY_COLORS[cat], color: CATEGORY_COLORS[cat] }"
+        :style="{ '--cat-color': categoryColor(cat), borderColor: categoryColor(cat), color: categoryColor(cat) }"
         @click="activeFilter = cat"
       >
-        <span class="dot" :style="{ background: CATEGORY_COLORS[cat] }" />{{ CATEGORY_NAMES[cat] }}
+        <span class="dot" :style="{ background: categoryColor(cat) }" />{{ categoryName(cat) }}
       </button>
 
       <span class="filter-strip-stat">{{ points.length }} postulatów</span>

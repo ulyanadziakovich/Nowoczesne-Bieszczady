@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CATEGORY_COLORS, CATEGORY_NAMES, voteWord, type DreamMapPoint } from '~/utils/dreamMapData'
+import { categoryColor, categoryName, voteWord, type DreamMapPoint } from '~/utils/dreamMapData'
 
 defineProps<{ point: DreamMapPoint }>()
 
@@ -11,9 +11,9 @@ const { hasVoted, voteFor } = useDreamMapPoints()
     <div class="card-head">
       <span
         class="card-pill"
-        :style="{ background: CATEGORY_COLORS[point.category] + '1a', color: CATEGORY_COLORS[point.category] }"
+        :style="{ background: categoryColor(point.category) + '1a', color: categoryColor(point.category) }"
       >
-        {{ CATEGORY_NAMES[point.category] }}
+        {{ categoryName(point.category) }}
       </span>
 
       <button
