@@ -1,14 +1,7 @@
 <script setup lang="ts">
-const links = [
-  { label: 'Szlaki rowerowe', to: '/szlaki' },
-  { label: 'Ustrzyki 2036', to: '/ustrzyki-2036' },
-  { label: 'Korona Gór', to: '/korona-gor' },
-  { label: 'Kultura i wydarzenia', to: '/kultura' },
-  { label: 'Inicjatywy i edukacja', to: '/inicjatywy' },
-  { label: 'O nas', to: '/o-nas/misja' },
-  { label: 'Aktualności', to: '/aktualnosci' },
-  { label: 'Kontakt', to: '/kontakt' },
-]
+// Menu comes from the CMS "navigation" collection, with the previously
+// hardcoded menu kept as a fallback inside the composable.
+const { footerLinks: links } = await useNavigation()
 
 const { data: settings } = await useCmsSingle<SiteSettings>('site-settings')
 const { data: documentsData } = await useCmsCollection<{ id: number; label: string; fileUrl: string }>('documents', { order: 'order' })

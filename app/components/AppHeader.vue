@@ -1,26 +1,7 @@
 <script setup lang="ts">
-const links = [
-  { label: 'Szlaki rowerowe', to: '/szlaki' },
-  { label: 'Ustrzyki 2036', to: '/ustrzyki-2036' },
-  { label: 'Korona Ustrzyckich Gór', to: '/korona-gor' },
-  { label: 'Kultura', to: '/kultura' },
-  { label: 'Inicjatywy', to: '/inicjatywy' },
-  {
-    label: 'O nas',
-    to: '/o-nas/misja',
-    children: [
-      { label: 'Kim jesteśmy / Misja', to: '/o-nas/misja' },
-      { label: 'Cele Stowarzyszenia', to: '/o-nas/cele' },
-      { label: 'Statut Stowarzyszenia', to: '/o-nas/statut' },
-      { label: 'Deklaracja członkowska', to: '/o-nas/deklaracja' },
-      { label: 'Zarząd i Zespół', to: '/o-nas/zarzad' },
-      { label: 'Sprawozdania', to: '/o-nas/sprawozdania' },
-      { label: 'Partnerzy i Grantodawcy', to: '/o-nas/partnerzy' },
-    ],
-  },
-  { label: 'Aktualności', to: '/aktualnosci' },
-  { label: 'Kontakt', to: '/kontakt' },
-]
+// Menu comes from the CMS "navigation" collection, with the previously
+// hardcoded menu kept as a fallback inside the composable.
+const { headerLinks: links } = await useNavigation()
 
 const { data: settings } = await useCmsSingle<SiteSettings>('site-settings')
 

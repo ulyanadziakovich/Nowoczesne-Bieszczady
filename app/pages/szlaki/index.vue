@@ -73,6 +73,23 @@ function resetFilters() {
       :stats="heroStats"
     />
 
+    <section class="section map-section">
+      <div class="container">
+        <div class="section-head">
+          <span class="kicker">Wszystkie trasy</span>
+          <h2 class="section-title">Mapa szlaków</h2>
+          <p class="lead">Wszystkie zaudytowane trasy na jednej mapie. Kliknij ślad, aby przejść do jego opisu.</p>
+        </div>
+
+        <ClientOnly>
+          <TrailsOverviewMap :trails="trails" />
+          <template #fallback>
+            <div class="map-placeholder card-surface" />
+          </template>
+        </ClientOnly>
+      </div>
+    </section>
+
     <section class="section">
       <div class="container">
         <div class="desktop-filtered">
@@ -173,6 +190,15 @@ function resetFilters() {
 </template>
 
 <style scoped>
+.map-section {
+  padding-bottom: 0;
+}
+
+.map-placeholder {
+  height: 520px;
+  background: var(--mist);
+}
+
 .filters {
   display: flex;
   align-items: center;
@@ -502,6 +528,10 @@ input[type='range']::-moz-range-thumb {
 
   .mobile-groups {
     display: block;
+  }
+
+  .map-placeholder {
+    height: 380px;
   }
 
   .note-card {

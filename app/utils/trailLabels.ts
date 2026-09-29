@@ -37,6 +37,7 @@ export interface Trail {
   safety?: string
   gallery?: string
   gpxAvailable: boolean
+  gpxFile?: string | null
   routeMapImage?: CmsImage | null
   elevationProfileImage?: CmsImage | null
 }

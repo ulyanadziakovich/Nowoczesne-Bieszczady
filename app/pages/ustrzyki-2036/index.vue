@@ -64,6 +64,26 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
               Rozwoju Społeczeństwa Obywatelskiego w ramach Rządowego Programu Fundusz Inicjatyw Obywatelskich
               NOWEFIO na lata 2021–2030, za pośrednictwem Stowarzyszenia „Pro Carpathia”.
             </p>
+            <div class="funding-logos">
+              <img
+                class="funding-logo funding-logo-niw"
+                src="/img/finansowanie-niw.png"
+                alt="Komitet do Spraw Pożytku Publicznego, Narodowy Instytut Wolności — Centrum Rozwoju Społeczeństwa Obywatelskiego, Rządowy Program Fundusz Inicjatyw Obywatelskich NOWEFIO na lata 2021-2030"
+                width="476"
+                height="56"
+                loading="lazy"
+                decoding="async"
+              />
+              <img
+                class="funding-logo funding-logo-procarpathia"
+                src="/img/finansowanie-procarpathia.png"
+                alt="Stowarzyszenie Pro Carpathia"
+                width="900"
+                height="306"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -125,6 +145,42 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
   color: #8a978f !important;
   padding-top: 1rem;
   border-top: 1px solid #e3ded1;
+}
+
+.funding-logos {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 1.25rem;
+}
+
+.funding-logo {
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.funding-logo-niw {
+  height: 42px;
+}
+
+.funding-logo-procarpathia {
+  height: 40px;
+}
+
+@media (max-width: 600px) {
+  .funding-logos {
+    gap: 1.25rem;
+  }
+
+  .funding-logo-niw {
+    height: 34px;
+  }
+
+  .funding-logo-procarpathia {
+    height: 32px;
+  }
 }
 
 </style>

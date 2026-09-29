@@ -21,6 +21,17 @@ export interface CmsImage {
   type: string
 }
 
+/**
+ * A populated Pruvious `file` field — a row of the built-in "uploads"
+ * collection. The public path of the file is `directory + filename`.
+ */
+export interface CmsFile {
+  filename: string
+  directory: string
+  type: string
+  size: number
+}
+
 interface CmsCollectionOptions {
   limit?: number
   order?: string
@@ -52,6 +63,25 @@ export function resolveCmsUrl(path: string | undefined | null) {
   if (/^https?:\/\//.test(path)) return path
   const config = useRuntimeConfig()
   return `${config.public.cmsUrl}${path}`
+}
+
+/**
+ * Same file, but routed through our own `/api/cms/` proxy instead of straight
+ * at the CMS domain.
+ *
+ * Use `resolveCmsUrl()` for anything the *browser* loads by URL (`<img src>`,
+ * `<a href>`, CSS backgrounds) — those are exempt from CORS, and going direct
+ * skips a hop.
+ *
+ * Use this one for anything JavaScript has to `fetch()` and read, such as GPX
+ * tracks: the CMS sends no CORS headers, so a direct cross-origin fetch fails.
+ */
+export function cmsFileProxyUrl(file: CmsFile | undefined | null) {
+  // Undefined (not '') on empty input, to match resolveCmsUrl()'s contract.
+  if (!file?.filename) return undefined
+  // `directory` is '' at the media root and 'name/' inside a folder, so it
+  // already carries its own trailing slash.
+  return `/api/cms/uploads/${file.directory}${file.filename}`
 }
 
 export interface PageContentBlock {
