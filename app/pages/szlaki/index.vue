@@ -291,15 +291,15 @@ function resetFilters() {
 }
 
 .dot-easy {
-  background: var(--leaf);
+  background: var(--diff-easy);
 }
 
 .dot-medium {
-  background: #f2b263;
+  background: var(--diff-medium);
 }
 
 .dot-hard {
-  background: #e57a63;
+  background: var(--diff-hard);
 }
 
 input[type='range'] {

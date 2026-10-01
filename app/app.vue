@@ -21,6 +21,22 @@
   --amber: #a8551f;
   --stone: #f3f1ea;
   --mist: #eff2ef;
+
+  /* Trail difficulty palette — single source of truth for the overview map lines,
+     its legend, the filter dots, the card dots and the difficulty pills. Chosen for
+     at least 3:1 contrast against OpenStreetMap tiles (forest/meadow/field/water),
+     where the previous green/peach/salmon dropped to 1.1–1.7 and disappeared.
+     Each *-tint/*-ink pair clears 4.5:1, the WCAG threshold for text. */
+  --diff-easy: #0072bd;
+  --diff-easy-tint: #dbe8f0;
+  --diff-easy-ink: #005c99;
+  --diff-medium: #9c27b0;
+  --diff-medium-tint: #eddbf0;
+  --diff-medium-ink: #901ea4;
+  --diff-hard: #cc0000;
+  --diff-hard-tint: #f0dbdb;
+  --diff-hard-ink: #ad0000;
+
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Fraunces', Georgia, serif;
 }
@@ -195,18 +211,18 @@ body {
 }
 
 .pill-easy {
-  background: #e4efe0;
-  color: var(--alpine);
+  background: var(--diff-easy-tint);
+  color: var(--diff-easy-ink);
 }
 
 .pill-medium {
-  background: #fbe9d9;
-  color: var(--amber);
+  background: var(--diff-medium-tint);
+  color: var(--diff-medium-ink);
 }
 
 .pill-hard {
-  background: #f5e0dd;
-  color: #a8341c;
+  background: var(--diff-hard-tint);
+  color: var(--diff-hard-ink);
 }
 
 @media (max-width: 900px) {

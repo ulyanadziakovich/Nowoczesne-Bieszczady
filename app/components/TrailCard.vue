@@ -106,15 +106,15 @@ const bikeTypes = computed(() => trailBikeTypes(props.trail))
 }
 
 .dot-easy {
-  background: var(--leaf);
+  background: var(--diff-easy);
 }
 
 .dot-medium {
-  background: var(--amber);
+  background: var(--diff-medium);
 }
 
 .dot-hard {
-  background: #a8341c;
+  background: var(--diff-hard);
 }
 
 .body {

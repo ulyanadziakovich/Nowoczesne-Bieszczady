@@ -18,13 +18,25 @@ export interface OverviewTrail {
 
 const props = defineProps<{ trails: OverviewTrail[] }>()
 
-/** Same palette as the difficulty dots on this page (.dot-easy/.dot-medium/.dot-hard). */
-const difficultyColors: Record<TrailDifficulty, string> = {
-  latwa: '#89be3a',
-  srednia: '#f2b263',
-  trudna: '#e57a63',
-}
+/**
+ * The difficulty palette lives in app.vue as --diff-easy/--diff-medium/--diff-hard, the single
+ * source of truth shared with the legend, the filter dots, the card dots and the pills. Leaflet
+ * only accepts literal colour strings, so the custom properties are read off the document once
+ * the map boots — safe here because this component always runs in the browser, inside
+ * <ClientOnly>, and the stylesheet is in place long before boot() is called.
+ */
 const fallbackColor = '#6c766e'
+let palette: Record<TrailDifficulty, string> | null = null
+
+function resolvePalette(): Record<TrailDifficulty, string> {
+  const style = getComputedStyle(document.documentElement)
+  const read = (name: string): string => style.getPropertyValue(name).trim() || fallbackColor
+  return {
+    latwa: read('--diff-easy'),
+    srednia: read('--diff-medium'),
+    trudna: read('--diff-hard'),
+  }
+}
 
 /** A polyline that keeps ~300 points still traces a Bieszczady loop faithfully at overview zoom. */
 const MAX_POINTS = 300
@@ -56,7 +68,7 @@ function registerPopup(slug: string, el: Element | ComponentPublicInstance | nul
 }
 
 function colorFor(difficulty: TrailDifficulty): string {
-  return difficultyColors[difficulty] ?? fallbackColor
+  return palette?.[difficulty] ?? fallbackColor
 }
 
 function parseGpx(xml: string): Pt[] {
@@ -156,6 +168,7 @@ async function boot() {
   const target = mapEl.value
   if (!target || map) return
   status.value = 'loading'
+  palette = resolvePalette()
 
   const L = await import('leaflet')
   if (!mapEl.value) return // unmounted while the chunk was loading
@@ -313,9 +326,9 @@ onUnmounted(() => {
 
     <div class="map-footer">
       <ul class="legend">
-        <li v-for="(color, difficulty) in difficultyColors" :key="difficulty">
-          <i class="legend-dot" :style="{ background: color }" />
-          {{ difficultyLabels[difficulty] }}
+        <li v-for="(label, difficulty) in difficultyLabels" :key="difficulty">
+          <i class="legend-dot" :class="`legend-dot-${difficulty}`" />
+          {{ label }}
         </li>
       </ul>
       <p v-if="failedTitles.length" class="legend-error">
@@ -441,6 +454,19 @@ onUnmounted(() => {
   height: 4px;
   border-radius: 999px;
   flex-shrink: 0;
+}
+
+/* Same custom properties the Leaflet lines are drawn with, so the legend can never drift. */
+.legend-dot-latwa {
+  background: var(--diff-easy);
+}
+
+.legend-dot-srednia {
+  background: var(--diff-medium);
+}
+
+.legend-dot-trudna {
+  background: var(--diff-hard);
 }
 
 .legend-error {
