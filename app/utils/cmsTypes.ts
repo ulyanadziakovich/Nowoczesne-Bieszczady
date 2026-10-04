@@ -51,6 +51,7 @@ export interface EventItem {
 export interface TeamMember {
   id: number
   name: string
+  photo?: CmsImage | null
   role: string
   order?: number
 }
