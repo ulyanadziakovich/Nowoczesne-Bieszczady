@@ -9,8 +9,20 @@ const { points, highlightedId } = useDreamMapPoints()
 const CATEGORIES = computed(() => orderedCategories(points.value))
 const activeFilter = ref<string>('all')
 
+// Kolejność wyświetlania: kategorie w kolejności z CMS (pole „Kolejność”),
+// a w każdej kategorii od największej liczby serduszek.
+const sortedPoints = computed(() => {
+  const rank = new Map(CATEGORIES.value.map((c, i) => [c, i]))
+  return [...points.value].sort(
+    (a, b) =>
+      (rank.get(a.category) ?? 999) - (rank.get(b.category) ?? 999) ||
+      b.votes - a.votes ||
+      a.id - b.id,
+  )
+})
+
 const filtered = computed(() =>
-  activeFilter.value === 'all' ? points.value : points.value.filter((p) => p.category === activeFilter.value),
+  activeFilter.value === 'all' ? sortedPoints.value : sortedPoints.value.filter((p) => p.category === activeFilter.value),
 )
 
 // Set when a star is clicked on the sky map above (desktop only — see
@@ -34,7 +46,7 @@ watch(highlightedId, async (id) => {
 const grouped = computed(() =>
   CATEGORIES.value.map((cat) => ({
     cat,
-    items: points.value.filter((p) => p.category === cat),
+    items: sortedPoints.value.filter((p) => p.category === cat),
   })).filter((g) => g.items.length),
 )
 </script>

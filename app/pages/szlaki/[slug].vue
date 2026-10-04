@@ -12,7 +12,7 @@ if (!trail.value) {
 useHead({ title: `${trail.value.title} — Nowoczesne Bieszczady` })
 
 const bikeTypes = computed(() => (trail.value ? trailBikeTypes(trail.value) : []))
-const descriptionParagraphs = computed(() => (trail.value?.description || '').split(/\n\s*\n/).filter(Boolean))
+const descriptionBlocks = computed(() => parseTrailDescription(trail.value?.description))
 const highlights = computed(() => (trail.value?.highlights || '').split('\n').filter(Boolean))
 const stops = computed(() => (trail.value?.stops || '').split('\n').filter(Boolean))
 const safety = computed(() => (trail.value?.safety || '').split('\n').filter(Boolean))
@@ -107,9 +107,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
             <button v-else class="btn btn-amber gpx-btn is-disabled" disabled>GPX wkrótce dostępny</button>
           </div>
 
-          <div v-if="gallery.length" class="gallery gallery-top">
-            <img v-for="(img, i) in gallery" :key="i" :src="resolveCmsUrl(img)" :alt="`${trail.title} — zdjęcie ${i + 1}`" />
-          </div>
+          <GalleryLightbox v-if="gallery.length" class="gallery-top" :images="gallery" :alt-prefix="trail.title" layout="mosaic" />
 
           <h2 class="section-title small first">Podstawowe informacje</h2>
           <div class="info-table card-surface">
@@ -149,7 +147,26 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
           </template>
 
           <h2 class="section-title small">Opis trasy</h2>
-          <p v-for="(paragraph, i) in descriptionParagraphs" :key="i" class="lead paragraph">{{ paragraph }}</p>
+          <template v-for="(block, i) in descriptionBlocks" :key="i">
+            <h3 v-if="block.type === 'heading'" class="desc-heading">{{ block.text }}</h3>
+            <p v-else-if="block.type === 'paragraph'" class="lead paragraph">{{ block.text }}</p>
+            <div v-else-if="block.type === 'segments'" class="segments">
+              <div v-for="(seg, j) in block.items" :key="j" class="segment">
+                <span v-if="seg.label" class="segment-label">{{ seg.label }}</span>
+                <p>{{ seg.text }}</p>
+              </div>
+            </div>
+            <ol v-else-if="block.type === 'stages'" class="stages">
+              <li v-for="(stage, j) in block.items" :key="j" class="stage">
+                <span class="stage-dot" aria-hidden="true">{{ j + 1 }}</span>
+                <div class="stage-head">
+                  <span v-if="stage.range" class="stage-range">{{ stage.range }}</span>
+                  <h4 class="stage-title">{{ stage.title }}</h4>
+                </div>
+                <p v-for="(b, k) in stage.body" :key="k" class="stage-body">{{ b }}</p>
+              </li>
+            </ol>
+          </template>
           <p v-if="trail.routeOverview" class="route-overview">
             <strong>Przebieg trasy:</strong> {{ trail.routeOverview }}
           </p>
@@ -169,8 +186,13 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
           </template>
 
           <h2 class="section-title small">Co warto zobaczyć</h2>
-          <ul class="list">
-            <li v-for="item in highlights" :key="item">{{ item }}</li>
+          <ul class="highlights">
+            <li v-for="item in highlights" :key="item">
+              <span class="hl-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+              </span>
+              <span>{{ item }}</span>
+            </li>
           </ul>
 
           <h2 class="section-title small">Miejsca odpoczynku i gastronomia</h2>
@@ -178,15 +200,29 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
             <li v-for="item in stops" :key="item">{{ item }}</li>
           </ul>
 
-          <template v-if="naturalValuesParagraphs.length">
-            <h2 class="section-title small">Walory przyrodnicze</h2>
-            <p v-for="(p, i) in naturalValuesParagraphs" :key="i" class="lead paragraph">{{ p }}</p>
-          </template>
+          <section v-if="naturalValuesParagraphs.length" class="values-card values-nature">
+            <div class="values-head">
+              <span class="values-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19c0-8 6-14 15-14 0 9-6 15-14 15" /><path d="M5 19c3-4 6-6 9-7" /></svg>
+              </span>
+              <h2 class="values-title">Walory przyrodnicze</h2>
+            </div>
+            <p v-for="(p, i) in naturalValuesParagraphs" :key="i" class="values-p">
+              <strong v-if="splitLeadLabel(p).label">{{ splitLeadLabel(p).label }}: </strong>{{ splitLeadLabel(p).rest }}
+            </p>
+          </section>
 
-          <template v-if="culturalValuesParagraphs.length">
-            <h2 class="section-title small">Walory historyczne i kulturowe</h2>
-            <p v-for="(p, i) in culturalValuesParagraphs" :key="i" class="lead paragraph">{{ p }}</p>
-          </template>
+          <section v-if="culturalValuesParagraphs.length" class="values-card values-culture">
+            <div class="values-head">
+              <span class="values-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v3M10.5 3.5h3" /><path d="M8 10l4-4 4 4" /><path d="M7 21V10h10v11" /><path d="M4 21h16" /><path d="M10.5 21v-4h3v4" /></svg>
+              </span>
+              <h2 class="values-title">Walory historyczne i kulturowe</h2>
+            </div>
+            <p v-for="(p, i) in culturalValuesParagraphs" :key="i" class="values-p">
+              <strong v-if="splitLeadLabel(p).label">{{ splitLeadLabel(p).label }}: </strong>{{ splitLeadLabel(p).rest }}
+            </p>
+          </section>
 
           <template v-if="hasSurfaceBreakdown">
             <h2 class="section-title small">Nawierzchnia</h2>
@@ -204,7 +240,9 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
 
           <template v-if="touristInfoParagraphs.length">
             <h2 class="section-title small">Informacje turystyczne i audytowe</h2>
-            <p v-for="(p, i) in touristInfoParagraphs" :key="i" class="lead paragraph">{{ p }}</p>
+            <p v-for="(p, i) in touristInfoParagraphs" :key="i" class="lead paragraph">
+              <strong v-if="splitLeadLabel(p).label" class="lead-label">{{ splitLeadLabel(p).label }}: </strong>{{ splitLeadLabel(p).rest }}
+            </p>
           </template>
 
           <div v-if="trail.finalRecommendation" class="final-recommendation">
@@ -224,7 +262,9 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
           <div class="sidebar-card card-surface">
             <h3>Bezpieczeństwo</h3>
             <ul class="safety-list">
-              <li v-for="tip in safety" :key="tip">{{ tip }}</li>
+              <li v-for="tip in safety" :key="tip">
+                <strong v-if="splitLeadLabel(tip).label" class="lead-label">{{ splitLeadLabel(tip).label }}: </strong>{{ splitLeadLabel(tip).rest }}
+              </li>
             </ul>
           </div>
 
@@ -693,6 +733,234 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
     display: inline-flex;
     align-items: center;
     min-height: 44px;
+  }
+}
+
+/* Opis trasy: nagłówki, kafelki odcinków i oś czasu etapów */
+.desc-heading {
+  margin: 2rem 0 1rem;
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--alpine);
+}
+
+.segments {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.segment {
+  padding: 1rem 1.1rem;
+  background: #fff;
+  border-radius: 12px;
+  border-top: 3px solid var(--leaf);
+  box-shadow: 0 6px 18px rgba(26, 36, 32, 0.06);
+}
+
+.segment:nth-child(3n + 2) {
+  border-top-color: var(--amber);
+}
+
+.segment:nth-child(3n + 3) {
+  border-top-color: var(--alpine);
+}
+
+.segment-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.segment p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #4a4a44;
+}
+
+.stages {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+
+.stage {
+  position: relative;
+  padding: 0 0 1.6rem 3rem;
+}
+
+.stage::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(var(--leaf), rgba(137, 190, 58, 0.25));
+}
+
+.stage:last-child::before {
+  display: none;
+}
+
+.stage-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--alpine);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 0 0 4px #e3eedb;
+}
+
+.stage-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.7rem;
+  min-height: 32px;
+  margin-bottom: 0.5rem;
+}
+
+.stage-range {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: #f6e7da;
+  color: var(--amber);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.stage-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.stage-body {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #4a4a44;
+}
+
+/* Co warto zobaczyć */
+.highlights {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.highlights li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  color: #3d3d38;
+  line-height: 1.5;
+}
+
+.hl-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e3eedb;
+  color: var(--alpine);
+}
+
+/* Walory jako kolorowe karty */
+.values-card {
+  margin-top: 2.5rem;
+  padding: 1.6rem 1.75rem 0.9rem;
+  border-radius: 16px;
+}
+
+.values-nature {
+  background: linear-gradient(135deg, #eaf3e2, #f4f8ef);
+  border: 1px solid #d6e7c7;
+}
+
+.values-culture {
+  background: linear-gradient(135deg, #f8ece1, #fbf5ee);
+  border: 1px solid #efd9c6;
+}
+
+.values-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.values-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.values-nature .values-icon,
+.values-nature strong {
+  color: var(--alpine);
+}
+
+.values-culture .values-icon,
+.values-culture strong {
+  color: var(--amber);
+}
+
+.values-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--ink);
+}
+
+.values-p {
+  margin: 0 0 0.9rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #3d3d38;
+}
+
+.lead-label {
+  color: var(--alpine);
+}
+
+@media (max-width: 640px) {
+  .segments {
+    grid-template-columns: 1fr;
+  }
+
+  .values-card {
+    padding: 1.25rem 1.2rem 0.6rem;
   }
 }
 </style>

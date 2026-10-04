@@ -9,6 +9,7 @@ const items = [
   { label: 'Zarząd i Zespół', to: '/o-nas/zarzad' },
   { label: 'Sprawozdania', to: '/o-nas/sprawozdania' },
   { label: 'Partnerzy i Grantodawcy', to: '/o-nas/partnerzy' },
+  { label: 'Wolontariat', to: '/o-nas/wolontariat' },
 ]
 </script>
 

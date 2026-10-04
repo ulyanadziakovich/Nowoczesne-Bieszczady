@@ -1,9 +1,16 @@
 <script setup lang="ts">
-const props = withDefaults(defineProps<{ images: string[]; altPrefix: string; layout?: 'grid' | 'scroll' }>(), {
+const props = withDefaults(defineProps<{ images: string[]; altPrefix: string; layout?: 'grid' | 'scroll' | 'mosaic' }>(), {
   layout: 'grid',
 })
 
 const openIndex = ref<number | null>(null)
+
+// Mozaika: na komputerze widać 5 pierwszych zdjęć (reszta pod licznikiem „+N”
+// na piątym kafelku), na telefonie wszystkie zdjęcia w przewijanym pasku.
+const MOSAIC_SIZE = 5
+const visibleImages = computed(() => props.images)
+const mosaicCount = computed(() => Math.min(props.images.length, MOSAIC_SIZE))
+const hiddenCount = computed(() => props.images.length - mosaicCount.value)
 
 function open(i: number) {
   openIndex.value = i
@@ -35,18 +42,29 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
-  <div v-if="images.length" class="gallery" :class="{ 'gallery-scroll': layout === 'scroll' }">
+  <div
+    v-if="images.length"
+    class="gallery"
+    :class="{ 'gallery-scroll': layout === 'scroll', 'gallery-mosaic': layout === 'mosaic', [`mosaic-count-${mosaicCount}`]: layout === 'mosaic' }"
+  >
     <button
-      v-for="(img, i) in images"
+      v-for="(img, i) in visibleImages"
       :key="i"
       type="button"
       class="gallery-item"
       :aria-label="`Powiększ zdjęcie ${i + 1} z ${images.length}`"
       @click="open(i)"
     >
-      <img :src="resolveCmsUrl(img)" :alt="`${altPrefix} — zdjęcie ${i + 1}`" />
+      <img :src="resolveCmsUrl(img)" :alt="`${altPrefix} — zdjęcie ${i + 1}`" :loading="i === 0 ? 'eager' : 'lazy'" />
+      <template v-if="layout === 'mosaic'">
+        <span v-if="hiddenCount > 0 && i === mosaicCount - 1" class="mosaic-more">
+          <span class="mosaic-more-count">+{{ hiddenCount }}</span>
+          <span class="mosaic-more-label">Zobacz wszystkie</span>
+        </span>
+      </template>
     </button>
   </div>
+  <p v-if="layout === 'mosaic' && images.length > 1" class="mosaic-swipe-hint">Przesuń, aby zobaczyć wszystkie {{ images.length }} zdjęć →</p>
 
   <Teleport to="body">
     <div v-if="openIndex !== null" class="lightbox-overlay" @click.self="close">
@@ -147,6 +165,155 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 @media (max-width: 700px) {
   .gallery-scroll {
     grid-template-columns: unset;
+  }
+}
+
+/* Mozaika: jedno duże zdjęcie po lewej i do czterech mniejszych obok. */
+.gallery-mosaic {
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  height: 420px;
+  gap: 0.6rem;
+}
+
+.gallery-mosaic .gallery-item:nth-child(n + 6) {
+  display: none;
+}
+
+.mosaic-swipe-hint {
+  display: none;
+}
+
+.gallery-mosaic .gallery-item {
+  position: relative;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.gallery-mosaic .gallery-item:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.gallery-mosaic .gallery-item img {
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.gallery-mosaic .gallery-item:hover img {
+  transform: scale(1.04);
+}
+
+.gallery-mosaic .gallery-item:first-child {
+  grid-row: 1 / 3;
+  border-radius: 16px 0 0 16px;
+}
+
+.gallery-mosaic .gallery-item:nth-child(3) {
+  border-top-right-radius: 16px;
+}
+
+.gallery-mosaic .gallery-item:nth-child(5) {
+  border-bottom-right-radius: 16px;
+}
+
+/* Mniej niż 5 zdjęć: układ się dopasowuje, bez pustych pól. */
+.gallery-mosaic.mosaic-count-1 {
+  grid-template-columns: 1fr;
+}
+.gallery-mosaic.mosaic-count-1 .gallery-item:first-child {
+  border-radius: 16px;
+}
+.gallery-mosaic.mosaic-count-2,
+.gallery-mosaic.mosaic-count-3 {
+  grid-template-columns: 2fr 1fr;
+}
+.gallery-mosaic.mosaic-count-2 .gallery-item:nth-child(2) {
+  grid-row: 1 / 3;
+  border-radius: 0 16px 16px 0;
+}
+.gallery-mosaic.mosaic-count-3 .gallery-item:nth-child(2) {
+  border-top-right-radius: 16px;
+}
+.gallery-mosaic.mosaic-count-3 .gallery-item:nth-child(3) {
+  border-radius: 0 0 16px 0;
+}
+.gallery-mosaic.mosaic-count-4 .gallery-item:nth-child(4) {
+  grid-column: 2 / 4;
+  border-bottom-right-radius: 16px;
+}
+
+.mosaic-more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  background: rgba(16, 26, 21, 0.55);
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.gallery-item:hover .mosaic-more {
+  background: rgba(16, 26, 21, 0.68);
+}
+
+.mosaic-more-count {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.mosaic-more-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 700px) {
+  /* Telefon: wszystkie zdjęcia w poziomym, przewijanym palcem pasku. */
+  .gallery-mosaic,
+  .gallery-mosaic[class*='mosaic-count-'] {
+    display: flex;
+    height: auto;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.6rem;
+    margin-right: -1rem;
+    padding-right: 1rem;
+    scrollbar-width: none;
+  }
+
+  .gallery-mosaic::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery-mosaic .gallery-item,
+  .gallery-mosaic .gallery-item:nth-child(n),
+  .gallery-mosaic[class*='mosaic-count-'] .gallery-item:nth-child(n) {
+    display: block;
+    flex: 0 0 82%;
+    height: 240px;
+    grid-row: auto;
+    grid-column: auto;
+    border-radius: 14px;
+    scroll-snap-align: start;
+  }
+
+  .mosaic-more {
+    display: none;
+  }
+
+  .mosaic-swipe-hint {
+    display: block;
+    margin: 0.5rem 0 1.5rem;
+    font-size: 0.78rem;
+    color: #8a978f;
   }
 }
 
