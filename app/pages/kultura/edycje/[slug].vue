@@ -22,7 +22,7 @@ const gallery = computed(() => (edition.value?.gallery || '').split('\n').map((s
       <div class="container article">
         <p class="lead paragraph">{{ edition.description }}</p>
 
-        <GalleryLightbox :images="gallery" :alt-prefix="edition.title" />
+        <GalleryLightbox :images="gallery" :alt-prefix="edition.title" layout="mosaic" />
 
         <NuxtLink to="/kultura" class="back-link">← Wróć do Kultury</NuxtLink>
       </div>

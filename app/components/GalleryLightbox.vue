@@ -12,6 +12,25 @@ const visibleImages = computed(() => props.images)
 const mosaicCount = computed(() => Math.min(props.images.length, MOSAIC_SIZE))
 const hiddenCount = computed(() => props.images.length - mosaicCount.value)
 
+// „Zobacz wszystkie” rozwija mozaikę w siatkę kafelków ze wszystkimi zdjęciami;
+// dopiero kliknięcie kafelka otwiera powiększenie.
+const expanded = ref(false)
+const galleryEl = ref<HTMLElement | null>(null)
+
+function isMoreTile(i: number) {
+  return props.layout === 'mosaic' && !expanded.value && hiddenCount.value > 0 && i === mosaicCount.value - 1
+}
+
+function onItemClick(i: number) {
+  if (isMoreTile(i)) expanded.value = true
+  else open(i)
+}
+
+function toggleExpanded() {
+  expanded.value = !expanded.value
+  if (!expanded.value) galleryEl.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 function open(i: number) {
   openIndex.value = i
 }
@@ -44,27 +63,38 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 <template>
   <div
     v-if="images.length"
+    ref="galleryEl"
     class="gallery"
-    :class="{ 'gallery-scroll': layout === 'scroll', 'gallery-mosaic': layout === 'mosaic', [`mosaic-count-${mosaicCount}`]: layout === 'mosaic' }"
+    :class="{
+      'gallery-scroll': layout === 'scroll',
+      'gallery-mosaic': layout === 'mosaic' && !expanded,
+      [`mosaic-count-${mosaicCount}`]: layout === 'mosaic' && !expanded,
+      'gallery-tiles': layout === 'mosaic' && expanded,
+    }"
   >
     <button
       v-for="(img, i) in visibleImages"
       :key="i"
       type="button"
       class="gallery-item"
-      :aria-label="`Powiększ zdjęcie ${i + 1} z ${images.length}`"
-      @click="open(i)"
+      :aria-label="isMoreTile(i) ? `Pokaż wszystkie ${images.length} zdjęć` : `Powiększ zdjęcie ${i + 1} z ${images.length}`"
+      @click="onItemClick(i)"
     >
       <img :src="resolveCmsUrl(img)" :alt="`${altPrefix} — zdjęcie ${i + 1}`" :loading="i === 0 ? 'eager' : 'lazy'" />
-      <template v-if="layout === 'mosaic'">
-        <span v-if="hiddenCount > 0 && i === mosaicCount - 1" class="mosaic-more">
+      <template v-if="isMoreTile(i)">
+        <span class="mosaic-more">
           <span class="mosaic-more-count">+{{ hiddenCount }}</span>
           <span class="mosaic-more-label">Zobacz wszystkie</span>
         </span>
       </template>
     </button>
   </div>
-  <p v-if="layout === 'mosaic' && images.length > 1" class="mosaic-swipe-hint">Przesuń, aby zobaczyć wszystkie {{ images.length }} zdjęć →</p>
+  <div v-if="layout === 'mosaic' && images.length > 1" class="mosaic-footer" :class="{ 'mosaic-footer-mobile-only': hiddenCount === 0 && !expanded }">
+    <p v-if="!expanded" class="mosaic-swipe-hint">Przesuń, aby zobaczyć więcej →</p>
+    <button type="button" class="mosaic-toggle" @click="toggleExpanded">
+      {{ expanded ? 'Zwiń galerię' : `Pokaż wszystkie zdjęcia (${images.length})` }}
+    </button>
+  </div>
 
   <Teleport to="body">
     <div v-if="openIndex !== null" class="lightbox-overlay" @click.self="close">
@@ -182,6 +212,59 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 
 .mosaic-swipe-hint {
   display: none;
+}
+
+.mosaic-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin: -0.75rem 0 1.5rem;
+}
+
+.mosaic-toggle {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid #d9d3c3;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--alpine);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.mosaic-toggle:hover {
+  background: #f4f1e8;
+  border-color: var(--alpine);
+}
+
+/* Rozwinięta galeria: wszystkie zdjęcia jako równe kwadratowe kafelki. */
+.gallery-tiles {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 0.5rem;
+}
+
+.gallery-tiles .gallery-item {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.gallery-tiles .gallery-item img {
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.gallery-tiles .gallery-item:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.gallery-tiles .gallery-item:hover img {
+  transform: scale(1.05);
 }
 
 .gallery-mosaic .gallery-item {
@@ -311,9 +394,29 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 
   .mosaic-swipe-hint {
     display: block;
-    margin: 0.5rem 0 1.5rem;
+    margin: 0;
     font-size: 0.78rem;
     color: #8a978f;
+  }
+
+  .mosaic-footer {
+    justify-content: space-between;
+    margin: 0.5rem 0 1.5rem;
+  }
+
+  .gallery-tiles {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem;
+  }
+
+  .gallery-tiles .gallery-item {
+    border-radius: 6px;
+  }
+}
+
+@media (min-width: 701px) {
+  .mosaic-footer-mobile-only {
+    display: none;
   }
 }
 

@@ -101,6 +101,7 @@ const grouped = computed(() =>
             :point="p"
             :class="{ highlighted: highlightedId === p.id }"
           />
+          <DreamMapIdeaTile />
         </div>
       </div>
 
@@ -115,6 +116,9 @@ const grouped = computed(() =>
           <div class="category-scroller">
             <DreamMapCard v-for="p in group.items" :key="p.id" class="scroller-card" :point="p" />
           </div>
+        </div>
+        <div class="mobile-idea">
+          <DreamMapIdeaTile />
         </div>
       </div>
     </div>
@@ -178,8 +182,8 @@ const grouped = computed(() =>
   margin-bottom: 2rem;
 }
 
-.category-row:last-child {
-  margin-bottom: 0;
+.mobile-idea {
+  margin-top: 2rem;
 }
 
 .category-row-head {

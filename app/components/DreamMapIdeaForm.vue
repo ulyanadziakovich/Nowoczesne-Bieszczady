@@ -3,6 +3,8 @@
 // „Zgłoszone pomysły”) i, gdy skonfigurowano wysyłkę, na e-mail stowarzyszenia.
 // Wszystkie teksty formularza można zmienić w CMS (treści strony, klucze dream-map-form-*).
 const content = usePageContent()
+// compact = jedna kolumna, bez własnego tła (wewnątrz okienka z kafelka)
+defineProps<{ compact?: boolean }>()
 
 const form = reactive({ title: '', problem: '', solution: '', contact: '', website: '' })
 const status = ref<'idle' | 'sending' | 'sent' | 'error'>('idle')
@@ -21,7 +23,7 @@ async function submit() {
 </script>
 
 <template>
-  <section id="zglos-pomysl" class="idea-form-wrap">
+  <section class="idea-form-wrap" :class="{ compact }">
     <div class="idea-intro">
       <span class="kicker">{{ content.title('dream-map-form-kicker', 'Twój głos') }}</span>
       <h2>{{ content.title('dream-map-form-intro', 'Zgłoś swój pomysł') }}</h2>
@@ -130,7 +132,7 @@ async function submit() {
 .idea-form input:focus,
 .idea-form textarea:focus {
   outline: none;
-  border-color: var(--alpine);
+  border-color: #a9541f;
   background: #fff;
 }
 
@@ -155,18 +157,25 @@ async function submit() {
 .idea-success {
   padding: 1.5rem;
   border-radius: 14px;
-  background: #eaf3e2;
+  background: #fbf3ec;
 }
 
 .idea-success strong {
   font-family: var(--font-display);
   font-size: 1.3rem;
-  color: var(--alpine);
+  color: #a9541f;
 }
 
 .idea-success p {
   margin: 0.5rem 0 1rem;
   color: #3d3d38;
+}
+
+.idea-form-wrap.compact {
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  box-shadow: none;
+  padding: 2.25rem 2rem 2rem;
 }
 
 @media (max-width: 800px) {

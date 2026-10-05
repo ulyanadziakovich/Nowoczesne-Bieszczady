@@ -12,6 +12,14 @@ useHead({ title: `${post.value.title} — Aktualności — Nowoczesne Bieszczady
 const bodyParagraphs = computed(() => (post.value?.body || '').split(/\n\s*\n/).filter(Boolean))
 const gallery = computed(() => (post.value?.gallery || '').split('\n').map((s) => s.trim()).filter(Boolean))
 
+function photoWord(n: number) {
+  const last = n % 10
+  const lastTwo = n % 100
+  if (n === 1) return 'zdjęcie'
+  if (last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14)) return 'zdjęcia'
+  return 'zdjęć'
+}
+
 // Plain text field, so this is the only formatting it supports:
 // **word** → bold, and lines starting with "● " get a styled accent dot
 // instead of a plain bullet character sitting flush in the text.
@@ -45,7 +53,13 @@ function formatParagraph(text: string) {
             v-html="formatParagraph(paragraph)"
           />
 
-          <GalleryLightbox v-if="gallery.length" :images="gallery" :alt-prefix="post.title" />
+          <section v-if="gallery.length" class="article-gallery">
+            <div class="gallery-head">
+              <h2>Galeria</h2>
+              <span class="gallery-count">{{ gallery.length }} {{ photoWord(gallery.length) }}</span>
+            </div>
+            <GalleryLightbox :images="gallery" :alt-prefix="post.title" layout="mosaic" />
+          </section>
 
           <NuxtLink to="/aktualnosci" class="back-link">← Wróć do aktualności</NuxtLink>
         </div>
@@ -125,5 +139,34 @@ function formatParagraph(text: string) {
   .paragraph.lede {
     font-size: 1.05rem;
   }
+}
+
+.article-gallery {
+  margin: 2.5rem 0 2rem;
+}
+
+.gallery-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e4dfd2;
+}
+
+.gallery-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--ink);
+}
+
+.gallery-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amber);
 }
 </style>

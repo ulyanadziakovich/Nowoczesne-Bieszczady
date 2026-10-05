@@ -90,12 +90,6 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
     </section>
 
     <DreamMapBoard />
-
-    <section class="section idea-section">
-      <div class="container">
-        <DreamMapIdeaForm />
-      </div>
-    </section>
   </div>
 </template>
 
