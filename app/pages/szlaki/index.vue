@@ -3,7 +3,8 @@ definePageMeta({ solidHeader: true })
 useHead({ title: 'Nasze szlaki rowerowe — Nowoczesne Bieszczady' })
 
 const { data: trailsData } = await useCmsCollection<Trail>('trails')
-const trails = computed(() => trailsData.value?.records ?? [])
+// Trasy w kolejności z CMS (przeciąganie w panelu), bez ukrytych („Aktywna” odznaczona).
+const trails = computed(() => byCmsOrder(trailsData.value?.records ?? []).filter(isCmsActive))
 const content = usePageContent()
 
 /** Upper bound of the length filter. Kept above the longest audited route so

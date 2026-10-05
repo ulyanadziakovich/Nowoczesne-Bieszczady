@@ -3,7 +3,7 @@ definePageMeta({ layout: 'onas', solidHeader: true })
 useHead({ title: 'Sprawozdania — O nas — Nowoczesne Bieszczady' })
 
 const { data } = await useCmsCollection<Report>('reports', { order: 'year:desc' })
-const reports = computed(() => data.value?.records ?? [])
+const reports = computed(() => byCmsOrder(data.value?.records ?? []))
 const content = usePageContent()
 </script>
 
@@ -16,7 +16,8 @@ const content = usePageContent()
       <li v-for="report in reports" :key="report.id">
         <span class="year">{{ report.year }}</span>
         <span class="title">{{ report.title }}</span>
-        <a :href="report.fileUrl || `/files/sprawozdanie-${report.year}.pdf`" class="btn btn-outline" download>Pobierz PDF</a>
+        <a v-if="report.file?.filename" :href="resolveCmsUrl(`/uploads/${report.file.directory}${report.file.filename}`)" class="btn btn-outline" target="_blank" rel="noopener">Pobierz PDF</a>
+        <span v-else class="btn btn-outline is-disabled" aria-disabled="true">PDF wkrótce</span>
       </li>
     </ul>
   </div>
@@ -71,5 +72,10 @@ const content = usePageContent()
   .reports-list li {
     flex-wrap: wrap;
   }
+}
+
+.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 </style>

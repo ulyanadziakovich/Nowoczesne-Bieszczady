@@ -21,6 +21,8 @@ export interface Trail {
   id: number
   slug: string
   title: string
+  /** „Aktywna/Aktywny” w CMS — nieaktywne są ukryte na stronie. */
+  active?: boolean
   difficulty: TrailDifficulty
   bikeTypes: string
   lengthKm: number
@@ -40,6 +42,8 @@ export interface Trail {
   gpxFile?: string | null
   routeMapImage?: CmsImage | null
   elevationProfileImage?: CmsImage | null
+  /** Ręczna kolejność z CMS (przeciąganie w panelu). */
+  order?: number
 }
 
 export function trailBikeTypes(trail: Pick<Trail, 'bikeTypes'>): TrailBikeType[] {

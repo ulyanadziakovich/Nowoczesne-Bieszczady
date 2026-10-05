@@ -3,7 +3,8 @@ definePageMeta({ solidHeader: true })
 
 const route = useRoute()
 const { data: trailsData } = await useCmsCollection<Trail>('trails')
-const trail = computed(() => trailsData.value?.records.find((t) => t.slug === route.params.slug))
+// Ukryta trasa (nieaktywna w CMS) zachowuje się jak nieistniejąca — 404.
+const trail = computed(() => trailsData.value?.records.find((t) => t.slug === route.params.slug && isCmsActive(t)))
 
 if (!trail.value) {
   throw createError({ statusCode: 404, statusMessage: 'Nie znaleziono trasy' })

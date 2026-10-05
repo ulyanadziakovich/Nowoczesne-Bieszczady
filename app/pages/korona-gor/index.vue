@@ -6,7 +6,7 @@ const { data: peaksData } = await useCmsCollection<Peak>('peaks', { order: 'orde
 const peaks = computed(() => peaksData.value?.records ?? [])
 
 const { data: eventsData } = await useCmsCollection<EventItem>('events')
-const sportEvents = computed(() => (eventsData.value?.records ?? []).filter((e) => e.tag === 'sport'))
+const sportEvents = computed(() => byCmsOrder(eventsData.value?.records ?? []).filter((e) => e.tag === 'sport'))
 
 const content = usePageContent()
 

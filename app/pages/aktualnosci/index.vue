@@ -3,7 +3,7 @@ definePageMeta({ solidHeader: true })
 useHead({ title: 'Aktualności — Nowoczesne Bieszczady' })
 
 const { data } = await useCmsCollection<NewsPost>('news', { order: 'id:desc' })
-const newsPosts = computed(() => data.value?.records ?? [])
+const newsPosts = computed(() => byCmsOrder(data.value?.records ?? []))
 const content = usePageContent()
 </script>
 

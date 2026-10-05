@@ -2,21 +2,21 @@
 definePageMeta({ layout: 'onas', solidHeader: true })
 useHead({ title: 'Wolontariat — O nas — Nowoczesne Bieszczady' })
 
-interface VolunteeringDocument {
-  id: number
-  label: string
-  file: CmsFile | null
-  order?: number
+// Cała treść podstrony z jednej zakładki CMS „Wolontariat”: tytuł, opis i dokumenty.
+interface VolunteeringPage {
+  title?: string
+  description?: string
+  documents?: { label: string; file: CmsFile | null }[]
 }
 
-const content = usePageContent()
-const { data } = await useCmsCollection<VolunteeringDocument>('volunteering-documents', { order: 'order' })
-const documents = computed(() => (data.value?.records ?? []).filter((d) => d.file?.filename))
+const { data } = await useCmsSingle<VolunteeringPage>('volunteering')
+const title = computed(() => data.value?.title || 'Wolontariat')
 const paragraphs = computed(() =>
-  content.body('wolontariat-intro', 'Wkrótce zamieścimy tutaj informacje o wolontariacie w Stowarzyszeniu Nowoczesne Bieszczady.')
+  (data.value?.description || 'Wkrótce zamieścimy tutaj informacje o wolontariacie w Stowarzyszeniu Nowoczesne Bieszczady.')
     .split(/\n\s*\n/)
     .filter(Boolean),
 )
+const documents = computed(() => (data.value?.documents ?? []).filter((d) => d.file?.filename))
 
 function fileUrl(file: CmsFile) {
   return resolveCmsUrl(`/uploads/${file.directory}${file.filename}`)
@@ -25,11 +25,11 @@ function fileUrl(file: CmsFile) {
 
 <template>
   <div>
-    <h2>{{ content.title('wolontariat-intro', 'Wolontariat') }}</h2>
+    <h2>{{ title }}</h2>
     <p v-for="(p, i) in paragraphs" :key="i">{{ p }}</p>
 
     <ul v-if="documents.length" class="docs-list">
-      <li v-for="doc in documents" :key="doc.id">
+      <li v-for="(doc, i) in documents" :key="i">
         <span class="doc-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /></svg>
         </span>

@@ -2,7 +2,7 @@
 definePageMeta({ solidHeader: true })
 
 const route = useRoute()
-const { data } = await useCmsCollection<FestivalEdition>('festival-editions')
+const { data } = await useCmsCollection<FestivalEdition>('festival-editions', { order: 'year:desc' })
 const edition = computed(() => data.value?.records.find((e) => e.slug === route.params.slug))
 
 if (!edition.value) {

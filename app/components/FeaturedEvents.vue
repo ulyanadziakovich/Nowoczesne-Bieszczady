@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { data } = useCmsCollection<NewsPost>('news', { order: 'id:desc' })
-const posts = computed(() => (data.value?.records ?? []).slice(0, 3))
+const posts = computed(() => byCmsOrder(data.value?.records ?? []).slice(0, 3))
 </script>
 
 <template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
-const { data } = await useCmsCollection<NewsPost>('news')
+const { data } = await useCmsCollection<NewsPost>('news', { order: 'id:desc' })
 const post = computed(() => data.value?.records.find((p) => p.slug === route.params.slug))
 
 if (!post.value) {

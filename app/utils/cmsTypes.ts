@@ -34,6 +34,8 @@ export interface NewsPost {
   excerpt: string
   body?: string
   gallery?: string
+  /** Ręczna kolejność z CMS (przeciąganie w panelu). */
+  order?: number
 }
 
 export interface EventItem {
@@ -46,6 +48,8 @@ export interface EventItem {
   freeEntry: boolean
   ticketsHref?: string
   tag?: string
+  /** Ręczna kolejność z CMS (przeciąganie w panelu). */
+  order?: number
 }
 
 export interface TeamMember {
@@ -67,7 +71,10 @@ export interface Report {
   id: number
   year: string
   title: string
-  fileUrl?: string
+  /** Plik sprawozdania wgrany w CMS. */
+  file?: CmsFile | null
+  /** Ręczna kolejność z CMS (przeciąganie w panelu). */
+  order?: number
 }
 
 export interface Goal {
@@ -95,14 +102,22 @@ export interface FestivalEdition {
   image: CmsImage | null
   gallery: string
   featured: boolean
+  /** Ręczna kolejność z CMS (przeciąganie w panelu). */
+  order?: number
 }
 
 export interface Contest {
   id: number
   title: string
+  /** „Aktywna/Aktywny” w CMS — nieaktywne są ukryte na stronie. */
+  active?: boolean
+  facts?: { label: string; value: string }[]
+  documents?: { label: string; file: CmsFile | null }[]
   description: string
   fundingNote: string
   image: CmsImage | null
+  /** Ręczna kolejność z CMS (przeciąganie w panelu). */
+  order?: number
 }
 
 export interface FlagshipTile {

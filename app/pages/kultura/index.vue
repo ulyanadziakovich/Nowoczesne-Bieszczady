@@ -3,11 +3,16 @@ definePageMeta({ solidHeader: true })
 useHead({ title: 'Kultura i wydarzenia — Nowoczesne Bieszczady' })
 
 const { data: editionsData } = await useCmsCollection<FestivalEdition>('festival-editions', { order: 'year:desc' })
-const festivalEditions = computed(() => editionsData.value?.records ?? [])
+const festivalEditions = computed(() => byCmsOrder(editionsData.value?.records ?? []))
 
 const { data: contestsData } = await useCmsCollection<Contest>('contests')
-// Painting contest hidden for now — kept in the CMS, just not shown here.
-const contests = computed(() => (contestsData.value?.records ?? []).filter((c) => !c.title.toLowerCase().includes('malarski')))
+// Na stronie tylko konkursy aktywne w CMS. Dopóki CMS nie ma pola „Aktywny”,
+// konkurs malarski pozostaje ukryty jak dotąd.
+const contests = computed(() =>
+  byCmsOrder(contestsData.value?.records ?? []).filter((c) =>
+    c.active === undefined ? !c.title.toLowerCase().includes('malarski') : c.active,
+  ),
+)
 
 const content = usePageContent()
 
@@ -31,9 +36,9 @@ function formatParagraph(text: string) {
   return escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
 }
 
-// Entry form / participant statement / rules — only the photo contest has
-// these right now, keyed generically in page-content so no schema change
-// was needed to add them.
+// Dokumenty i ramka z informacjami są w samym konkursie w CMS (pola „Dokumenty
+// do pobrania” i „Najważniejsze informacje”). Starsze bloki z „Tekstów na stronach”
+// zostają jako zapas dla konkursu fotograficznego, dopóki konkurs ich nie ma.
 const photoContestDocuments = computed(() =>
   [
     { key: 'konkurs-fotograficzny-karta' },
@@ -45,6 +50,18 @@ const photoContestDocuments = computed(() =>
 )
 
 const photoContestFacts = computed(() => content.pairs('konkurs-fotograficzny-fakty'))
+
+function contestDocuments(contest: Contest) {
+  const own = (contest.documents ?? [])
+    .filter((d) => d.file?.filename)
+    .map((d) => ({ title: d.label, url: resolveCmsUrl(`/uploads/${d.file!.directory}${d.file!.filename}`) }))
+  return own.length ? own : isPhotoContest(contest) ? photoContestDocuments.value : []
+}
+
+function contestFacts(contest: Contest) {
+  const own = (contest.facts ?? []).filter((f) => f.label && f.value)
+  return own.length ? own : isPhotoContest(contest) ? photoContestFacts.value : []
+}
 
 const FACT_STYLE: Record<string, { color: string; icon: string }> = {
   Kategorie: { color: '#1f6fa8', icon: 'landscape' },
@@ -159,9 +176,9 @@ const announcementText =
             <h3 class="contest-title">{{ contest.title }}</h3>
             <p class="lead paragraph" v-html="formatParagraph(descriptionParagraphs(contest.description)[0])" />
 
-            <div v-if="isPhotoContest(contest) && photoContestFacts.length" class="fact-grid">
+            <div v-if="contestFacts(contest).length" class="fact-grid">
               <div
-                v-for="fact in photoContestFacts"
+                v-for="fact in contestFacts(contest)"
                 :key="fact.label"
                 class="fact-item"
                 :style="{ '--fact-color': factStyle(fact.label).color }"
@@ -197,9 +214,9 @@ const announcementText =
             />
             <p v-if="contest.fundingNote" class="funding-note">{{ contest.fundingNote }}</p>
 
-            <div v-if="isPhotoContest(contest) && photoContestDocuments.length" class="documents">
+            <div v-if="contestDocuments(contest).length" class="documents">
               <p class="documents-label">Dokumenty do pobrania</p>
-              <div v-for="doc in photoContestDocuments" :key="doc.url" class="document-row">
+              <div v-for="doc in contestDocuments(contest)" :key="doc.url" class="document-row">
                 <span class="document-name">
                   <svg class="document-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8">
                     <path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
