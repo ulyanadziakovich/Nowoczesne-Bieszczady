@@ -15,7 +15,8 @@ function isShortTitle(p: string) {
 }
 
 function splitStageTitle(title: string) {
-  const m = title.match(/\s*\(([^()]*\d[^()]*km)\)\s*$/)
+  // „Tytuł (ok. 0,0 – 11,0 km)” albo „Tytuł, ok. 0-18 km”
+  const m = title.match(/\s*\(([^()]*\d[^()]*km)\)\s*$/) || title.match(/,\s*((?:ok\.\s*)?[\d,.]+\s*[-–]\s*[\d,.]+\s*km)\s*$/)
   return m ? { title: title.slice(0, m.index).trim(), range: m[1].trim() } : { title: title.trim(), range: '' }
 }
 
