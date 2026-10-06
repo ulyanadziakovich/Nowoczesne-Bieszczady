@@ -23,8 +23,9 @@ function submit() {
     <PageHero
       variant="light"
       kicker="Kontakt"
-      title="Skontaktuj się z nami"
+      :title="content.title('kontakt-hero-description', 'Skontaktuj się z nami')"
       :description="content.body('kontakt-hero-description')"
+      :description-html="content.html('kontakt-hero-description')"
       :stats="content.lines('kontakt-stats')"
     />
 

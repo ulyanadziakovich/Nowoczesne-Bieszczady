@@ -87,8 +87,9 @@ const announcementText =
     <PageHero
       variant="light"
       kicker="Kultura"
-      title="Kultura i wydarzenia"
+      :title="content.title('kultura-hero-description', 'Kultura i wydarzenia')"
       :description="content.body('kultura-hero-description')"
+      :description-html="content.html('kultura-hero-description')"
       :stats="heroStats"
     />
 

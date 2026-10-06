@@ -74,8 +74,9 @@ function resetFilters() {
     <PageHero
       variant="light"
       kicker="Turystyka rowerowa"
-      title="Nasze szlaki rowerowe"
+      :title="content.title('szlaki-hero-description', 'Nasze szlaki rowerowe')"
       :description="content.body('szlaki-hero-description')"
+      :description-html="content.html('szlaki-hero-description')"
       :stats="heroStats"
     />
 

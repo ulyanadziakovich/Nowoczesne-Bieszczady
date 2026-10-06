@@ -12,8 +12,9 @@ const content = usePageContent()
     <PageHero
       variant="light"
       kicker="Edukacja i społeczność"
-      title="Inicjatywy społeczne i edukacja"
+      :title="content.title('inicjatywy-hero-description', 'Inicjatywy społeczne i edukacja')"
       :description="content.body('inicjatywy-hero-description')"
+      :description-html="content.html('inicjatywy-hero-description')"
       :stats="heroStats"
     />
 

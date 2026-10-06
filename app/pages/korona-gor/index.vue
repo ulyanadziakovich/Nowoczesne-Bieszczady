@@ -19,8 +19,9 @@ const heroStats = computed(() => [`${peaks.value.length} szczytów w pętli`, ..
     <PageHero
       variant="light"
       kicker="Turystyka górska"
-      title="Korona Ustrzyckich Gór"
+      :title="content.title('korona-gor-hero-description', 'Korona Ustrzyckich Gór')"
       :description="content.body('korona-gor-hero-description')"
+      :description-html="content.html('korona-gor-hero-description')"
       :stats="heroStats"
     />
 

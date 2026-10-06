@@ -4,6 +4,8 @@ withDefaults(
     kicker?: string
     title: string
     description?: string
+    /** Sformatowany opis z edytora CMS (HTML) — zastępuje `description`, gdy jest. */
+    descriptionHtml?: string
     image?: string
     variant?: 'photo' | 'light'
     stats?: string[]
@@ -29,7 +31,7 @@ withDefaults(
         </span>
       </div>
       <h1>{{ title }}</h1>
-      <p v-if="description">{{ description }}</p>
+      <RichText v-if="description || descriptionHtml" class="hero-text" :text="description" :html="descriptionHtml" />
 
       <div v-if="stats?.length" class="stats-row">
         <template v-for="(stat, i) in stats" :key="stat">
@@ -45,7 +47,7 @@ withDefaults(
     <div class="container content">
       <span v-if="kicker" class="kicker">{{ kicker }}</span>
       <h1>{{ title }}</h1>
-      <p v-if="description">{{ description }}</p>
+      <RichText v-if="description || descriptionHtml" class="hero-text" :text="description" :html="descriptionHtml" tone="dark" />
     </div>
   </section>
 </template>
@@ -82,13 +84,8 @@ h1 {
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35);
 }
 
-p {
-  margin: 1rem 0 0;
-  max-width: 640px;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: #eef1ee;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.3);
+.hero-text {
+  margin-top: 1rem;
 }
 
 /* ---- Light variant: plain content header, no photo ---- */
@@ -170,10 +167,6 @@ p {
   text-shadow: none;
 }
 
-.page-hero.light p {
-  color: #4a4a44;
-  text-shadow: none;
-}
 
 @media (max-width: 800px) {
   .page-hero {

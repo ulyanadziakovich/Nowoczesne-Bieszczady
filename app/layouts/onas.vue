@@ -18,8 +18,9 @@ const items = [
     <PageHero
       variant="light"
       kicker="Stowarzyszenie"
-      title="O nas"
+      :title="content.title('onas-hero-description', 'O nas')"
       :description="content.body('onas-hero-description')"
+      :description-html="content.html('onas-hero-description')"
       :stats="content.lines('onas-stats')"
     />
 

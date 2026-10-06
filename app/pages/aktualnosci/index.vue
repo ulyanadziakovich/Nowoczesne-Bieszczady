@@ -12,8 +12,9 @@ const content = usePageContent()
     <PageHero
       variant="light"
       kicker="Blog"
-      title="Aktualności"
+      :title="content.title('aktualnosci-hero-description', 'Aktualności')"
       :description="content.body('aktualnosci-hero-description')"
+      :description-html="content.html('aktualnosci-hero-description')"
       :stats="[`${newsPosts.length} opublikowane wpisy`, 'Aktualizowane na bieżąco']"
     />
 

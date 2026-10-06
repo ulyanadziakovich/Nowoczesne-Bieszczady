@@ -105,6 +105,8 @@ export interface PageContentBlock {
   key: string
   title?: string
   body?: string
+  /** Sformatowana treść z edytora w CMS (HTML) — ma pierwszeństwo przed `body`. */
+  content?: string
   image?: string
 }
 
@@ -126,6 +128,12 @@ export function usePageContent() {
 
   function body(key: string, fallback = '') {
     return get(key)?.body || fallback
+  }
+
+  /** Treść z edytora w CMS (HTML) albo '' gdy pole jest puste lub go jeszcze nie ma. */
+  function html(key: string) {
+    const value = get(key)?.content || ''
+    return value.replace(/<p>\s*<\/p>/g, '').trim() ? value : ''
   }
 
   function image(key: string, fallback = '') {
@@ -150,5 +158,5 @@ export function usePageContent() {
     })
   }
 
-  return { blocks, get, title, body, image, paragraphs, lines, pairs }
+  return { blocks, get, title, body, html, image, paragraphs, lines, pairs }
 }
