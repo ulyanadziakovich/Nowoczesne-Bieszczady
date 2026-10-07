@@ -21,6 +21,9 @@ const awardLabel = (award: Laureate['award']) =>
   })[award] ?? ''
 
 const works = computed(() => props.items.filter((w) => w.image?.src))
+const RANK: Record<Laureate['award'], number> = { 'i-miejsce': 1, 'ii-miejsce': 2, 'iii-miejsce': 3, wyroznienie: 4 }
+
+// Kategorie w kolejności z CMS; w każdej: podium (I–III miejsce) i wyróżnienia.
 const groups = computed(() => {
   const order: string[] = []
   const map = new Map<string, { work: Laureate; index: number }[]>()
@@ -32,8 +35,17 @@ const groups = computed(() => {
     }
     map.get(key)!.push({ work, index })
   })
-  return order.map((category) => ({ category, items: map.get(category)! }))
+  return order.map((category) => {
+    const items = map.get(category)!.slice().sort((x, y) => RANK[x.work.award] - RANK[y.work.award])
+    return {
+      category,
+      podium: items.filter((i) => i.work.award !== 'wyroznienie'),
+      mentions: items.filter((i) => i.work.award === 'wyroznienie'),
+    }
+  })
 })
+const activeCategory = ref(0)
+const active = computed(() => groups.value[activeCategory.value] ?? groups.value[0])
 
 const openIndex = ref<number | null>(null)
 const current = computed(() => (openIndex.value === null ? null : works.value[openIndex.value]))
@@ -59,19 +71,56 @@ onUnmounted(() => document.removeEventListener('keydown', onKey))
 
 <template>
   <div v-if="works.length" class="laureates">
-    <h3 v-if="title" class="laureates-title">{{ title }}</h3>
-
-    <div v-for="group in groups" :key="group.category" class="laureates-group">
-      <p v-if="group.category" class="laureates-category">{{ group.category }}</p>
-      <div class="laureates-grid">
-        <button v-for="{ work, index } in group.items" :key="index" type="button" class="work" @click="open(index)">
-          <span class="work-media">
-            <img :src="resolveCmsUrl(work.image!.src)" :alt="`${work.title} — ${work.author}`" loading="lazy" />
-            <span class="award" :class="`award-${work.award}`">{{ awardLabel(work.award) }}</span>
-          </span>
-          <span class="work-title">{{ work.title }}</span>
-          <span class="work-author">{{ work.author }}</span>
+    <div class="laureates-head">
+      <h3 v-if="title" class="laureates-title">{{ title }}</h3>
+      <div v-if="groups.length > 1" class="laureates-tabs" role="tablist">
+        <button
+          v-for="(group, i) in groups"
+          :key="group.category"
+          type="button"
+          role="tab"
+          class="tab"
+          :class="{ active: i === activeCategory }"
+          :aria-selected="i === activeCategory"
+          @click="activeCategory = i"
+        >
+          {{ group.category }}
         </button>
+      </div>
+    </div>
+
+    <div v-if="active" :key="active.category" class="laureates-panel">
+      <!-- Podium: I miejsce duże, II i III obok. -->
+      <div v-if="active.podium.length" class="podium" :class="`podium-${active.podium.length}`">
+        <button
+          v-for="({ work, index }, k) in active.podium"
+          :key="index"
+          type="button"
+          class="work"
+          :class="{ 'work-main': k === 0 }"
+          @click="open(index)"
+        >
+          <img :src="resolveCmsUrl(work.image!.src)" :alt="`${work.title} — ${work.author}`" loading="eager" />
+          <span class="work-caption">
+            <span class="award" :class="`award-${work.award}`">{{ awardLabel(work.award) }}</span>
+            <span class="work-title">{{ work.title }}</span>
+            <span class="work-author">{{ work.author }}</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Wyróżnienia: pasek mniejszych zdjęć, przewijany w bok. -->
+      <div v-if="active.mentions.length" class="mentions">
+        <p class="mentions-label">{{ page.t('awardMention') }} · {{ active.mentions.length }}</p>
+        <div class="mentions-strip">
+          <button v-for="{ work, index } in active.mentions" :key="index" type="button" class="mention" @click="open(index)">
+            <span class="mention-media">
+              <img :src="resolveCmsUrl(work.image!.src)" :alt="`${work.title} — ${work.author}`" loading="eager" />
+            </span>
+            <span class="mention-title">{{ work.title }}</span>
+            <span class="mention-author">{{ work.author }}</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -95,117 +144,308 @@ onUnmounted(() => document.removeEventListener('keydown', onKey))
 
 <style scoped>
 .laureates {
-  margin-top: 3.5rem;
-  padding-top: 3rem;
+  margin-top: 4.5rem;
+  padding-top: 3.5rem;
   border-top: 1px solid #e3ded1;
 }
 
+.laureates-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
+  margin-bottom: 2rem;
+}
+
 .laureates-title {
-  margin: 0 0 1.75rem;
+  margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
   font-weight: 600;
+  line-height: 1.15;
   color: var(--text-title);
 }
 
-.laureates-group + .laureates-group {
-  margin-top: 2.5rem;
+.laureates-tabs {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(26, 36, 32, 0.07);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.laureates-category {
-  margin: 0 0 1rem;
-  font-size: 0.78rem;
+.laureates-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  padding: 0.55rem 1.1rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-body);
+  font: inherit;
+  font-size: 0.85rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--amber);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
 
-.laureates-grid {
+.tab.active {
+  background: var(--amber);
+  color: #fff;
+}
+
+.laureates-panel {
+  animation: fade-in 0.4s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --- Podium --- */
+.podium {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1rem;
+  height: clamp(420px, 46vw, 600px);
+}
+
+.podium-1 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+.podium-2 {
+  grid-template-rows: 1fr;
 }
 
 .work {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  position: relative;
+  overflow: hidden;
   padding: 0;
   border: none;
-  background: none;
+  border-radius: 18px;
+  background: #1a2420;
   font: inherit;
   text-align: left;
-  cursor: pointer;
+  cursor: zoom-in;
 }
 
-.work-media {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  margin-bottom: 0.65rem;
-  border-radius: 14px;
-  aspect-ratio: 4 / 3;
-  background: #1a2420;
-  box-shadow: 0 14px 34px rgba(26, 36, 32, 0.12);
+.work-main {
+  grid-row: 1 / -1;
 }
 
-.work-media img {
+.work img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
-  transition: transform 0.6s ease;
+  transition: transform 0.9s ease;
 }
 
-.work:hover .work-media img {
-  transform: scale(1.05);
+.work:hover img {
+  transform: scale(1.04);
 }
 
-.award {
-  display: inline-block;
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #fff;
-  background: rgba(21, 29, 28, 0.78);
-  backdrop-filter: blur(4px);
-}
-
-.work-media .award {
+.work-caption {
   position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-}
-
-.award-i-miejsce {
-  background: linear-gradient(135deg, #c9a227, #9a7a12);
-}
-
-.award-ii-miejsce {
-  background: linear-gradient(135deg, #a9b1b7, #6f787f);
-}
-
-.award-iii-miejsce {
-  background: linear-gradient(135deg, #c27a45, #8f5128);
+  inset: auto 0 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 3.5rem 1.4rem 1.2rem;
+  background: linear-gradient(to top, rgba(8, 12, 10, 0.82), rgba(8, 12, 10, 0));
+  color: #fff;
 }
 
 .work-title {
   font-family: var(--font-display);
   font-size: 1.05rem;
   font-weight: 600;
+  line-height: 1.25;
+}
+
+.work-main .work-title {
+  font-size: clamp(1.25rem, 2.2vw, 1.7rem);
+}
+
+.work-author {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.award {
+  display: inline-block;
+  margin-bottom: 0.2rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
+}
+
+.award-i-miejsce {
+  background: linear-gradient(135deg, #d4ae3a, #9a7a12);
+}
+
+.award-ii-miejsce {
+  background: linear-gradient(135deg, #b9c0c5, #6f787f);
+}
+
+.award-iii-miejsce {
+  background: linear-gradient(135deg, #c98450, #8f5128);
+}
+
+/* --- Wyróżnienia --- */
+.mentions {
+  margin-top: 1.75rem;
+}
+
+.mentions-label {
+  margin: 0 0 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+.mentions-strip {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.mention {
+  flex: 0 0 clamp(200px, 22vw, 260px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: zoom-in;
+  scroll-snap-align: start;
+}
+
+.mention-media {
+  display: block;
+  overflow: hidden;
+  margin-bottom: 0.55rem;
+  border-radius: 12px;
+  aspect-ratio: 4 / 3;
+  background: #1a2420;
+}
+
+.mention-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.mention:hover .mention-media img {
+  transform: scale(1.05);
+}
+
+.mention-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
   line-height: 1.3;
   color: var(--text-title);
 }
 
-.work-author {
-  font-size: 0.88rem;
+.mention-author {
+  font-size: 0.8rem;
   color: var(--text-body);
 }
 
+/* Tablet i telefon: zwycięzca na całą szerokość, II i III obok siebie. */
+@media (max-width: 900px) {
+  .podium {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    height: auto;
+  }
+
+  .podium-1 {
+    grid-template-columns: 1fr;
+  }
+
+  .work {
+    aspect-ratio: 4 / 3;
+  }
+
+  .work-main {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    aspect-ratio: 16 / 11;
+  }
+
+  .work:not(.work-main) .work-caption {
+    padding: 2.5rem 0.8rem 0.75rem;
+  }
+
+  .work:not(.work-main) .work-title {
+    font-size: 0.88rem;
+  }
+
+  .work:not(.work-main) .work-author {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .laureates {
+    margin-top: 3rem;
+    padding-top: 2.5rem;
+  }
+
+  .laureates-tabs {
+    width: 100%;
+  }
+
+  .podium {
+    gap: 0.6rem;
+  }
+
+  .work {
+    border-radius: 12px;
+  }
+
+  .mention {
+    flex-basis: 62%;
+  }
+}
+
+/* --- Duży podgląd --- */
 .lb {
   position: fixed;
   inset: 0;
@@ -286,19 +526,6 @@ onUnmounted(() => document.removeEventListener('keydown', onKey))
 }
 
 @media (max-width: 700px) {
-  .laureates-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.9rem;
-  }
-
-  .work-title {
-    font-size: 0.92rem;
-  }
-
-  .work-author {
-    font-size: 0.8rem;
-  }
-
   .lb {
     padding: 3.5rem 0.75rem;
   }
