@@ -2,9 +2,14 @@
 definePageMeta({ layout: 'onas', solidHeader: true })
 const page = await usePageTexts('strona-o-nas')
 await usePageTitle(() => page.t('celeTitle'))
-
+// Cele z formularza „Strona: O nas” (zakładka „Cele”); do czasu przeniesienia
+// danych — ze starej kolekcji „Cele”.
 const { data } = await useCmsCollection<Goal>('goals', { order: 'order' })
-const goals = computed(() => data.value?.records ?? [])
+const goals = computed<{ id?: number; title: string; description?: string }[]>(() => {
+  const own = (page.data.value?.goals ?? []) as { title: string; description?: string }[]
+  return own.length ? own : (data.value?.records ?? [])
+})
+
 
 </script>
 
@@ -14,7 +19,7 @@ const goals = computed(() => data.value?.records ?? [])
     <RichText :html="page.html('celeText')" :lead="false" />
 
     <div class="goals">
-      <div v-for="goal in goals" :key="goal.id" class="goal-card card-surface">
+      <div v-for="(goal, i) in goals" :key="goal.id ?? i" class="goal-card card-surface">
         <h3>{{ goal.title }}</h3>
         <p>{{ goal.description }}</p>
       </div>

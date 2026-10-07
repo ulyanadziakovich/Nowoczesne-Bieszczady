@@ -58,6 +58,7 @@ const burzaImage = computed(() => page.image('burzaImage') ?? resolveCmsUrl(cont
         </div>
       </div>
     </section>
+    <RelatedNews place="inicjatywy" />
   </div>
 </template>
 

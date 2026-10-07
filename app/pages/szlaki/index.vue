@@ -197,6 +197,7 @@ function resetFilters() {
         </div>
       </div>
     </section>
+    <RelatedNews place="szlaki" />
   </div>
 </template>
 

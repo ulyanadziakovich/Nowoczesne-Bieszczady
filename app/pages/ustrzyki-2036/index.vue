@@ -68,6 +68,7 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
     </section>
 
     <DreamMapBoard />
+    <RelatedNews place="ustrzyki-2036" />
   </div>
 </template>
 

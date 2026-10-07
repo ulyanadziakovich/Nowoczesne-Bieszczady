@@ -90,6 +90,7 @@ const heroStats = computed(() => [page.t('statPeaks', { liczba: peaks.value.leng
         </div>
       </div>
     </section>
+    <RelatedNews place="korona-gor" />
   </div>
 </template>
 

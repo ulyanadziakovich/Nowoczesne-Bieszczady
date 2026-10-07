@@ -225,6 +225,7 @@ const announcementImage = computed(
         </div>
       </div>
     </section>
+    <RelatedNews place="kultura" />
   </div>
 </template>
 

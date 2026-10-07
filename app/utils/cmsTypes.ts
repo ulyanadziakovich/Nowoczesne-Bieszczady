@@ -36,6 +36,8 @@ export interface NewsPost {
   body?: string
     gallery?: string
   photos?: CmsGalleryImage[] | null
+  /** Podstrony, na których wpis ma się też pokazać („Pokaż także na podstronach”). */
+  showOn?: string[] | null
 
   /** Ręczna kolejność z CMS (przeciąganie w panelu). */
   order?: number

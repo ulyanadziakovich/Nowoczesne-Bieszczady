@@ -3,8 +3,13 @@ definePageMeta({ layout: 'onas', solidHeader: true })
 const page = await usePageTexts('strona-o-nas')
 await usePageTitle(() => page.t('zarzadTitle'))
 
+// Osoby z formularza „Strona: O nas” (zakładka „Zarząd i Zespół”); do czasu
+// przeniesienia danych — ze starej kolekcji „Zarząd i zespół”.
 const { data } = await useCmsCollection<TeamMember>('team', { order: 'order' })
-const teamMembers = computed(() => data.value?.records ?? [])
+const teamMembers = computed<{ id?: number; name: string; role?: string; photo?: CmsImage | null }[]>(() => {
+  const own = (page.data.value?.team ?? []) as { name: string; role?: string; photo?: CmsImage | null }[]
+  return own.length ? own : (data.value?.records ?? [])
+})
 
 </script>
 
@@ -14,7 +19,7 @@ const teamMembers = computed(() => data.value?.records ?? [])
     <RichText :html="page.html('zarzadText')" :lead="false" />
 
     <ul class="team">
-      <li v-for="member in teamMembers" :key="member.id" class="member-row">
+      <li v-for="(member, i) in teamMembers" :key="member.id ?? i" class="member-row">
         <img v-if="member.photo" class="avatar avatar-photo" :src="resolveCmsUrl(member.photo.src)" :alt="member.name" />
         <svg v-else class="avatar" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
           <circle cx="12" cy="8" r="4" />

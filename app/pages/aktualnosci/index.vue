@@ -6,6 +6,22 @@ const newsPosts = computed(() => byCmsOrder(data.value?.records ?? []))
 const page = await usePageTexts('strona-aktualnosci')
 const common = await usePageTexts('site-settings')
 await usePageTitle(() => page.t('pageTitle'))
+
+// Filtr kategorii (kategorie z CMS, tylko te, które mają wpisy). Wybór trafia do adresu
+// (?kategoria=Sport), więc przefiltrowaną listę można komuś wysłać.
+const route = useRoute()
+const router = useRouter()
+const categories = computed(() => [...new Set(newsPosts.value.map((p) => p.category).filter(Boolean))])
+const activeCategory = computed(() => {
+  const q = String(route.query.kategoria ?? '')
+  return categories.value.includes(q) ? q : ''
+})
+const visiblePosts = computed(() =>
+  activeCategory.value ? newsPosts.value.filter((p) => p.category === activeCategory.value) : newsPosts.value,
+)
+function selectCategory(category: string) {
+  router.replace({ query: category ? { ...route.query, kategoria: category } : {} })
+}
 </script>
 
 <template>
@@ -20,8 +36,24 @@ await usePageTitle(() => page.t('pageTitle'))
 
     <section class="section">
       <div class="container">
+                <nav v-if="categories.length > 1" class="category-filter" :aria-label="page.t('filterAll')">
+          <button type="button" class="category-chip" :class="{ active: !activeCategory }" @click="selectCategory('')">
+            {{ page.t('filterAll') }}
+          </button>
+          <button
+            v-for="category in categories"
+            :key="category"
+            type="button"
+            class="category-chip"
+            :class="{ active: activeCategory === category }"
+            @click="selectCategory(category)"
+          >
+            {{ category }}
+          </button>
+        </nav>
+
         <div class="grid-3">
-          <NuxtLink v-for="post in newsPosts" :key="post.slug" :to="`/aktualnosci/${post.slug}`" class="post-card card-surface">
+          <NuxtLink v-for="post in visiblePosts" :key="post.slug" :to="`/aktualnosci/${post.slug}`" class="post-card card-surface">
             <img :src="resolveCmsUrl(post.image?.src)" :alt="post.title" />
             <div class="body">
               <span class="meta">{{ post.date }} · {{ post.category }}</span>
@@ -37,6 +69,36 @@ await usePageTitle(() => page.t('pageTitle'))
 </template>
 
 <style scoped>
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.category-chip {
+  padding: 0.5rem 1.05rem;
+  border: 1.5px solid #ddd8cb;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text-title);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.category-chip:hover {
+  border-color: var(--amber);
+}
+
+.category-chip.active {
+  border-color: var(--amber);
+  background: var(--amber);
+  color: #fff;
+}
+
 .post-card {
   display: flex;
   flex-direction: column;

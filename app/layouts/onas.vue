@@ -26,6 +26,7 @@ const items = computed(() => childrenOf('o-nas'))
         </div>
       </div>
     </section>
+    <RelatedNews place="o-nas" />
   </div>
 </template>
 

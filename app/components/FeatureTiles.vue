@@ -1,17 +1,33 @@
 <script setup lang="ts">
+// Kafelki z formularza „Strona: Główna” (zakładka „Kafelki pod nagłówkiem”);
+// do czasu przeniesienia danych — ze starej kolekcji „kafelki flagowe”.
 const { data } = await useCmsCollection<FlagshipTile>('flagship-tiles', { order: 'order' })
-const tiles = computed(() => data.value?.records ?? [])
+const home = usePageTextsSync('home')
+interface Tile {
+  id?: number
+  title: string
+  text?: string
+  image?: CmsImage | null
+  tags?: string | null
+  ctaLabel?: string | null
+  href?: string
+}
+const tiles = computed<Tile[]>(() => {
+  const own = (home.data.value?.tiles ?? []) as Tile[]
+  if (own.length) return own
+  return (data.value?.records ?? []).map((t) => ({ ...t, text: t.back, href: t.moreHref }))
+})
 </script>
 
 <template>
   <section class="tiles">
-    <FeatureTile
-      v-for="tile in tiles"
-      :key="tile.id"
+        <FeatureTile
+      v-for="(tile, i) in tiles"
+      :key="tile.id ?? i"
       :image="resolveCmsUrl(tile.image?.src)"
       :title="tile.title"
-      :description="tile.back"
-            :more-href="tile.moreHref"
+      :description="tile.text ?? ''"
+      :more-href="tile.href || '/'"
       :tags="tile.tags"
       :cta-label="tile.ctaLabel"
     />

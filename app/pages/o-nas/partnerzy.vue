@@ -3,8 +3,13 @@ definePageMeta({ layout: 'onas', solidHeader: true })
 const page = await usePageTexts('strona-o-nas')
 await usePageTitle(() => page.t('partnerzyTitle'))
 
+// Partnerzy z formularza „Strona: O nas” (zakładka „Partnerzy”); do czasu
+// przeniesienia danych — ze starej kolekcji „Partnerzy”.
 const { data } = await useCmsCollection<Partner>('partners', { order: 'order' })
-const partners = computed(() => data.value?.records ?? [])
+const partners = computed<{ id?: number; name: string; logo?: CmsImage | null; url?: string }[]>(() => {
+  const own = (page.data.value?.partners ?? []) as { name: string; logo?: CmsImage | null; url?: string }[]
+  return own.length ? own : (data.value?.records ?? [])
+})
 
 </script>
 
@@ -14,15 +19,28 @@ const partners = computed(() => data.value?.records ?? [])
     <RichText :html="page.html('partnerzyText')" :lead="false" />
 
     <div class="partners">
-      <div v-for="partner in partners" :key="partner.id" class="partner-badge">
+      <component
+        :is="partner.url ? 'a' : 'div'"
+        v-for="(partner, i) in partners"
+        :key="partner.id ?? i"
+        :href="partner.url || undefined"
+        :target="partner.url ? '_blank' : undefined"
+        :rel="partner.url ? 'noopener' : undefined"
+        class="partner-badge"
+      >
         <img v-if="partner.logo" :src="resolveCmsUrl(partner.logo.src)" :alt="partner.name" />
         <span v-else>{{ partner.name }}</span>
-      </div>
+      </component>
     </div>
   </div>
 </template>
 
 <style scoped>
+a.partner-badge {
+  color: inherit;
+  text-decoration: none;
+}
+
 .partners {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
