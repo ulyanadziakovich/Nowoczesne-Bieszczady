@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ solidHeader: true })
 const page = await usePageTexts('strona-kontakt')
+usePageTheme(page)
 await usePageTitle(() => page.t('pageTitle'))
 const { data: settings } = await useCmsSingle<SiteSettings>('site-settings')
 

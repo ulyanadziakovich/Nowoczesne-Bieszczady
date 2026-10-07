@@ -138,7 +138,7 @@ body {
   font-family: var(--font-display);
   font-size: 2.4rem;
   font-weight: 600;
-  color: var(--ink);
+  color: var(--text-title);
   margin: 0 0 1rem;
 }
 
@@ -149,7 +149,7 @@ body {
 }
 
 .lead {
-  color: #4a4a44;
+  color: var(--text-lead);
   font-size: 1.05rem;
   line-height: 1.7;
   margin: 0;

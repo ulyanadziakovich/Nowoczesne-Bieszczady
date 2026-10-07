@@ -4,6 +4,7 @@ definePageMeta({ solidHeader: true })
 const { data } = await useCmsCollection<NewsPost>('news', { order: 'id:desc' })
 const newsPosts = computed(() => byCmsOrder(data.value?.records ?? []))
 const page = await usePageTexts('strona-aktualnosci')
+usePageTheme(page)
 const common = await usePageTexts('site-settings')
 await usePageTitle(() => page.t('pageTitle'))
 

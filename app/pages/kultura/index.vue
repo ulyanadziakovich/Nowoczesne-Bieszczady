@@ -14,6 +14,7 @@ const contests = computed(() =>
 )
 
 const page = await usePageTexts('strona-kultura')
+usePageTheme(page)
 await usePageTitle(() => page.t('pageTitle'))
 
 const heroStats = computed(() =>

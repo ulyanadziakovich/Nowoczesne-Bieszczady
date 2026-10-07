@@ -4,6 +4,7 @@
 // Same key/collection as DreamMapSky.vue — Nuxt dedupes this to one fetch,
 // so the SSR fallback below can show the real CMS photo too, not a blank one.
 const page = await usePageTexts('dream-map-settings')
+usePageTheme(page)
 const heroSettings = page.data
 await usePageTitle(() => page.t('pageTitle'))
 // Logotypy: z formularza strony; do czasu wgrania — dotychczasowe pliki (etap 2).

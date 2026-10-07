@@ -112,3 +112,29 @@ export function useTrailLabels() {
   }))
   return { difficulty, bike }
 }
+
+/**
+ * Kolory jednej podstrony z jej zakładki „Wygląd tej strony” w CMS. Puste pole =
+ * kolor ogólny („Wygląd strony” w „Elementach wspólnych”). Wołać w setupie strony.
+ */
+export function usePageTheme(texts: { data: Ref<Record<string, any> | null | undefined> }) {
+  const MAP: [string, string[]][] = [
+    ['themeBackground', ['--mist']],
+    ['themeHero', ['--stone']],
+    ['themeTitle', ['--text-title']],
+    ['themeLead', ['--text-lead']],
+    ['themeBody', ['--text-body']],
+    ['themeAccent', ['--amber']],
+  ]
+  const css = computed(() => {
+    const rules: string[] = []
+    for (const [field, vars] of MAP) {
+      const value = texts.data.value?.[field]
+      if (typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value)) rules.push(...vars.map((v) => `${v}:${value}`))
+    }
+    const bg = texts.data.value?.themeBackground
+    if (typeof bg === 'string' && /^#[0-9a-f]{6}$/i.test(bg)) rules.push(`background:${bg}`)
+    return rules.length ? `.app-main{${rules.join(';')}}` : ''
+  })
+  useHead({ style: [{ key: 'page-theme', innerHTML: css }] })
+}

@@ -110,7 +110,7 @@ h1 {
 
 .page-hero.light .content {
   position: relative;
-  color: var(--ink);
+  color: var(--text-title);
 }
 
 .stats-row {

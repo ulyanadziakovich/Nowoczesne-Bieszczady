@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const home = await usePageTexts('home')
+usePageTheme(home)
 const common = await usePageTexts('site-settings')
 useHead({ title: () => common.t('siteName') })
 </script>

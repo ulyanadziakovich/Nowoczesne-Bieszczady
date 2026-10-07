@@ -3,6 +3,7 @@ definePageMeta({ solidHeader: true })
 
 const route = useRoute()
 const page = await usePageTexts('strona-kultura')
+usePageTheme(page)
 const common = await usePageTexts('site-settings')
 const { data } = await useCmsCollection<FestivalEdition>('festival-editions', { order: 'year:desc' })
 const edition = computed(() => data.value?.records.find((e) => e.slug === route.params.slug))

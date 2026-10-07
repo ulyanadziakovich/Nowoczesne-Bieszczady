@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const page = await usePageTexts('strona-aktualnosci')
+usePageTheme(page)
 const common = await usePageTexts('site-settings')
 const { data } = await useCmsCollection<NewsPost>('news', { order: 'id:desc' })
 const post = computed(() => data.value?.records.find((p) => p.slug === route.params.slug))

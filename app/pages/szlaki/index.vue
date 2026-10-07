@@ -5,6 +5,7 @@ const { data: trailsData } = await useCmsCollection<Trail>('trails')
 // Trasy w kolejności z CMS (przeciąganie w panelu), bez ukrytych („Aktywna” odznaczona).
 const trails = computed(() => byCmsOrder(trailsData.value?.records ?? []).filter(isCmsActive))
 const page = await usePageTexts('strona-szlaki')
+usePageTheme(page)
 const labels = useTrailLabels()
 await usePageTitle(() => page.t('pageTitle'))
 

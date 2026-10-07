@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ solidHeader: true })
 const page = await usePageTexts('strona-inicjatywy')
+usePageTheme(page)
 await usePageTitle(() => page.t('pageTitle'))
 // Zdjęcia: z formularza strony, a do czasu wgrania — dotychczasowe z „Tekstów na stronach”.
 const content = usePageContent()

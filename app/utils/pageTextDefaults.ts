@@ -15,7 +15,13 @@ export const pageTextDefaults = {
     "aboutTagline": "„SKUTECZNI DLA WAS”",
     "newsKicker": "Blog",
     "newsTitle": "Najnowsze aktualności",
-    "newsAllLink": "Zobacz wszystkie aktualności"
+    "newsAllLink": "Zobacz wszystkie aktualności",
+    "themeBackground": "",
+    "themeHero": "",
+    "themeTitle": "",
+    "themeLead": "",
+    "themeBody": "",
+    "themeAccent": ""
   },
   "site-settings": {
     "email": "biuro@nowoczesnebieszczady.pl",
@@ -72,7 +78,13 @@ export const pageTextDefaults = {
     "photosFew": "{liczba} zdjęcia",
     "photosMany": "{liczba} zdjęć",
     "backLink": "← Wróć do aktualności",
-    "notFound": "Nie znaleziono wpisu"
+    "notFound": "Nie znaleziono wpisu",
+    "themeBackground": "",
+    "themeHero": "",
+    "themeTitle": "",
+    "themeLead": "",
+    "themeBody": "",
+    "themeAccent": ""
   },
   "strona-szlaki": {
     "heroKicker": "Turystyka rowerowa",
@@ -103,7 +115,13 @@ export const pageTextDefaults = {
     "emptyReset": "Wyczyść filtry i pokaż wszystkie",
     "cardCta": "Zobacz trasę i pobierz GPX",
     "noteKicker": "Projekt „Podkarpacka Rowerowa Przygoda”",
-    "noteText": "Trasy w naszej bazie są sukcesywnie audytowane we współpracy z Województwem Podkarpackim. Każdy audyt obejmuje realny przejazd trasy, dokumentację fotograficzną nawierzchni i widoków, pomiar przewyższeń oraz opis miejsc odpoczynku i punktów gastronomicznych."
+    "noteText": "Trasy w naszej bazie są sukcesywnie audytowane we współpracy z Województwem Podkarpackim. Każdy audyt obejmuje realny przejazd trasy, dokumentację fotograficzną nawierzchni i widoków, pomiar przewyższeń oraz opis miejsc odpoczynku i punktów gastronomicznych.",
+    "themeBackground": "",
+    "themeHero": "",
+    "themeTitle": "",
+    "themeLead": "",
+    "themeBody": "",
+    "themeAccent": ""
   },
   "strona-trasa": {
     "gpxTitle": "Pobierz nawigację GPX",
@@ -143,7 +161,13 @@ export const pageTextDefaults = {
     "recommendationTitle": "Rekomendacja końcowa",
     "safetyTitle": "Bezpieczeństwo",
     "backLink": "← Wróć do wszystkich tras",
-    "notFound": "Nie znaleziono trasy"
+    "notFound": "Nie znaleziono trasy",
+    "themeBackground": "",
+    "themeHero": "",
+    "themeTitle": "",
+    "themeLead": "",
+    "themeBody": "",
+    "themeAccent": ""
   },
   "strona-korona": {
     "heroKicker": "Turystyka górska",
@@ -162,7 +186,13 @@ export const pageTextDefaults = {
     "eventsTitle": "Rajdy i mecze terenowe",
     "eventFree": "Wstęp wolny",
     "eventMore": "Więcej",
-    "eventTickets": "Bilety"
+    "eventTickets": "Bilety",
+    "themeBackground": "",
+    "themeHero": "",
+    "themeTitle": "",
+    "themeLead": "",
+    "themeBody": "",
+    "themeAccent": ""
   },
   "strona-kultura": {
     "heroKicker": "Kultura",
@@ -194,7 +224,13 @@ export const pageTextDefaults = {
     "contestsLink": "Śledź aktualności →",
     "editionKicker": "Festiwal Granie Bez Granic",
     "editionBack": "← Wróć do Kultury",
-    "editionNotFound": "Nie znaleziono edycji"
+    "editionNotFound": "Nie znaleziono edycji",
+    "themeBackground": "",
+    "themeHero": "",
+    "themeTitle": "",
+    "themeLead": "",
+    "themeBody": "",
+    "themeAccent": ""
   },
   "strona-inicjatywy": {
     "heroKicker": "Edukacja i społeczność",
@@ -211,7 +247,13 @@ export const pageTextDefaults = {
     "noteKicker": "Bądź na bieżąco",
     "noteTitle": "Relacje ze spotkań i warsztatów",
     "noteText": "Zdjęcia, podsumowania i najświeższe wieści z „Bieszczad w eterze”, „Bieszczadzkiej Burzy Mózgów” i innych naszych inicjatyw publikujemy na bieżąco w Aktualnościach.",
-    "noteButton": "Zobacz aktualności"
+    "noteButton": "Zobacz aktualności",
+    "themeBackground": "",
+    "themeHero": "",
+    "themeTitle": "",
+    "themeLead": "",
+    "themeBody": "",
+    "themeAccent": ""
   },
   "strona-kontakt": {
     "heroKicker": "Kontakt",
@@ -229,7 +271,13 @@ export const pageTextDefaults = {
     "formMessagePlaceholder": "W czym możemy pomóc?",
     "formSubmit": "Wyślij wiadomość",
     "infoTitle": "Stowarzyszenie Nowoczesne Bieszczady",
-    "socialTitle": "Social media"
+    "socialTitle": "Social media",
+    "themeBackground": "",
+    "themeHero": "",
+    "themeTitle": "",
+    "themeLead": "",
+    "themeBody": "",
+    "themeAccent": ""
   },
   "strona-o-nas": {
     "heroKicker": "Stowarzyszenie",
@@ -264,7 +312,13 @@ export const pageTextDefaults = {
     "wolontariatTitle": "Wolontariat",
     "wolontariatText": "",
     "wolontariatEmpty": "Wkrótce zamieścimy tutaj informacje o wolontariacie w Stowarzyszeniu Nowoczesne Bieszczady.",
-    "wolontariatOpen": "Pobierz / zobacz"
+    "wolontariatOpen": "Pobierz / zobacz",
+    "themeBackground": "",
+    "themeHero": "",
+    "themeTitle": "",
+    "themeLead": "",
+    "themeBody": "",
+    "themeAccent": ""
   },
   "dream-map-settings": {
     "skyTitle": "Cyfrowa Mapa",
@@ -300,7 +354,13 @@ export const pageTextDefaults = {
     "ideaError": "Nie udało się wysłać zgłoszenia. Spróbuj ponownie za chwilę.",
     "ideaSuccessTitle": "Dziękujemy!",
     "ideaSuccessText": "Twój pomysł do nas dotarł. Skontaktujemy się, jeśli będziemy mieli pytania.",
-    "ideaAgain": "Zgłoś kolejny pomysł"
+    "ideaAgain": "Zgłoś kolejny pomysł",
+    "themeBackground": "",
+    "themeHero": "",
+    "themeTitle": "",
+    "themeLead": "",
+    "themeBody": "",
+    "themeAccent": ""
   }
 } as const
 

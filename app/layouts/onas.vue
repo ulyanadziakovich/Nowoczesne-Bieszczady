@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const page = await usePageTexts('strona-o-nas')
+usePageTheme(page)
 // Boczne menu = podpozycje „O nas” z „Menu strony” w CMS (nazwy i kolejność stamtąd).
 const { childrenOf } = await useNavigation()
 const items = computed(() => childrenOf('o-nas'))

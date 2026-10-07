@@ -8,6 +8,7 @@ const { data: eventsData } = await useCmsCollection<EventItem>('events')
 const sportEvents = computed(() => byCmsOrder(eventsData.value?.records ?? []).filter((e) => e.tag === 'sport'))
 
 const page = await usePageTexts('strona-korona')
+usePageTheme(page)
 await usePageTitle(() => page.t('pageTitle'))
 
 const routeStats = computed(() => [{ label: page.t('barPeaksLabel'), value: String(peaks.value.length) }, ...page.pairs('stats')])

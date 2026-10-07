@@ -3,6 +3,7 @@ definePageMeta({ solidHeader: true })
 
 const route = useRoute()
 const page = await usePageTexts('strona-trasa')
+usePageTheme(page)
 const common = await usePageTexts('site-settings')
 const labels = useTrailLabels()
 const { data: trailsData } = await useCmsCollection<Trail>('trails')
