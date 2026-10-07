@@ -34,7 +34,9 @@ export interface NewsPost {
   image: CmsImage | null
   excerpt: string
   body?: string
-  gallery?: string
+    gallery?: string
+  photos?: CmsGalleryImage[] | null
+
   /** Ręczna kolejność z CMS (przeciąganie w panelu). */
   order?: number
 }
@@ -101,7 +103,9 @@ export interface FestivalEdition {
   title: string
   description: string
   image: CmsImage | null
-  gallery: string
+    gallery: string
+  photos?: CmsGalleryImage[] | null
+
   featured: boolean
   /** Ręczna kolejność z CMS (przeciąganie w panelu). */
   order?: number

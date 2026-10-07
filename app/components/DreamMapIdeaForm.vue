@@ -132,7 +132,7 @@ async function submit() {
 .idea-form input:focus,
 .idea-form textarea:focus {
   outline: none;
-  border-color: #a9541f;
+  border-color: var(--amber);
   background: #fff;
 }
 
@@ -163,7 +163,7 @@ async function submit() {
 .idea-success strong {
   font-family: var(--font-display);
   font-size: 1.3rem;
-  color: #a9541f;
+  color: var(--amber);
 }
 
 .idea-success p {

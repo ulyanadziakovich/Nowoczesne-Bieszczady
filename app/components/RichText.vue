@@ -82,7 +82,7 @@ const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === '
   width: 28px;
   height: 2px;
   margin-bottom: 0.8rem;
-  background: #a9541f;
+  background: var(--amber);
 }
 
 .rich-list {
@@ -136,11 +136,11 @@ const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === '
 .rich-link-go {
   flex-shrink: 0;
   font-weight: 700;
-  color: #a9541f;
+  color: var(--amber);
 }
 
 .rich-p a {
-  color: #a9541f;
+  color: var(--amber);
   font-weight: 600;
   text-underline-offset: 3px;
 }
@@ -183,7 +183,7 @@ const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === '
   width: 28px;
   height: 2px;
   margin-bottom: 0.8rem;
-  background: #a9541f;
+  background: var(--amber);
 }
 
 .rich-html :deep(ul),
@@ -198,7 +198,7 @@ const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === '
 }
 
 .rich-html :deep(li::marker) {
-  color: #a9541f;
+  color: var(--amber);
 }
 
 .rich-html :deep(li p) {
@@ -221,31 +221,31 @@ const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === '
   border: 1px solid #e6e2d8;
   border-radius: 12px;
   background: #fff;
-  color: #151d1c;
+  color: var(--text-title);
   text-decoration: none;
   transition: transform 0.15s, border-color 0.15s;
 }
 
 .rich-html :deep(ul:has(> li > p > a:only-child):not(:has(> li > p > :not(a))) a)::after {
   content: '→';
-  color: #a9541f;
+  color: var(--amber);
   font-weight: 700;
 }
 
 .rich-html :deep(ul:has(> li > p > a:only-child):not(:has(> li > p > :not(a))) a:hover) {
   transform: translateX(3px);
-  border-color: #a9541f;
+  border-color: var(--amber);
 }
 
 .rich-html :deep(blockquote) {
   margin: 1.4rem 0;
   padding: 0.2rem 0 0.2rem 1.2rem;
-  border-left: 3px solid #a9541f;
+  border-left: 3px solid var(--amber);
   font-style: italic;
 }
 
 .rich-html :deep(a) {
-  color: #a9541f;
+  color: var(--amber);
   font-weight: 600;
   text-underline-offset: 3px;
 }
@@ -255,11 +255,11 @@ const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === '
 }
 
 .tone-light.rich-html {
-  color: #6c7173;
+  color: var(--text-body);
 }
 
 .tone-light.rich-html.with-lead :deep(p:first-child) {
-  color: #566c71;
+  color: var(--text-lead);
 }
 
 .tone-light.rich-html :deep(h1),
@@ -267,7 +267,7 @@ const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === '
 .tone-light.rich-html :deep(h3),
 .tone-light.rich-html :deep(h4),
 .tone-light.rich-html :deep(strong) {
-  color: #151d1c;
+  color: var(--text-title);
 }
 
 .tone-dark.rich-html {
@@ -287,31 +287,31 @@ const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === '
 
 /* Jasne tło (nagłówek bez zdjęcia, treść strony) — kolory z palety strony. */
 .tone-light .rich-p {
-  color: #6c7173;
+  color: var(--text-body);
 }
 
 .tone-light .rich-lead {
-  color: #566c71;
+  color: var(--text-lead);
 }
 
 .tone-light .rich-heading {
-  color: #151d1c;
+  color: var(--text-title);
 }
 
 .tone-light .rich-list li {
   background: #fff;
   border: 1px solid #e6e2d8;
-  color: #151d1c;
+  color: var(--text-title);
 }
 
 .tone-light .rich-links a {
   background: #fff;
   border: 1px solid #e6e2d8;
-  color: #151d1c;
+  color: var(--text-title);
 }
 
 .tone-light .rich-links a:hover {
-  border-color: #a9541f;
+  border-color: var(--amber);
 }
 
 /* Ciemne tło (nagłówek ze zdjęciem). */

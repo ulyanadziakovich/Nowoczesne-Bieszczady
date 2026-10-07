@@ -21,8 +21,8 @@ const LEGACY_META: Record<string, { tags: string[]; cta: string }> = {
 const meta = computed(() => {
   const legacy = LEGACY_META[props.moreHref]
   return {
-    tags: props.tags == null ? (legacy?.tags ?? []) : props.tags.split('\n').map((t) => t.trim()).filter(Boolean),
-    cta: props.ctaLabel == null ? (legacy?.cta ?? '') : props.ctaLabel,
+        tags: props.tags?.trim() ? props.tags.split('\n').map((t) => t.trim()).filter(Boolean) : (legacy?.tags ?? []),
+    cta: props.ctaLabel?.trim() || legacy?.cta || '',
   }
 })
 </script>

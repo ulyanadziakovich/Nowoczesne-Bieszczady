@@ -120,13 +120,13 @@ const outroBlocks = computed(() => (firstPillars.value < 0 ? [] : blocks.value.s
    szeryfowe nagłówki jak w hero — bez kart, które powtarzałyby kafelki i aktualności. */
 .about {
   --a-bg: #fff;
-  /* Tylko kolory z palety: #151d1c, #566c71, #6c7173, #615b3a, #a9541f */
-  --a-title: #151d1c;
-  --a-head: #151d1c;
-  --a-text: #6c7173;
-  --a-accent: #a9541f;
-  --a-lead: #566c71;
-  --a-olive: #615b3a;
+  /* Tylko kolory z palety: var(--text-title), var(--text-lead), var(--text-body), var(--text-extra), var(--amber) */
+  --a-title: var(--text-title);
+  --a-head: var(--text-title);
+  --a-text: var(--text-body);
+  --a-accent: var(--amber);
+  --a-lead: var(--text-lead);
+  --a-olive: var(--text-extra);
   --a-line: #d9d3c3;
   background: var(--a-bg);
 }

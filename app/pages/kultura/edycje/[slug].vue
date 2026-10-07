@@ -13,7 +13,7 @@ if (!edition.value) {
 
 useHead({ title: () => [edition.value?.title, page.t('editionKicker'), common.t('siteName')].filter(Boolean).join(' — ') })
 
-const gallery = computed(() => (edition.value?.gallery || '').split('\n').map((s) => s.trim()).filter(Boolean))
+const gallery = computed(() => galleryImages(edition.value))
 </script>
 
 <template>

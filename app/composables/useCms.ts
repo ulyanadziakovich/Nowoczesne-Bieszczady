@@ -160,3 +160,28 @@ export function usePageContent() {
 
   return { blocks, get, title, body, html, image, paragraphs, lines, pairs }
 }
+
+/** Zdjęcie z pola „Zdjęcia (galeria)” w CMS (po `populate`). */
+export interface CmsGalleryImage {
+  src: string
+  alt?: string
+  width?: number
+  height?: number
+}
+
+/**
+ * Adresy zdjęć galerii: z nowego pola „Zdjęcia (galeria)” (upload), a gdy jest
+ * puste — ze starego pola z listą adresów (do czasu przeniesienia danych).
+ */
+export function galleryImages(record: { photos?: CmsGalleryImage[] | null; gallery?: string | null } | null | undefined) {
+  if (record?.photos?.length) return record.photos.map((p) => p.src)
+  return (record?.gallery || '')
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean)
+}
+
+/** Adres pliku z pola typu „plik” (albo undefined). */
+export function cmsFileUrl(file: CmsFile | null | undefined) {
+  return file?.filename ? resolveCmsUrl(`/uploads/${file.directory}${file.filename}`) : undefined
+}

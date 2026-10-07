@@ -12,8 +12,9 @@ export interface OverviewTrail {
   slug: string
   title: string
   difficulty: TrailDifficulty
-  lengthKm: number
+    lengthKm: number
   gpxFile?: string | null
+  gpxUpload?: CmsFile | null
 }
 
 const props = defineProps<{ trails: OverviewTrail[] }>()
@@ -48,7 +49,9 @@ const INITIAL_ZOOM = 9
 
 type Pt = [number, number]
 
-const mappable = computed(() => props.trails.filter((trail) => Boolean(trail.gpxFile)))
+const mappable = computed(() =>
+  props.trails.map((trail) => ({ ...trail, gpxUrl: trailGpxUrl(trail) })).filter((trail) => Boolean(trail.gpxUrl)),
+)
 
 const rootEl = ref<HTMLElement | null>(null)
 const mapEl = ref<HTMLElement | null>(null)
@@ -205,7 +208,7 @@ async function boot() {
   await Promise.all(
     mappable.value.map(async (trail) => {
       try {
-        const response = await fetch(trail.gpxFile!, { signal })
+        const response = await fetch(trail.gpxUrl!, { signal })
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
         const points = simplifyTrack(parseGpx(await response.text()))
         if (!map || signal.aborted) return
@@ -216,7 +219,7 @@ async function boot() {
         if (signal.aborted) return
         // One broken GPX must never take the rest of the map down.
         failedTitles.value = [...failedTitles.value, trail.title]
-        console.warn(`[TrailsOverviewMap] nie udało się wczytać ${trail.gpxFile}`, error)
+        console.warn(`[TrailsOverviewMap] nie udało się wczytać ${trail.gpxUrl}`, error)
       }
     }),
   )

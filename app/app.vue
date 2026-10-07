@@ -1,3 +1,30 @@
+<script setup lang="ts">
+// Kolory z CMS („Elementy wspólne i kontakt” → „Wygląd strony”) nadpisują
+// zmienne CSS całej strony. Przyjmujemy tylko poprawne kody #RRGGBB.
+const theme = await usePageTexts('site-settings')
+const THEME_VARS: [string, string][] = [
+  ['colorTitle', '--text-title'],
+  ['colorLead', '--text-lead'],
+  ['colorBody', '--text-body'],
+  ['colorExtra', '--text-extra'],
+  ['colorAccent', '--amber'],
+  ['colorBrand', '--alpine'],
+  ['colorInk', '--ink'],
+  ['colorBackground', '--mist'],
+  ['colorSection', '--stone'],
+  ['colorEasy', '--diff-easy'],
+  ['colorMedium', '--diff-medium'],
+  ['colorHard', '--diff-hard'],
+]
+const themeCss = computed(() => {
+  const rules = THEME_VARS.map(([field, cssVar]) => [cssVar, theme.t(field as any)] as const)
+    .filter(([, value]) => /^#[0-9a-f]{6}$/i.test(value))
+    .map(([cssVar, value]) => `${cssVar}:${value}`)
+  return rules.length ? `:root{${rules.join(';')}}` : ''
+})
+useHead({ style: [{ key: 'cms-theme', innerHTML: themeCss }] })
+</script>
+
 <template>
   <div class="app-shell">
     <NuxtRouteAnnouncer />
@@ -21,6 +48,12 @@
   --amber: #a8551f;
   --stone: #f3f1ea;
   --mist: #eff2ef;
+
+  /* Kolory tekstu (domyślne — nadpisywane z CMS, „Wygląd strony”). */
+  --text-title: #151d1c;
+  --text-lead: #566c71;
+  --text-body: #6c7173;
+  --text-extra: #615b3a;
 
   /* Trail difficulty palette — single source of truth for the overview map lines,
      its legend, the filter dots, the card dots and the difficulty pills. Chosen for

@@ -20,7 +20,8 @@ const descriptionBlocks = computed(() => parseTrailDescription(trail.value?.desc
 const highlights = computed(() => (trail.value?.highlights || '').split('\n').filter(Boolean))
 const stops = computed(() => (trail.value?.stops || '').split('\n').filter(Boolean))
 const safety = computed(() => (trail.value?.safety || '').split('\n').filter(Boolean))
-const gallery = computed(() => (trail.value?.gallery || '').split('\n').filter(Boolean))
+const gallery = computed(() => galleryImages(trail.value))
+const gpxUrl = computed(() => (trail.value ? trailGpxUrl(trail.value) : undefined))
 
 const naturalValuesParagraphs = computed(() => (trail.value?.naturalValues || '').split(/\n\s*\n/).filter(Boolean))
 const culturalValuesParagraphs = computed(() => (trail.value?.culturalValues || '').split(/\n\s*\n/).filter(Boolean))
@@ -107,7 +108,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
               <h3>{{ page.t('gpxTitle') }}</h3>
               <p>{{ page.t('gpxText') }}</p>
             </div>
-            <a v-if="trail.gpxAvailable && trail.gpxFile" :href="trail.gpxFile" download class="btn btn-amber gpx-btn">{{ page.t('gpxButton') }}</a>
+            <a v-if="trail.gpxAvailable && gpxUrl" :href="gpxUrl" download class="btn btn-amber gpx-btn">{{ page.t('gpxButton') }}</a>
             <button v-else class="btn btn-amber gpx-btn is-disabled" disabled>{{ page.t('gpxSoon') }}</button>
           </div>
 

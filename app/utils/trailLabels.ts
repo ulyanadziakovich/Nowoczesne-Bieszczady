@@ -25,8 +25,11 @@ export interface Trail {
   stops?: string
   safety?: string
   gallery?: string
+  photos?: CmsGalleryImage[] | null
   gpxAvailable: boolean
-  gpxFile?: string | null
+    gpxFile?: string | null
+  /** Plik GPX wgrany w CMS (pole „Plik GPX”) — ma pierwszeństwo przed gpxFile. */
+  gpxUpload?: CmsFile | null
   routeMapImage?: CmsImage | null
   elevationProfileImage?: CmsImage | null
   /** Ręczna kolejność z CMS (przeciąganie w panelu). */
@@ -38,4 +41,9 @@ export function trailBikeTypes(trail: Pick<Trail, 'bikeTypes'>): TrailBikeType[]
     .split(',')
     .map((t) => t.trim())
     .filter(Boolean) as TrailBikeType[]
+}
+
+/** Adres pliku GPX trasy: wgrany plik z CMS (przez nasze proxy — mapa czyta go fetch-em), a do czasu przeniesienia — stary adres. */
+export function trailGpxUrl(trail: Pick<Trail, 'gpxFile' | 'gpxUpload'>) {
+  return cmsFileProxyUrl(trail.gpxUpload ?? null) ?? trail.gpxFile ?? undefined
 }

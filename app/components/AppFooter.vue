@@ -5,8 +5,16 @@ const { footerLinks: links } = await useNavigation()
 
 const { data: settings } = await useCmsSingle<SiteSettings>('site-settings')
 const common = await usePageTexts('site-settings')
-const { data: documentsData } = await useCmsCollection<{ id: number; label: string; fileUrl: string }>('documents', { order: 'order' })
-const documents = computed(() => documentsData.value?.records ?? [])
+const { data: documentsData } = await useCmsCollection<{ id: number; label: string; file?: CmsFile | null; fileUrl?: string }>(
+  'documents',
+  { order: 'order' },
+)
+// Plik wgrany w CMS; do czasu przeniesienia — stary adres.
+const documents = computed(() =>
+  (documentsData.value?.records ?? [])
+    .map((d) => ({ ...d, url: cmsFileUrl(d.file) ?? d.fileUrl }))
+    .filter((d) => d.url),
+)
 </script>
 
 <template>
@@ -28,7 +36,7 @@ const documents = computed(() => documentsData.value?.records ?? [])
 
       <div v-if="documents.length" class="downloads">
         <p class="downloads-title">{{ common.t('footerDownloads') }}</p>
-        <a v-for="doc in documents" :key="doc.id" :href="doc.fileUrl" target="_blank" rel="noopener" class="download-item">
+        <a v-for="doc in documents" :key="doc.id" :href="doc.url" target="_blank" rel="noopener" class="download-item">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
           </svg>

@@ -62,7 +62,7 @@ onUnmounted(() => {
 
 .idea-tile:hover {
   transform: translateY(-3px);
-  border-color: #a9541f;
+  border-color: var(--amber);
   box-shadow: 0 18px 40px rgba(169, 84, 31, 0.12);
 }
 
@@ -74,7 +74,7 @@ onUnmounted(() => {
   height: 48px;
   margin-bottom: 0.3rem;
   border-radius: 50%;
-  background: #a9541f;
+  background: var(--amber);
   color: #fff;
   transition: transform 0.25s;
 }
@@ -88,7 +88,7 @@ onUnmounted(() => {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #a9541f;
+  color: var(--amber);
 }
 
 .idea-title {
@@ -96,13 +96,13 @@ onUnmounted(() => {
   font-size: 1.45rem;
   font-weight: 600;
   line-height: 1.25;
-  color: #151d1c;
+  color: var(--text-title);
 }
 
 .idea-text {
   font-size: 0.92rem;
   line-height: 1.65;
-  color: #6c7173;
+  color: var(--text-body);
 }
 
 .idea-cta {
@@ -110,7 +110,7 @@ onUnmounted(() => {
   padding-top: 0.6rem;
   font-size: 0.88rem;
   font-weight: 700;
-  color: #a9541f;
+  color: var(--amber);
 }
 
 .idea-overlay {
@@ -145,7 +145,7 @@ onUnmounted(() => {
   border: none;
   border-radius: 50%;
   background: #f2f0ec;
-  color: #151d1c;
+  color: var(--text-title);
   font-size: 1.3rem;
   line-height: 1;
   cursor: pointer;

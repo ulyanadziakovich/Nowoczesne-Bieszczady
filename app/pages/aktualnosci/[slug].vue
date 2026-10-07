@@ -12,7 +12,7 @@ if (!post.value) {
 useHead({ title: () => [post.value?.title, page.t('pageTitle'), common.t('siteName')].filter(Boolean).join(' — ') })
 
 const bodyParagraphs = computed(() => (post.value?.body || '').split(/\n\s*\n/).filter(Boolean))
-const gallery = computed(() => (post.value?.gallery || '').split('\n').map((s) => s.trim()).filter(Boolean))
+const gallery = computed(() => galleryImages(post.value))
 
 // Plain text field, so this is the only formatting it supports:
 // **word** → bold, and lines starting with "● " get a styled accent dot

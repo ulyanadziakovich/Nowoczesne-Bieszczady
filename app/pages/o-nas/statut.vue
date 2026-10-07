@@ -5,7 +5,10 @@ await usePageTitle(() => page.t('statutTitle'))
 // Strony statutu i plik PDF: do czasu wgrania w formularzu — z „Tekstów na stronach” (etap 2).
 const content = usePageContent()
 const pdfUrl = computed(() => page.file('statutFile') ?? content.image('statut-intro'))
-const pages = computed(() => (content.body('statut-galeria') || '').split('\n').map((s) => s.trim()).filter(Boolean))
+const pages = computed(() => {
+  const own = (page.data.value?.statutPages ?? []) as CmsGalleryImage[]
+  return own.length ? own.map((p) => p.src) : (content.body('statut-galeria') || '').split('\n').map((s) => s.trim()).filter(Boolean)
+})
 </script>
 
 <template>
