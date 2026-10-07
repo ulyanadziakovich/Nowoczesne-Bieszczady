@@ -2,19 +2,45 @@
 // Wyświetla dłuższy tekst z CMS z zachowaniem struktury (akapity, śródtytuły,
 // listy, linki) — patrz parseRichText(). Pierwszy akapit jest wyróżniony.
 // `html` = treść z edytora CMS (ma pierwszeństwo), `text` = zwykły tekst.
-const props = withDefaults(defineProps<{ text?: string | null; html?: string | null; tone?: 'light' | 'dark'; lead?: boolean }>(), {
+const props = withDefaults(
+  defineProps<{
+    text?: string | null
+    html?: string | null
+    tone?: 'light' | 'dark'
+    lead?: boolean
+    /** Długi tekst pokazuje się zwinięty, z przyciskiem „Czytaj całość”. */
+    collapsible?: boolean
+    collapsedHeight?: string
+  }>(),
+  {
   text: '',
   html: '',
+  collapsible: false,
+  collapsedHeight: '24rem',
   tone: 'light',
   lead: true,
 })
 
 const safeHtml = computed(() => sanitizeCmsHtml(props.html))
+
+// Zwijamy tylko naprawdę długie teksty (po długości samej treści, żeby serwer
+// i przeglądarka wyrenderowały to samo — bez mierzenia i „skakania” strony).
+const plainLength = computed(() => (safeHtml.value ? safeHtml.value.replace(/<[^>]+>/g, '') : props.text || '').length)
+const canCollapse = computed(() => props.collapsible && plainLength.value > 1100)
+const expanded = ref(false)
+const common = usePageTextsSync('site-settings')
+const shell = ref<HTMLElement | null>(null)
+function toggle() {
+  expanded.value = !expanded.value
+  if (!expanded.value) shell.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 const blocks = computed(() => (safeHtml.value ? [] : parseRichText(props.text)))
 const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === 'paragraph'))
 </script>
 
 <template>
+  <div v-if="safeHtml || blocks.length" ref="shell" class="rich-shell" :class="[`tone-${tone}`, { 'is-collapsed': canCollapse && !expanded }]">
+  <div class="rich-clip" :style="canCollapse && !expanded ? { maxHeight: collapsedHeight } : undefined">
   <!-- eslint-disable-next-line vue/no-v-html -- treść z CMS, przefiltrowana w sanitizeCmsHtml() -->
   <div v-if="safeHtml" class="rich rich-html" :class="[`tone-${tone}`, { 'with-lead': lead }]" v-html="safeHtml" />
   <div v-else-if="blocks.length" class="rich" :class="`tone-${tone}`">
@@ -45,9 +71,73 @@ const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === '
       </ul>
     </template>
   </div>
+  </div>
+  <button v-if="canCollapse" type="button" class="rich-toggle" :aria-expanded="expanded" @click="toggle">
+    <span>{{ expanded ? common.t('readLess') : common.t('readFull') }}</span>
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" :class="{ flipped: expanded }">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </button>
+  </div>
 </template>
 
 <style scoped>
+.rich-shell {
+  position: relative;
+}
+
+.rich-clip {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Zwinięty tekst gaśnie łagodnie w kolor tła sekcji (--fade-to ustawia rodzic). */
+.rich-shell.is-collapsed .rich-clip::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 7rem;
+  background: linear-gradient(to bottom, transparent, var(--fade-to, var(--mist)));
+  pointer-events: none;
+}
+
+.rich-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1.1rem;
+  padding: 0.7rem 1.3rem;
+  border: 1.5px solid var(--amber);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--amber);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.rich-toggle:hover {
+  background: var(--amber);
+  color: #fff;
+}
+
+.rich-toggle svg {
+  transition: transform 0.2s;
+}
+
+.rich-toggle svg.flipped {
+  transform: rotate(180deg);
+}
+
+.tone-dark .rich-toggle {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
 .rich {
   max-width: 720px;
   overflow-wrap: anywhere;

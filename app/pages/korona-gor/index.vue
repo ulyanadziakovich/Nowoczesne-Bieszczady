@@ -10,7 +10,7 @@ usePageTheme(page)
 await usePageTitle(() => page.t('pageTitle'))
 
 const routeStats = computed(() => [{ label: page.t('barPeaksLabel'), value: String(peaks.value.length) }, ...page.pairs('stats')])
-const heroStats = computed(() => [page.t('statPeaks', { liczba: peaks.value.length }), ...page.pairs('stats').map((p) => p.value)].filter(Boolean))
+const heroStats = computed(() => [page.plural('statPeaks', peaks.value.length), ...page.pairs('stats').map((p) => p.value)].filter(Boolean))
 </script>
 
 <template>

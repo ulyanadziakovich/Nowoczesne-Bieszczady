@@ -1,5 +1,5 @@
 <script setup lang="ts">
-withDefaults(
+const props = withDefaults(
   defineProps<{
     kicker?: string
     title: string
@@ -14,6 +14,15 @@ withDefaults(
     variant: 'photo',
   },
 )
+
+// Długi opis z CMS dzielimy: pierwszy akapit zostaje w nagłówku jako wstęp,
+// a reszta trafia pod nagłówek do osobnej, wygodnej do czytania kolumny
+// (zwiniętej, gdy jest bardzo długa) — zamiast ściany tekstu w nagłówku.
+const split = computed(() => {
+  const html = sanitizeCmsHtml(props.descriptionHtml)
+  const m = html.match(/^\s*(<p>[\s\S]*?<\/p>)([\s\S]*)$/)
+  return m ? { lead: m[1]!, rest: m[2]!.trim() } : { lead: html, rest: '' }
+})
 </script>
 
 <template>
@@ -30,7 +39,8 @@ withDefaults(
         </span>
       </div>
       <h1>{{ title }}</h1>
-      <RichText v-if="description || descriptionHtml" class="hero-text" :text="description" :html="descriptionHtml" />
+      <RichText v-if="split.lead" class="hero-text hero-lead" :html="split.lead" />
+      <RichText v-else-if="description" class="hero-text" :text="description" />
 
       <div v-if="stats?.length" class="stats-row">
         <template v-for="(stat, i) in stats" :key="stat">
@@ -41,7 +51,15 @@ withDefaults(
     </div>
   </section>
 
-  <section v-else class="page-hero" :style="{ backgroundImage: `url(${image})` }">
+  <section v-if="variant === 'light' && split.rest" class="page-intro">
+    <div class="container">
+      <div class="intro-column">
+        <RichText :html="split.rest" :lead="false" collapsible collapsed-height="28rem" />
+      </div>
+    </div>
+  </section>
+
+  <section v-if="variant !== 'light'" class="page-hero" :style="{ backgroundImage: `url(${image})` }">
     <div class="overlay" />
     <div class="container content">
       <span v-if="kicker" class="kicker">{{ kicker }}</span>
@@ -52,6 +70,51 @@ withDefaults(
 </template>
 
 <style scoped>
+/* ---- Opis pod nagłówkiem: jedna wyśrodkowana kolumna do czytania ---- */
+.page-intro {
+  --fade-to: #fff;
+  background: #fff;
+  padding: 4.5rem 0 4rem;
+  border-bottom: 1px solid rgba(26, 36, 32, 0.06);
+}
+
+.intro-column {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.intro-column :deep(.rich-html p),
+.intro-column :deep(.rich-p) {
+  font-size: 1.06rem;
+  line-height: 1.85;
+}
+
+.intro-column :deep(.rich-html h2),
+.intro-column :deep(.rich-heading) {
+  margin-top: 2.6rem;
+  font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+}
+
+.intro-column :deep(.rich-html > :first-child),
+.intro-column :deep(.rich > :first-child) {
+  margin-top: 0;
+}
+
+.hero-lead {
+  max-width: 820px;
+}
+
+.hero-lead :deep(p) {
+  font-size: clamp(1.08rem, 1.6vw, 1.22rem) !important;
+  line-height: 1.7 !important;
+}
+
+@media (max-width: 800px) {
+  .page-intro {
+    padding: 3rem 0 2.75rem;
+  }
+}
+
 .page-hero {
   position: relative;
   margin-top: 0;

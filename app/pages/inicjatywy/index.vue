@@ -17,27 +17,23 @@ const burzaImage = computed(() => page.image('burzaImage'))
       :stats="page.lines('stats')"
     />
 
-    <section class="section">
-      <div class="container two-col">
-        <div>
-          <span class="kicker">{{ page.t('eterKicker') }}</span>
-          <h2 class="section-title">{{ page.t('eterTitle') }}</h2>
-          <RichText class="section-text" :html="page.html('eterText')" :lead="false" />
-        </div>
-        <img v-if="eterImage" :src="eterImage" :alt="page.imageAlt('eterImage', page.t('eterTitle'))" class="side-image" />
-      </div>
-    </section>
+    <FeatureStory
+      :kicker="page.t('eterKicker')"
+      :title="page.t('eterTitle')"
+      :html="page.html('eterText')"
+      :image="eterImage"
+      :alt="page.imageAlt('eterImage', page.t('eterTitle'))"
+    />
 
-    <section class="section section-alt">
-      <div class="container two-col reverse">
-        <img v-if="burzaImage" :src="burzaImage" :alt="page.imageAlt('burzaImage', page.t('burzaTitle'))" class="side-image" />
-        <div>
-          <span class="kicker">{{ page.t('burzaKicker') }}</span>
-          <h2 class="section-title">{{ page.t('burzaTitle') }}</h2>
-          <RichText class="section-text" :html="page.html('burzaText')" :lead="false" />
-        </div>
-      </div>
-    </section>
+    <FeatureStory
+      :kicker="page.t('burzaKicker')"
+      :title="page.t('burzaTitle')"
+      :html="page.html('burzaText')"
+      :image="burzaImage"
+      :alt="page.imageAlt('burzaImage', page.t('burzaTitle'))"
+      reverse
+      tone="stone"
+    />
 
     <section class="section">
       <div class="container">

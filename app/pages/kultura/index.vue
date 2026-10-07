@@ -19,16 +19,16 @@ await usePageTitle(() => page.t('pageTitle'))
 
 const heroStats = computed(() =>
   [
-    page.t('statEditions', { liczba: festivalEditions.value.length }),
-    page.t('statContests', { liczba: contests.value.length }),
+    page.plural('statEditions', festivalEditions.value.length),
+    page.plural('statContests', contests.value.length),
     page.t('statExtra'),
   ].filter(Boolean),
 )
 
 const cultureStats = computed(() => [
-  { label: page.t('barEditionsLabel'), value: String(festivalEditions.value.length) },
+  { label: page.plural('barEditions', festivalEditions.value.length), value: String(festivalEditions.value.length) },
   ...page.pairs('stats'),
-  { label: page.t('barContestsLabel'), value: String(contests.value.length) },
+  { label: page.plural('barContests', contests.value.length), value: String(contests.value.length) },
 ])
 
 function descriptionParagraphs(text: string) {
@@ -357,13 +357,13 @@ const announcementImage = computed(() => page.image('announcementImage'))
    instead of boxed tiles, so the section reads like normal page copy. */
 .two-col {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 3rem;
-  align-items: center;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(2.5rem, 5vw, 5rem);
+  align-items: start;
 }
 
 .two-col.reverse {
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
 }
 
 .two-col.reverse > *:first-child {
@@ -410,12 +410,16 @@ const announcementImage = computed(() => page.image('announcementImage'))
   margin-bottom: 0;
 }
 
+/* Duże pionowe zdjęcie konkursu, przyklejone obok treści podczas przewijania. */
 .side-image {
+  position: sticky;
+  top: 7.5rem;
   width: 100%;
-  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
   display: block;
-  border-radius: 18px;
-  box-shadow: 0 20px 44px rgba(26, 36, 32, 0.14);
+  border-radius: 22px;
+  box-shadow: 0 30px 70px rgba(26, 36, 32, 0.16);
 }
 
 .contest-row .funding-note {
@@ -575,18 +579,36 @@ const announcementImage = computed(() => page.image('announcementImage'))
   }
 }
 
+@media (max-width: 1023px) {
+  .two-col,
+  .two-col.reverse {
+    grid-template-columns: 1fr;
+  }
+
+  .side-image {
+    position: static;
+    aspect-ratio: 16 / 9;
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .side-image {
+    aspect-ratio: 4 / 3;
+    border-radius: 14px;
+  }
+}
+
 @media (max-width: 900px) {
   .two-col,
   .two-col.reverse {
     grid-template-columns: 1fr;
   }
 
-  .two-col.reverse > *:first-child {
-    order: 2;
-  }
-
+  /* Na telefonie i tablecie zdjęcie zawsze nad tekstem. */
+  .two-col.reverse > *:first-child,
   .two-col.reverse > *:last-child {
-    order: 1;
+    order: 0;
   }
 
   .contest-row {

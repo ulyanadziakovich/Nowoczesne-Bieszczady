@@ -27,47 +27,39 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
       </template>
     </ClientOnly>
 
-    <section class="section">
-      <div class="container">
-        <div class="section-head">
-          <span class="kicker">{{ page.t('aboutKicker') }}</span>
-          <h2 class="section-title">{{ page.t('aboutTitle') }}</h2>
-        </div>
-
-        <div v-if="aboutImageUrl" class="about-image-wrap">
-          <img :src="aboutImageUrl" :alt="page.imageAlt('aboutImage', page.t('aboutTitle'))" class="about-image" />
-        </div>
-
-        <div class="about">
-          <div class="about-text">
-            <RichText class="about-rich" :html="page.html('aboutText')" />
-            <p class="funding-note">{{ page.t('fundingNote') }}</p>
-            <div class="funding-logos">
-              <img
-                v-if="fundingLogo1"
-                class="funding-logo funding-logo-niw"
-                :src="fundingLogo1"
-                :alt="page.imageAlt('fundingLogo1', '')"
-                width="476"
-                height="56"
-                loading="lazy"
-                decoding="async"
-              />
-              <img
-                v-if="fundingLogo2"
-                class="funding-logo funding-logo-procarpathia"
-                :src="fundingLogo2"
-                :alt="page.imageAlt('fundingLogo2', '')"
-                width="900"
-                height="306"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-          </div>
+    <FeatureStory
+      :kicker="page.t('aboutKicker')"
+      :title="page.t('aboutTitle')"
+      :html="page.html('aboutText')"
+      :image="aboutImageUrl"
+      :alt="page.imageAlt('aboutImage', page.t('aboutTitle'))"
+    >
+      <div class="funding">
+        <p class="funding-note">{{ page.t('fundingNote') }}</p>
+        <div class="funding-logos">
+          <img
+            v-if="fundingLogo1"
+            class="funding-logo funding-logo-niw"
+            :src="fundingLogo1"
+            :alt="page.imageAlt('fundingLogo1', '')"
+            width="476"
+            height="56"
+            loading="lazy"
+            decoding="async"
+          />
+          <img
+            v-if="fundingLogo2"
+            class="funding-logo funding-logo-procarpathia"
+            :src="fundingLogo2"
+            :alt="page.imageAlt('fundingLogo2', '')"
+            width="900"
+            height="306"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       </div>
-    </section>
+    </FeatureStory>
 
     <DreamMapBoard />
     <RelatedNews place="ustrzyki-2036" />
@@ -75,6 +67,12 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
 </template>
 
 <style scoped>
+.funding {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e6e2d8;
+}
+
 .sky-fallback {
   height: 100vh;
   height: 100dvh;
