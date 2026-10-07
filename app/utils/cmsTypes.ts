@@ -112,6 +112,14 @@ export interface Contest {
   image: CmsImage | null
   /** Ręczna kolejność z CMS (przeciąganie w panelu). */
   order?: number
+  laureatesTitle?: string | null
+  laureates?: {
+    image?: CmsImage | null
+    title: string
+    author: string
+    category?: string
+    award: 'i-miejsce' | 'ii-miejsce' | 'iii-miejsce' | 'wyroznienie'
+  }[]
 }
 
 export interface FlagshipTile {

@@ -90,60 +90,6 @@ const announcementImage = computed(() => page.image('announcementImage'))
       </div>
     </section>
 
-    <section class="section section-alt">
-      <div class="container">
-        <div class="section-head">
-          <span class="kicker">{{ page.t('festivalKicker') }}</span>
-          <h2 class="section-title">{{ page.t('festivalTitle') }}</h2>
-          <p class="lead">{{ page.t('festivalLead') }}</p>
-        </div>
-
-        <div class="grid-3">
-          <NuxtLink v-for="edition in festivalEditions" :key="edition.id" :to="`/kultura/edycje/${edition.slug}`" class="edition-card card-surface">
-            <div class="edition-image-wrap">
-              <img :src="resolveCmsUrl(edition.image?.src)" :alt="edition.title" />
-              <span v-if="edition.featured" class="featured-badge">{{ page.t('editionNewest') }}</span>
-            </div>
-            <div class="edition-body">
-              <span class="year">{{ edition.year }}</span>
-              <h3>{{ edition.title }}</h3>
-              <p>{{ edition.description }}</p>
-              <span class="link">{{ page.t('editionLink') }}</span>
-            </div>
-          </NuxtLink>
-
-          <!-- Not an edition — a standalone announcement for the upcoming
-               festival, shown alongside them in the same grid/card style. -->
-          <article v-if="announcementImage" class="edition-card card-surface announcement-card">
-            <div class="edition-image-wrap announcement-image-wrap">
-              <img
-                :src="announcementImage"
-                :alt="page.imageAlt('announcementImage', page.t('announcementBadge'))"
-                class="announcement-image"
-              />
-              <span v-if="page.t('announcementBadge')" class="featured-badge">{{ page.t('announcementBadge') }}</span>
-            </div>
-            <div class="edition-body">
-              <p class="announcement-text">{{ page.t('announcementText') }}</p>
-            </div>
-          </article>
-        </div>
-
-        <div class="note-card">
-          <div class="note-icon">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6">
-              <path d="M9 18V5l12-2v13M9 9l12-2M6 18a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm12-2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
-            </svg>
-          </div>
-          <div class="note-text">
-            <span class="kicker">{{ page.t('upcomingKicker') }}</span>
-            <h3>{{ page.t('upcomingTitle') }}</h3>
-            <p>{{ page.t('upcomingText') }}</p>
-          </div>
-          <NuxtLink to="/aktualnosci" class="btn btn-amber">{{ page.t('upcomingButton') }}</NuxtLink>
-        </div>
-      </div>
-    </section>
 
     <section class="section">
       <div class="container">
@@ -220,6 +166,64 @@ const announcementImage = computed(() => page.image('announcementImage'))
 
             <NuxtLink to="/aktualnosci" class="link">{{ page.t('contestsLink') }}</NuxtLink>
           </div>
+        </div>
+        <template v-for="contest in contests" :key="`laureates-${contest.id}`">
+          <LaureatesGallery v-if="contest.laureates?.length" :title="contest.laureatesTitle" :items="contest.laureates" />
+        </template>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-head">
+          <span class="kicker">{{ page.t('festivalKicker') }}</span>
+          <h2 class="section-title">{{ page.t('festivalTitle') }}</h2>
+          <p class="lead">{{ page.t('festivalLead') }}</p>
+        </div>
+
+        <div class="grid-3">
+          <NuxtLink v-for="edition in festivalEditions" :key="edition.id" :to="`/kultura/edycje/${edition.slug}`" class="edition-card card-surface">
+            <div class="edition-image-wrap">
+              <img :src="resolveCmsUrl(edition.image?.src)" :alt="edition.title" />
+              <span v-if="edition.featured" class="featured-badge">{{ page.t('editionNewest') }}</span>
+            </div>
+            <div class="edition-body">
+              <span class="year">{{ edition.year }}</span>
+              <h3>{{ edition.title }}</h3>
+              <p>{{ edition.description }}</p>
+              <span class="link">{{ page.t('editionLink') }}</span>
+            </div>
+          </NuxtLink>
+
+          <!-- Not an edition — a standalone announcement for the upcoming
+               festival, shown alongside them in the same grid/card style. -->
+          <article v-if="announcementImage" class="edition-card card-surface announcement-card">
+            <div class="edition-image-wrap announcement-image-wrap">
+              <img
+                :src="announcementImage"
+                :alt="page.imageAlt('announcementImage', page.t('announcementBadge'))"
+                class="announcement-image"
+              />
+              <span v-if="page.t('announcementBadge')" class="featured-badge">{{ page.t('announcementBadge') }}</span>
+            </div>
+            <div class="edition-body">
+              <p class="announcement-text">{{ page.t('announcementText') }}</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="note-card">
+          <div class="note-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M9 18V5l12-2v13M9 9l12-2M6 18a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm12-2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+            </svg>
+          </div>
+          <div class="note-text">
+            <span class="kicker">{{ page.t('upcomingKicker') }}</span>
+            <h3>{{ page.t('upcomingTitle') }}</h3>
+            <p>{{ page.t('upcomingText') }}</p>
+          </div>
+          <NuxtLink to="/aktualnosci" class="btn btn-amber">{{ page.t('upcomingButton') }}</NuxtLink>
         </div>
       </div>
     </section>
