@@ -25,7 +25,7 @@ withDefaults(
       <div class="story-body">
         <span v-if="kicker" class="kicker">{{ kicker }}</span>
         <h2 v-if="title" class="story-title">{{ title }}</h2>
-        <RichText v-if="html" :html="html" :lead="true" collapsible collapsed-height="26rem" />
+        <RichText v-if="html" :html="html" :lead="true" collapsible collapsed-height="17rem" />
         <slot />
       </div>
     </div>
@@ -49,23 +49,21 @@ withDefaults(
 
 .story-grid {
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-  gap: clamp(2.5rem, 5vw, 5.5rem);
-  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(2.5rem, 5vw, 5rem);
+  align-items: center;
 }
 
 .story-reverse .story-media {
   order: 2;
 }
 
-/* Zdjęcie przyklejone obok tekstu — duże, w pionie, z delikatnym cieniem. */
+/* Dwie równe połowy: poziome zdjęcie 4:3 i tekst wyśrodkowany obok niego. */
 .story-media {
-  position: sticky;
-  top: 7.5rem;
   margin: 0;
   overflow: hidden;
   border-radius: 22px;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 3;
   box-shadow: 0 30px 70px rgba(26, 36, 32, 0.16);
 }
 
@@ -87,16 +85,16 @@ withDefaults(
 }
 
 .story-title {
-  margin: 0 0 1.5rem;
+  margin: 0 0 1.25rem;
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3.4vw, 2.75rem);
+  font-size: clamp(1.6rem, 2.4vw, 2.2rem);
   font-weight: 600;
   line-height: 1.15;
   color: var(--text-title);
 }
 
 .story-body :deep(.rich) {
-  max-width: 640px;
+  max-width: none;
 }
 
 .story-body :deep(.rich-html p) {
