@@ -18,16 +18,15 @@ withDefaults(
 
 <template>
   <section class="story" :class="[`story-${tone}`, { 'story-reverse': reverse }]">
-    <div class="container story-grid">
+    <!-- Zdjęcie „pływa” z boku, a tekst je opływa i dalej płynie pod nim. -->
+    <div class="container story-flow">
       <figure v-if="image" class="story-media">
         <img :src="image" :alt="alt || title || ''" loading="lazy" />
       </figure>
-      <div class="story-body">
-        <span v-if="kicker" class="kicker">{{ kicker }}</span>
-        <h2 v-if="title" class="story-title">{{ title }}</h2>
-        <RichText v-if="html" :html="html" :lead="true" collapsible collapsed-height="17rem" />
-        <slot />
-      </div>
+      <span v-if="kicker" class="kicker story-kicker">{{ kicker }}</span>
+      <h2 v-if="title" class="story-title">{{ title }}</h2>
+      <RichText v-if="html" :html="html" :lead="true" collapsible collapsed-height="17rem" />
+      <slot />
     </div>
   </section>
 </template>
@@ -47,24 +46,26 @@ withDefaults(
   background: var(--stone);
 }
 
-.story-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(2.5rem, 5vw, 5rem);
-  align-items: center;
+/* Po zdjęciu wszystko wraca do pełnej szerokości. */
+.story-flow::after {
+  content: '';
+  display: block;
+  clear: both;
 }
 
-.story-reverse .story-media {
-  order: 2;
-}
-
-/* Dwie równe połowy: poziome zdjęcie 4:3 i tekst wyśrodkowany obok niego. */
 .story-media {
-  margin: 0;
+  float: left;
+  width: 48%;
+  margin: 0.4rem 3.5rem 1.5rem 0;
   overflow: hidden;
   border-radius: 22px;
   aspect-ratio: 4 / 3;
   box-shadow: 0 30px 70px rgba(26, 36, 32, 0.16);
+}
+
+.story-reverse .story-media {
+  float: right;
+  margin: 0.4rem 0 1.5rem 3.5rem;
 }
 
 .story-media img {
@@ -79,9 +80,8 @@ withDefaults(
   transform: scale(1.03);
 }
 
-.story-body {
-  min-width: 0;
-  padding-top: 0.5rem;
+.story-kicker {
+  display: block;
 }
 
 .story-title {
@@ -93,43 +93,38 @@ withDefaults(
   color: var(--text-title);
 }
 
-.story-body :deep(.rich) {
+.story-flow :deep(.rich) {
   max-width: none;
 }
 
-.story-body :deep(.rich-html p) {
+.story-flow :deep(.rich-html p) {
   font-size: 1.04rem;
   line-height: 1.85;
 }
 
-/* Tablet: zdjęcie szerokie nad tekstem. */
+/* Tablet i telefon: zdjęcie na całą szerokość nad tekstem. */
 @media (max-width: 1023px) {
   .story {
     padding: 4.5rem 0;
   }
 
-  .story-grid {
-    grid-template-columns: 1fr;
-  }
-
+  .story-media,
   .story-reverse .story-media {
-    order: 0;
-  }
-
-  .story-media {
-    position: static;
+    float: none;
+    width: 100%;
+    margin: 0 0 2rem;
     aspect-ratio: 16 / 9;
     border-radius: 18px;
   }
 }
 
-/* Telefon: mniejsze odstępy, zdjęcie trochę wyższe. */
 @media (max-width: 600px) {
   .story {
     padding: 3.25rem 0;
   }
 
-  .story-media {
+  .story-media,
+  .story-reverse .story-media {
     aspect-ratio: 4 / 3;
     border-radius: 14px;
   }

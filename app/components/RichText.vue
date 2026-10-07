@@ -88,6 +88,10 @@ const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === '
 
 .rich-clip {
   position: relative;
+}
+
+/* Tylko zwinięty tekst jest przycinany — rozwinięty może opływać zdjęcie obok. */
+.rich-shell.is-collapsed .rich-clip {
   overflow: hidden;
 }
 
