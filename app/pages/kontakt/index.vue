@@ -132,7 +132,8 @@ function submit() {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr);
   gap: clamp(2.5rem, 5vw, 5rem);
-  align-items: start;
+  /* Formularz kończy się równo z ostatnią kartą kontaktu (Facebook). */
+  align-items: end;
 }
 
 /* --- Dane kontaktowe --- */
