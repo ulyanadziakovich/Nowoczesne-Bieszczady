@@ -52,6 +52,8 @@ const current = computed(() => (openIndex.value === null ? null : works.value[op
 function open(i: number) {
   openIndex.value = i
 }
+
+const { isTouch, trackEl, onTrackScroll } = useSwipeLightbox(openIndex)
 function close() {
   openIndex.value = null
 }
@@ -127,8 +129,19 @@ onUnmounted(() => document.removeEventListener('keydown', onKey))
     <Teleport to="body">
       <div v-if="current" class="lb" @click.self="close">
         <button type="button" class="lb-close" aria-label="Zamknij" @click="close">×</button>
-        <button v-if="works.length > 1" type="button" class="lb-nav lb-prev" aria-label="Poprzednia praca" @click="step(-1)">‹</button>
-        <figure class="lb-figure">
+        <!-- Telefon: prace w pasku przewijanym palcem. -->
+        <div v-if="isTouch" ref="trackEl" class="lb-track" @scroll.passive="onTrackScroll">
+          <figure v-for="(work, i) in works" :key="i" class="lb-figure lb-slide">
+            <img :src="resolveCmsUrl(work.image!.src)" :alt="`${work.title} — ${work.author}`" loading="lazy" decoding="async" />
+            <figcaption>
+              <span class="award" :class="`award-${work.award}`">{{ awardLabel(work.award) }}</span>
+              <strong>{{ work.title }}</strong>
+              <span>{{ work.author }}<template v-if="work.category"> · {{ work.category }}</template></span>
+            </figcaption>
+          </figure>
+        </div>
+        <button v-if="works.length > 1 && !isTouch" type="button" class="lb-nav lb-prev" aria-label="Poprzednia praca" @click="step(-1)">‹</button>
+        <figure v-if="!isTouch" class="lb-figure">
           <img :src="resolveCmsUrl(current.image!.src)" :alt="`${current.title} — ${current.author}`" />
           <figcaption>
             <span class="award" :class="`award-${current.award}`">{{ awardLabel(current.award) }}</span>
@@ -136,7 +149,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKey))
             <span>{{ current.author }}<template v-if="current.category"> · {{ current.category }}</template></span>
           </figcaption>
         </figure>
-        <button v-if="works.length > 1" type="button" class="lb-nav lb-next" aria-label="Następna praca" @click="step(1)">›</button>
+        <button v-if="works.length > 1 && !isTouch" type="button" class="lb-nav lb-next" aria-label="Następna praca" @click="step(1)">›</button>
       </div>
     </Teleport>
   </div>
@@ -429,7 +442,19 @@ onUnmounted(() => document.removeEventListener('keydown', onKey))
   }
 
   .laureates-tabs {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
     width: 100%;
+    overflow: visible;
+  }
+
+  .tab {
+    padding: 0.55rem 0.4rem;
+    font-size: 0.74rem;
+    line-height: 1.2;
+    white-space: normal;
+    text-align: center;
   }
 
   .podium {
@@ -454,7 +479,8 @@ onUnmounted(() => document.removeEventListener('keydown', onKey))
   align-items: center;
   justify-content: center;
   padding: 3.5rem 4.5rem;
-  background: rgba(6, 10, 14, 0.94);
+  background: rgba(6, 10, 14, 0.96);
+  backdrop-filter: blur(8px);
 }
 
 .lb-figure {
@@ -490,6 +516,32 @@ onUnmounted(() => document.removeEventListener('keydown', onKey))
   color: #fff;
 }
 
+.lb-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.lb-track::-webkit-scrollbar {
+  display: none;
+}
+
+.lb-slide {
+  flex: 0 0 100%;
+  justify-content: center;
+  padding: 3.5rem 0.75rem 2rem;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+.lb-slide img {
+  max-height: calc(100dvh - 13rem);
+}
+
 .lb-close,
 .lb-nav {
   position: fixed;
@@ -502,6 +554,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKey))
 }
 
 .lb-close {
+  z-index: 2;
   top: 1.25rem;
   right: 1.5rem;
   width: 42px;

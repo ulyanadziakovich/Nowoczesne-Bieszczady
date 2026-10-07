@@ -13,6 +13,21 @@ if (!post.value) {
 useHead({ title: () => [post.value?.title, page.t('pageTitle'), common.t('siteName')].filter(Boolean).join(' — ') })
 
 const bodyParagraphs = computed(() => (post.value?.body || '').split(/\n\s*\n/).filter(Boolean))
+
+// Treść to zwykły tekst — rozpoznajemy w niej strukturę, żeby nie była ścianą tekstu:
+//  • akapit w całości pogrubiony (**…**) → śródtytuł,
+//  • akapit, którego ostatnia linia zaczyna się od „– ” (np. „– powiedział …”) → cytat z podpisem.
+type Block = { type: 'heading' | 'quote' | 'paragraph'; text: string; cite?: string }
+const bodyBlocks = computed<Block[]>(() =>
+  bodyParagraphs.value.map((raw) => {
+    const text = raw.trim()
+    const heading = text.match(/^\*\*([^*\n]+)\*\*$/)
+    if (heading) return { type: 'heading', text: heading[1]!.trim() }
+    const quote = text.match(/^([\s\S]+?)\n\s*([–—-]\s.{1,90})$/)
+    if (quote) return { type: 'quote', text: quote[1]!.trim(), cite: quote[2]!.trim() }
+    return { type: 'paragraph', text }
+  }),
+)
 const gallery = computed(() => galleryImages(post.value))
 
 // Plain text field, so this is the only formatting it supports:
@@ -40,13 +55,14 @@ function formatParagraph(text: string) {
         <img v-if="post.image" :src="resolveCmsUrl(post.image.src)" :alt="post.title" class="cover-image" />
 
         <div class="article">
-          <p
-            v-for="(paragraph, i) in bodyParagraphs"
-            :key="i"
-            class="lead paragraph"
-            :class="{ lede: i === 0 }"
-            v-html="formatParagraph(paragraph)"
-          />
+          <template v-for="(block, i) in bodyBlocks" :key="i">
+            <h2 v-if="block.type === 'heading'" class="article-subheading">{{ block.text }}</h2>
+            <blockquote v-else-if="block.type === 'quote'" class="article-quote">
+              <p v-html="formatParagraph(block.text)" />
+              <cite>{{ block.cite }}</cite>
+            </blockquote>
+            <p v-else class="lead paragraph" :class="{ lede: i === 0 }" v-html="formatParagraph(block.text)" />
+          </template>
 
           <section v-if="gallery.length" class="article-gallery">
             <div class="gallery-head">
@@ -64,6 +80,54 @@ function formatParagraph(text: string) {
 </template>
 
 <style scoped>
+.article-subheading {
+  margin: 2.6rem 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.6vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-title);
+}
+
+.article-subheading::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 2px;
+  margin-bottom: 0.9rem;
+  background: var(--amber);
+}
+
+.article-quote {
+  margin: 1.8rem 0;
+  padding: 0.3rem 0 0.3rem 1.4rem;
+  border-left: 3px solid var(--amber);
+}
+
+.article-quote p {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.08rem, 2vw, 1.25rem);
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--text-title);
+  white-space: pre-line;
+}
+
+.article-quote cite {
+  font-size: 0.85rem;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+@media (max-width: 600px) {
+  .article-quote {
+    margin: 1.4rem 0;
+    padding-left: 1rem;
+  }
+}
+
 .article-container {
   max-width: 780px;
 }

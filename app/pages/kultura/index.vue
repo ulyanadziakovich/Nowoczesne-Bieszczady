@@ -414,13 +414,13 @@ const announcementImage = computed(() => page.image('announcementImage'))
   margin-bottom: 0;
 }
 
-/* Duże pionowe zdjęcie konkursu, przyklejone obok treści podczas przewijania. */
+/* Duże zdjęcie konkursu, przyklejone obok treści podczas przewijania.
+   Pokazujemy je w całości (bez przycinania) — to często plakat z napisami. */
 .side-image {
   position: sticky;
   top: 7.5rem;
   width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
+  height: auto;
   display: block;
   border-radius: 22px;
   box-shadow: 0 30px 70px rgba(26, 36, 32, 0.16);
@@ -482,9 +482,22 @@ const announcementImage = computed(() => page.image('announcementImage'))
   color: var(--ink);
 }
 
+/* Telefon: informacje o konkursie zostają 2 × 2, tylko ciaśniej. */
 @media (max-width: 480px) {
   .fact-grid {
-    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .fact-item {
+    padding: 0.7rem 0.75rem 0.75rem 0.85rem;
+  }
+
+  .fact-label {
+    font-size: 0.62rem;
+  }
+
+  .fact-value {
+    font-size: 0.82rem;
   }
 }
 
@@ -566,20 +579,26 @@ const announcementImage = computed(() => page.image('announcementImage'))
   border-color: #a8551f;
 }
 
+/* Telefon: nazwa dokumentu i dwa małe przyciski w jednym wierszu. */
 @media (max-width: 480px) {
   .document-row {
-    flex-wrap: wrap;
-    padding: 0.75rem 0;
+    gap: 0.6rem;
+    padding: 0.65rem 0;
+  }
+
+  .document-name {
+    min-width: 0;
+    font-size: 0.84rem;
+    line-height: 1.3;
   }
 
   .document-actions {
-    width: 100%;
+    gap: 0.35rem;
   }
 
   .doc-btn {
-    flex: 1;
-    justify-content: center;
-    padding: 0.55rem 0.85rem;
+    padding: 0.38rem 0.6rem;
+    font-size: 0.72rem;
   }
 }
 
@@ -591,14 +610,12 @@ const announcementImage = computed(() => page.image('announcementImage'))
 
   .side-image {
     position: static;
-    aspect-ratio: 16 / 9;
     border-radius: 18px;
   }
 }
 
 @media (max-width: 600px) {
   .side-image {
-    aspect-ratio: 4 / 3;
     border-radius: 14px;
   }
 }
@@ -746,7 +763,18 @@ const announcementImage = computed(() => page.image('announcementImage'))
 @media (max-width: 900px) {
   .stat-bar {
     grid-template-columns: repeat(2, 1fr);
-    row-gap: 1.5rem;
+    row-gap: 1rem;
+    gap: 0.75rem;
+    padding: 1.25rem 1rem;
+    border-radius: 16px;
+  }
+
+  .stat-tile strong {
+    font-size: 1.55rem;
+  }
+
+  .stat-tile span {
+    font-size: 0.62rem;
   }
 
   .stat-tile:nth-child(2) {

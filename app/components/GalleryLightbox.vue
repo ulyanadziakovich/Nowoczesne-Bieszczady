@@ -36,6 +36,8 @@ function open(i: number) {
   openIndex.value = i
 }
 
+const { isTouch, trackEl, onTrackScroll } = useSwipeLightbox(openIndex)
+
 function close() {
   openIndex.value = null
 }
@@ -101,8 +103,15 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
     <div v-if="openIndex !== null" class="lightbox-overlay" @click.self="close">
       <button type="button" class="lightbox-close" aria-label="Zamknij" @click="close">×</button>
 
+      <!-- Telefon: wszystkie zdjęcia w pasku przewijanym palcem. -->
+      <div v-if="isTouch" ref="trackEl" class="lightbox-track" @scroll.passive="onTrackScroll" @click.self="close">
+        <div v-for="(img, i) in images" :key="i" class="lightbox-slide" @click.self="close">
+          <img :src="resolveCmsUrl(img)" :alt="`${altPrefix} — zdjęcie ${i + 1}`" loading="lazy" decoding="async" />
+        </div>
+      </div>
+
       <button
-        v-if="images.length > 1"
+        v-if="images.length > 1 && !isTouch"
         type="button"
         class="lightbox-nav lightbox-prev"
         aria-label="Poprzednie zdjęcie"
@@ -112,14 +121,14 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
       </button>
 
       <img
-        v-if="openIndex !== null"
+        v-if="openIndex !== null && !isTouch"
         :src="resolveCmsUrl(images[openIndex])"
         :alt="`${altPrefix} — zdjęcie ${openIndex + 1}`"
         class="lightbox-image"
       />
 
       <button
-        v-if="images.length > 1"
+        v-if="images.length > 1 && !isTouch"
         type="button"
         class="lightbox-nav lightbox-next"
         aria-label="Następne zdjęcie"
@@ -433,12 +442,49 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   padding: 4rem 1.5rem;
 }
 
+.lightbox-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.lightbox-track::-webkit-scrollbar {
+  display: none;
+}
+
+.lightbox-slide {
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5rem 0.75rem;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+.lightbox-slide img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
 .lightbox-image {
   max-width: 100%;
   max-height: 100%;
   border-radius: 8px;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
   object-fit: contain;
+}
+
+.lightbox-close,
+.lightbox-count {
+  z-index: 2;
 }
 
 .lightbox-close {
