@@ -1,14 +1,12 @@
 <script setup lang="ts">
 // Wpisy z Aktualności, przy których w CMS zaznaczono tę podstronę
 // („Pokaż także na podstronach”). Bez takich wpisów sekcja się nie pokazuje.
-const props = withDefaults(defineProps<{ place: string; limit?: number; kicker?: string; title?: string }>(), { limit: 6 })
+const props = defineProps<{ place: string; kicker?: string; title?: string }>()
 
 const { data } = useCmsCollection<NewsPost>('news', { order: 'id:desc' })
 const common = usePageTextsSync('site-settings')
 const posts = computed(() =>
-  byCmsOrder(data.value?.records ?? [])
-    .filter((p) => (p.showOn ?? []).includes(props.place))
-    .slice(0, props.limit),
+  byCmsOrder(data.value?.records ?? []).filter((p) => (p.showOn ?? []).includes(props.place)),
 )
 </script>
 
