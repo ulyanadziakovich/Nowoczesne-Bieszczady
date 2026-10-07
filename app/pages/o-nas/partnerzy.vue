@@ -3,13 +3,10 @@ definePageMeta({ layout: 'onas', solidHeader: true })
 const page = await usePageTexts('strona-o-nas')
 await usePageTitle(() => page.t('partnerzyTitle'))
 
-// Partnerzy z formularza „Strona: O nas” (zakładka „Partnerzy”); do czasu
-// przeniesienia danych — ze starej kolekcji „Partnerzy”.
-const { data } = await useCmsCollection<Partner>('partners', { order: 'order' })
-const partners = computed<{ id?: number; name: string; logo?: CmsImage | null; url?: string }[]>(() => {
-  const own = (page.data.value?.partners ?? []) as { name: string; logo?: CmsImage | null; url?: string }[]
-  return own.length ? own : (data.value?.records ?? [])
-})
+// Partnerzy z formularza „Strona: O nas” (zakładka „Partnerzy”).
+const partners = computed(
+  () => (page.data.value?.partners ?? []) as { id?: number; name: string; logo?: CmsImage | null; url?: string }[],
+)
 
 </script>
 

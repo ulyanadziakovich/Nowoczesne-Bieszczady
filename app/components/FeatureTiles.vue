@@ -1,7 +1,5 @@
 <script setup lang="ts">
-// Kafelki z formularza „Strona: Główna” (zakładka „Kafelki pod nagłówkiem”);
-// do czasu przeniesienia danych — ze starej kolekcji „kafelki flagowe”.
-const { data } = await useCmsCollection<FlagshipTile>('flagship-tiles', { order: 'order' })
+// Kafelki z formularza „Strona: Główna” (zakładka „Kafelki pod nagłówkiem”).
 const home = usePageTextsSync('home')
 interface Tile {
   id?: number
@@ -12,11 +10,7 @@ interface Tile {
   ctaLabel?: string | null
   href?: string
 }
-const tiles = computed<Tile[]>(() => {
-  const own = (home.data.value?.tiles ?? []) as Tile[]
-  if (own.length) return own
-  return (data.value?.records ?? []).map((t) => ({ ...t, text: t.back, href: t.moreHref }))
-})
+const tiles = computed<Tile[]>(() => (home.data.value?.tiles ?? []) as Tile[])
 </script>
 
 <template>

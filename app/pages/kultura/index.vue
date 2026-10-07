@@ -66,10 +66,7 @@ function factStyle(label: string) {
   return FACT_STYLE[label] ?? { color: 'var(--alpine)', icon: 'landscape' }
 }
 
-// Do czasu wgrania plakatu w CMS — dotychczasowy plik zapowiedzi.
-const announcementImage = computed(
-  () => page.image('announcementImage') ?? resolveCmsUrl('/uploads/festival-editions/granie-bez-granic-2026-zapowiedz.jpg'),
-)
+const announcementImage = computed(() => page.image('announcementImage'))
 </script>
 
 <template>

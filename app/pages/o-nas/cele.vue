@@ -2,13 +2,8 @@
 definePageMeta({ layout: 'onas', solidHeader: true })
 const page = await usePageTexts('strona-o-nas')
 await usePageTitle(() => page.t('celeTitle'))
-// Cele z formularza „Strona: O nas” (zakładka „Cele”); do czasu przeniesienia
-// danych — ze starej kolekcji „Cele”.
-const { data } = await useCmsCollection<Goal>('goals', { order: 'order' })
-const goals = computed<{ id?: number; title: string; description?: string }[]>(() => {
-  const own = (page.data.value?.goals ?? []) as { title: string; description?: string }[]
-  return own.length ? own : (data.value?.records ?? [])
-})
+// Cele z formularza „Strona: O nas” (zakładka „Cele”).
+const goals = computed(() => (page.data.value?.goals ?? []) as { id?: number; title: string; description?: string }[])
 
 
 </script>

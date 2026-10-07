@@ -9,22 +9,13 @@ const props = defineProps<{
   ctaLabel?: string | null
 }>()
 
-// TYMCZASOWO, do wypełnienia nowych pól w CMS po wdrożeniu (wtedy do usunięcia):
-// dotychczasowe etykiety i napisy, używane tylko gdy CMS nie ma jeszcze tych pól.
-const LEGACY_META: Record<string, { tags: string[]; cta: string }> = {
-  '/szlaki': { tags: ['Pliki GPX', 'Filtry trudności'], cta: 'Zobacz trasy' },
-  '/ustrzyki-2036': { tags: ['18 postulatów', 'Mapa marzeń'], cta: 'Zobacz mapę marzeń' },
-  '/korona-gor': { tags: ['Szczyty', 'Kalendarz rajdów'], cta: 'Zobacz szczyty' },
-  '/inicjatywy': { tags: ['Warsztaty', 'Debaty społeczne'], cta: 'Zobacz inicjatywy' },
-}
-
-const meta = computed(() => {
-  const legacy = LEGACY_META[props.moreHref]
-  return {
-        tags: props.tags?.trim() ? props.tags.split('\n').map((t) => t.trim()).filter(Boolean) : (legacy?.tags ?? []),
-    cta: props.ctaLabel?.trim() || legacy?.cta || '',
-  }
-})
+const meta = computed(() => ({
+  tags: (props.tags ?? '')
+    .split('\n')
+    .map((t) => t.trim())
+    .filter(Boolean),
+  cta: props.ctaLabel ?? '',
+}))
 </script>
 
 <template>

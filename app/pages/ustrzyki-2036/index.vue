@@ -7,9 +7,8 @@ const page = await usePageTexts('dream-map-settings')
 usePageTheme(page)
 const heroSettings = page.data
 await usePageTitle(() => page.t('pageTitle'))
-// Logotypy: z formularza strony; do czasu wgrania — dotychczasowe pliki (etap 2).
-const fundingLogo1 = computed(() => page.image('fundingLogo1') ?? '/img/finansowanie-niw.png')
-const fundingLogo2 = computed(() => page.image('fundingLogo2') ?? '/img/finansowanie-procarpathia.png')
+const fundingLogo1 = computed(() => page.image('fundingLogo1'))
+const fundingLogo2 = computed(() => page.image('fundingLogo2'))
 const fallbackBackgroundImage = computed(
   () =>
     `linear-gradient(180deg, rgba(4, 7, 14, 0.72) 0%, rgba(4, 7, 14, 0.15) 30%, rgba(4, 7, 14, 0.2) 58%, rgba(4, 7, 14, 0.8) 100%), ` +
@@ -45,6 +44,7 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
             <p class="funding-note">{{ page.t('fundingNote') }}</p>
             <div class="funding-logos">
               <img
+                v-if="fundingLogo1"
                 class="funding-logo funding-logo-niw"
                 :src="fundingLogo1"
                 :alt="page.imageAlt('fundingLogo1', '')"
@@ -54,6 +54,7 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
                 decoding="async"
               />
               <img
+                v-if="fundingLogo2"
                 class="funding-logo funding-logo-procarpathia"
                 :src="fundingLogo2"
                 :alt="page.imageAlt('fundingLogo2', '')"

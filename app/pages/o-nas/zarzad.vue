@@ -3,13 +3,10 @@ definePageMeta({ layout: 'onas', solidHeader: true })
 const page = await usePageTexts('strona-o-nas')
 await usePageTitle(() => page.t('zarzadTitle'))
 
-// Osoby z formularza „Strona: O nas” (zakładka „Zarząd i Zespół”); do czasu
-// przeniesienia danych — ze starej kolekcji „Zarząd i zespół”.
-const { data } = await useCmsCollection<TeamMember>('team', { order: 'order' })
-const teamMembers = computed<{ id?: number; name: string; role?: string; photo?: CmsImage | null }[]>(() => {
-  const own = (page.data.value?.team ?? []) as { name: string; role?: string; photo?: CmsImage | null }[]
-  return own.length ? own : (data.value?.records ?? [])
-})
+// Osoby z formularza „Strona: O nas” (zakładka „Zarząd i Zespół”).
+const teamMembers = computed(
+  () => (page.data.value?.team ?? []) as { id?: number; name: string; role?: string; photo?: CmsImage | null }[],
+)
 
 </script>
 

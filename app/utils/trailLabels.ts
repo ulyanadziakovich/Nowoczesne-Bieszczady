@@ -43,7 +43,7 @@ export function trailBikeTypes(trail: Pick<Trail, 'bikeTypes'>): TrailBikeType[]
     .filter(Boolean) as TrailBikeType[]
 }
 
-/** Adres pliku GPX trasy: wgrany plik z CMS (przez nasze proxy — mapa czyta go fetch-em), a do czasu przeniesienia — stary adres. */
-export function trailGpxUrl(trail: Pick<Trail, 'gpxFile' | 'gpxUpload'>) {
-  return cmsFileProxyUrl(trail.gpxUpload ?? null) ?? trail.gpxFile ?? undefined
+/** Adres wgranego w CMS pliku GPX (przez nasze proxy — mapa czyta go fetch-em). */
+export function trailGpxUrl(trail: Pick<Trail, 'gpxUpload'>) {
+  return cmsFileProxyUrl(trail.gpxUpload ?? null)
 }

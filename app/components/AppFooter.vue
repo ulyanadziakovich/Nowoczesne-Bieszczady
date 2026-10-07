@@ -5,15 +5,11 @@ const { footerLinks: links } = await useNavigation()
 
 const { data: settings } = await useCmsSingle<SiteSettings>('site-settings')
 const common = await usePageTexts('site-settings')
-const { data: documentsData } = await useCmsCollection<{ id: number; label: string; file?: CmsFile | null; fileUrl?: string }>(
-  'documents',
-  { order: 'order' },
-)
-// Plik wgrany w CMS; do czasu przeniesienia — stary adres.
+const { data: documentsData } = await useCmsCollection<{ id: number; label: string; file?: CmsFile | null }>('documents', {
+  order: 'order',
+})
 const documents = computed(() =>
-  (documentsData.value?.records ?? [])
-    .map((d) => ({ ...d, url: cmsFileUrl(d.file) ?? d.fileUrl }))
-    .filter((d) => d.url),
+  (documentsData.value?.records ?? []).map((d) => ({ ...d, url: cmsFileUrl(d.file) })).filter((d) => d.url),
 )
 </script>
 

@@ -2,13 +2,8 @@
 definePageMeta({ layout: 'onas', solidHeader: true })
 const page = await usePageTexts('strona-o-nas')
 await usePageTitle(() => page.t('statutTitle'))
-// Strony statutu i plik PDF: do czasu wgrania w formularzu — z „Tekstów na stronach” (etap 2).
-const content = usePageContent()
-const pdfUrl = computed(() => page.file('statutFile') ?? content.image('statut-intro'))
-const pages = computed(() => {
-  const own = (page.data.value?.statutPages ?? []) as CmsGalleryImage[]
-  return own.length ? own.map((p) => p.src) : (content.body('statut-galeria') || '').split('\n').map((s) => s.trim()).filter(Boolean)
-})
+const pdfUrl = computed(() => page.file('statutFile'))
+const pages = computed(() => ((page.data.value?.statutPages ?? []) as CmsGalleryImage[]).map((p) => p.src))
 </script>
 
 <template>
@@ -16,7 +11,7 @@ const pages = computed(() => {
     <h2>{{ page.t('statutTitle') }}</h2>
     <RichText :html="page.html('statutText')" :lead="false" />
 
-    <div class="actions">
+    <div v-if="pdfUrl" class="actions">
       <a :href="pdfUrl" class="btn btn-amber" download>{{ page.t('statutDownload') }}</a>
       <a :href="pdfUrl" target="_blank" rel="noopener" class="btn btn-outline">{{ page.t('statutOpen') }}</a>
     </div>

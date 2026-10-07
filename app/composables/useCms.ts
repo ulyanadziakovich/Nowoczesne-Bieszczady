@@ -100,67 +100,6 @@ export function cmsFileProxyUrl(file: CmsFile | undefined | null) {
   return `/api/cms/uploads/${file.directory}${file.filename}`
 }
 
-export interface PageContentBlock {
-  id: number
-  key: string
-  title?: string
-  body?: string
-  /** Sformatowana treść z edytora w CMS (HTML) — ma pierwszeństwo przed `body`. */
-  content?: string
-  image?: string
-}
-
-/**
- * Fetches every keyed text block from the "page-content" collection once
- * (cached/shared across the whole app) and exposes lookup helpers.
- */
-export function usePageContent() {
-  const { data } = useCmsCollection<PageContentBlock>('page-content', { limit: 200 })
-  const blocks = computed(() => data.value?.records ?? [])
-
-  function get(key: string) {
-    return blocks.value.find((b) => b.key === key)
-  }
-
-  function title(key: string, fallback = '') {
-    return get(key)?.title || fallback
-  }
-
-  function body(key: string, fallback = '') {
-    return get(key)?.body || fallback
-  }
-
-  /** Treść z edytora w CMS (HTML) albo '' gdy pole jest puste lub go jeszcze nie ma. */
-  function html(key: string) {
-    const value = get(key)?.content || ''
-    return value.replace(/<p>\s*<\/p>/g, '').trim() ? value : ''
-  }
-
-  function image(key: string, fallback = '') {
-    return get(key)?.image || fallback
-  }
-
-  /** Splits a body field into paragraphs on blank lines. */
-  function paragraphs(key: string) {
-    return (body(key) || '').split(/\n\s*\n/).filter(Boolean)
-  }
-
-  /** Splits a body/text field into a list, one item per line. */
-  function lines(key: string) {
-    return (body(key) || '').split('\n').filter(Boolean)
-  }
-
-  /** Parses "Label: value" lines into { label, value } pairs — for small stat lists. */
-  function pairs(key: string) {
-    return lines(key).map((line) => {
-      const [label, ...rest] = line.split(':')
-      return { label: label.trim(), value: rest.join(':').trim() }
-    })
-  }
-
-  return { blocks, get, title, body, html, image, paragraphs, lines, pairs }
-}
-
 /** Zdjęcie z pola „Zdjęcia (galeria)” w CMS (po `populate`). */
 export interface CmsGalleryImage {
   src: string
@@ -169,16 +108,9 @@ export interface CmsGalleryImage {
   height?: number
 }
 
-/**
- * Adresy zdjęć galerii: z nowego pola „Zdjęcia (galeria)” (upload), a gdy jest
- * puste — ze starego pola z listą adresów (do czasu przeniesienia danych).
- */
-export function galleryImages(record: { photos?: CmsGalleryImage[] | null; gallery?: string | null } | null | undefined) {
-  if (record?.photos?.length) return record.photos.map((p) => p.src)
-  return (record?.gallery || '')
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean)
+/** Adresy zdjęć z pola „Zdjęcia (galeria)” w CMS. */
+export function galleryImages(record: { photos?: CmsGalleryImage[] | null } | null | undefined) {
+  return (record?.photos ?? []).map((p) => p.src)
 }
 
 /** Adres pliku z pola typu „plik” (albo undefined). */

@@ -3,10 +3,8 @@ definePageMeta({ solidHeader: true })
 const page = await usePageTexts('strona-inicjatywy')
 usePageTheme(page)
 await usePageTitle(() => page.t('pageTitle'))
-// Zdjęcia: z formularza strony, a do czasu wgrania — dotychczasowe z „Tekstów na stronach”.
-const content = usePageContent()
-const eterImage = computed(() => page.image('eterImage') ?? resolveCmsUrl(content.image('inicjatywy-eterze')))
-const burzaImage = computed(() => page.image('burzaImage') ?? resolveCmsUrl(content.image('inicjatywy-burza')))
+const eterImage = computed(() => page.image('eterImage'))
+const burzaImage = computed(() => page.image('burzaImage'))
 </script>
 
 <template>
