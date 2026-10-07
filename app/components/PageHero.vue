@@ -79,8 +79,12 @@ const split = computed(() => {
 }
 
 .intro-column {
-  max-width: 760px;
-  margin: 0 auto;
+  max-width: none;
+}
+
+/* Opis na całą szerokość treści — tak jak sekcje poniżej. */
+.intro-column :deep(.rich) {
+  max-width: none;
 }
 
 .intro-column :deep(.rich-html p),
@@ -100,8 +104,9 @@ const split = computed(() => {
   margin-top: 0;
 }
 
-.hero-lead {
-  max-width: 820px;
+.hero-lead,
+.hero-lead :deep(.rich) {
+  max-width: none;
 }
 
 .hero-lead :deep(p) {

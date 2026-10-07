@@ -70,6 +70,12 @@ useHead({ style: [{ key: 'cms-theme', innerHTML: themeCss }] })
   --diff-hard-tint: #f0dbdb;
   --diff-hard-ink: #ad0000;
 
+  /* Jedna siatka dla całej strony: treść ma maks. 1200 px (z marginesem 1.5rem),
+     a nagłówek i stopka wyrównują się do tych samych linii (--edge). */
+  --container: 1200px;
+  --gutter: 1.5rem;
+  --edge: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter)));
+
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Fraunces', Georgia, serif;
 }
@@ -107,9 +113,9 @@ body {
 /* ---- Shared page/design-system utilities (used across all subpages) ---- */
 
 .container {
-  max-width: 1200px;
+  max-width: var(--container);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 var(--gutter);
 }
 
 .section {

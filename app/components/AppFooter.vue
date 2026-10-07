@@ -73,12 +73,13 @@ const documents = computed(() =>
   scroll-margin-top: 110px;
   background: var(--ink);
   color: #d7dce1;
-  padding: 3.5rem 3rem 1.5rem;
+  padding: 4rem var(--edge) 1.75rem;
 }
 
 .top {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1.3fr 1.2fr;
+  align-items: start;
   gap: 3rem;
   padding-bottom: 2.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -86,7 +87,7 @@ const documents = computed(() =>
 
 .brand {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.9rem;
   max-width: 280px;
 }
@@ -201,13 +202,19 @@ const documents = computed(() =>
   color: var(--amber);
 }
 
+@media (max-width: 1100px) {
+  .top {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 @media (max-width: 800px) {
   .footer {
     padding: 2.5rem 1.5rem 1.5rem;
   }
 
   .top {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 2rem;
   }
 

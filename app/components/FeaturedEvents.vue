@@ -33,11 +33,11 @@ const posts = computed(() => byCmsOrder(data.value?.records ?? []).slice(0, 3))
 .events {
   scroll-margin-top: 110px;
   background: var(--mist);
-  padding: 5rem 3rem;
+  padding: 5rem var(--edge);
 }
 
 .section-head-row {
-  max-width: 1200px;
+  max-width: none;
   margin: 0 auto 2.5rem;
   display: flex;
   align-items: flex-end;
@@ -66,7 +66,7 @@ h2 {
 }
 
 .grid {
-  max-width: 1200px;
+  max-width: none;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
