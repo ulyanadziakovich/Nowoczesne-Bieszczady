@@ -151,9 +151,9 @@ watch(menuOpen, (open) => {
 .main-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 3rem;
-  padding: 1.25rem var(--edge);
+  padding: 1.25rem 3rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   position: relative;
 }
