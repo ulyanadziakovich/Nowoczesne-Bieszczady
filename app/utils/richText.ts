@@ -1,4 +1,4 @@
-import sanitizeHtml from 'sanitize-html'
+import { COMMENT_NODE, DOCTYPE_NODE, ELEMENT_NODE, TEXT_NODE, parse } from 'ultrahtml'
 
 /**
  * Dłuższe teksty z CMS (np. opisy w nagłówkach podstron) są wpisywane jako
@@ -68,26 +68,54 @@ export function shortUrl(url: string) {
 }
 
 /**
- * Treść z edytora CMS (HTML) wstawiamy przez v-html, więc przepuszczamy ją
- * przez sanitize-html (prawdziwy parser + biała lista): zostają tylko
- * znaczniki tekstowe, linki tylko http(s)/mailto/tel, bez atrybutów on*,
- * stylów i skryptów. Zewnętrzne linki otwierają się w nowej karcie.
+ * Treść z edytora CMS (HTML) wstawiamy przez v-html, więc najpierw parsujemy ją
+ * prawdziwym parserem (ultrahtml — ten sam, którego używa Nitro) i budujemy
+ * od nowa tylko z białej listy: znaczniki tekstowe, linki wyłącznie
+ * http(s)/mailto/tel, żadnych innych atrybutów. Niebezpieczne elementy
+ * znikają razem z zawartością, pozostałe nieznane — zostaje tylko ich tekst.
  */
+const ALLOWED_TAGS = new Set(['p', 'br', 'h1', 'h2', 'h3', 'h4', 'strong', 'b', 'em', 'i', 'u', 's', 'a', 'ul', 'ol', 'li', 'blockquote', 'hr'])
+const DROP_WITH_CONTENT = new Set(['script', 'style', 'iframe', 'object', 'embed', 'noscript', 'template', 'svg', 'math', 'textarea', 'select', 'title', 'head'])
+const VOID_TAGS = new Set(['br', 'hr'])
+const SAFE_URL = /^(https?:|mailto:|tel:)/
+
+function decodeEntities(value: string) {
+  return value
+    .replace(/&#x([0-9a-f]+);?/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);?/g, (_, dec) => String.fromCodePoint(Number(dec)))
+    .replace(/&colon;/gi, ':')
+    .replace(/&amp;/gi, '&')
+}
+
+function safeHref(raw: string | undefined) {
+  if (!raw) return null
+  const url = decodeEntities(raw).replace(/[\u0000-\u0020\u007f-\u009f]/g, '')
+  return SAFE_URL.test(url.toLowerCase()) ? url : null
+}
+
+const escapeText = (value: string) => value.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+const escapeAttr = (value: string) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+function serialize(node: any): string {
+  if (node.type === TEXT_NODE) return escapeText(node.value)
+  if (node.type === COMMENT_NODE || node.type === DOCTYPE_NODE) return ''
+  const children = (node.children || []).map(serialize).join('')
+  if (node.type !== ELEMENT_NODE) return children
+
+  const tag = String(node.name).toLowerCase()
+  if (DROP_WITH_CONTENT.has(tag)) return ''
+  if (!ALLOWED_TAGS.has(tag)) return children
+  if (VOID_TAGS.has(tag)) return `<${tag}>`
+  if (tag === 'a') {
+    const href = safeHref(node.attributes?.href)
+    if (!href) return children
+    const external = /^https?:/i.test(href) ? ' target="_blank" rel="noopener noreferrer"' : ''
+    return `<a href="${escapeAttr(href)}"${external}>${children}</a>`
+  }
+  return `<${tag}>${children}</${tag}>`
+}
+
 export function sanitizeCmsHtml(html: string | null | undefined) {
-  const clean = sanitizeHtml(html || '', {
-    allowedTags: ['p', 'br', 'h1', 'h2', 'h3', 'h4', 'strong', 'b', 'em', 'i', 'u', 's', 'a', 'ul', 'ol', 'li', 'blockquote', 'hr'],
-    allowedAttributes: { a: ['href', 'target', 'rel'] },
-    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
-    allowProtocolRelative: false,
-    transformTags: {
-      a: (tagName, attribs) => {
-        const external = /^https?:\/\//i.test(attribs.href || '')
-        return {
-          tagName,
-          attribs: external ? { href: attribs.href, target: '_blank', rel: 'noopener noreferrer' } : { href: attribs.href || '' },
-        }
-      },
-    },
-  })
-  return clean.replace(/<p>\s*<\/p>/g, '').trim()
+  if (!html) return ''
+  return serialize(parse(html)).replace(/<p>\s*<\/p>/g, '').trim()
 }
