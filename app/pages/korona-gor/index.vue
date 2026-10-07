@@ -4,8 +4,6 @@ definePageMeta({ solidHeader: true })
 const { data: peaksData } = await useCmsCollection<Peak>('peaks', { order: 'order' })
 const peaks = computed(() => peaksData.value?.records ?? [])
 
-const { data: eventsData } = await useCmsCollection<EventItem>('events')
-const sportEvents = computed(() => byCmsOrder(eventsData.value?.records ?? []).filter((e) => e.tag === 'sport'))
 
 const page = await usePageTexts('strona-korona')
 usePageTheme(page)
@@ -65,33 +63,8 @@ const heroStats = computed(() => [page.t('statPeaks', { liczba: peaks.value.leng
       </div>
     </section>
 
-    <section class="section">
-      <div class="container">
-        <div class="section-head">
-          <span class="kicker">{{ page.t('eventsKicker') }}</span>
-          <h2 class="section-title">{{ page.t('eventsTitle') }}</h2>
-        </div>
-
-        <div class="grid-2">
-          <EventCard
-            v-for="event in sportEvents"
-            :key="event.id"
-            :image="resolveCmsUrl(event.image?.src)"
-            :title="event.title"
-            :date="event.date"
-            :time="event.time"
-            :place="event.place"
-            :free-entry="event.freeEntry"
-            more-href="/aktualnosci"
-            :tickets-href="event.ticketsHref"
-            :free-label="page.t('eventFree')"
-            :more-label="page.t('eventMore')"
-            :tickets-label="page.t('eventTickets')"
-          />
-        </div>
-      </div>
-    </section>
-    <RelatedNews place="korona-gor" />
+    <!-- Aktualności z zaznaczonym „Korona Ustrzyckich Gór” (pole „Pokaż także na podstronach”). -->
+    <RelatedNews place="korona-gor" :kicker="page.t('eventsKicker')" :title="page.t('eventsTitle')" />
   </div>
 </template>
 

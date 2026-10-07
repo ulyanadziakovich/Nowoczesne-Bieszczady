@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Wpisy z Aktualności, przy których w CMS zaznaczono tę podstronę
 // („Pokaż także na podstronach”). Bez takich wpisów sekcja się nie pokazuje.
-const props = withDefaults(defineProps<{ place: string; limit?: number }>(), { limit: 6 })
+const props = withDefaults(defineProps<{ place: string; limit?: number; kicker?: string; title?: string }>(), { limit: 6 })
 
 const { data } = useCmsCollection<NewsPost>('news', { order: 'id:desc' })
 const common = usePageTextsSync('site-settings')
@@ -17,8 +17,8 @@ const posts = computed(() =>
     <div class="container">
       <div class="related-head">
         <div>
-          <span class="kicker">{{ common.t('relatedKicker') }}</span>
-          <h2 class="section-title">{{ common.t('relatedTitle') }}</h2>
+          <span class="kicker">{{ kicker || common.t('relatedKicker') }}</span>
+          <h2 class="section-title">{{ title || common.t('relatedTitle') }}</h2>
         </div>
         <NuxtLink to="/aktualnosci" class="related-all">{{ common.t('relatedAll') }}</NuxtLink>
       </div>

@@ -43,19 +43,6 @@ export interface NewsPost {
   order?: number
 }
 
-export interface EventItem {
-  id: number
-  title: string
-  date: string
-  time: string
-  place: string
-  image: CmsImage | null
-  freeEntry: boolean
-  ticketsHref?: string
-  tag?: string
-  /** Ręczna kolejność z CMS (przeciąganie w panelu). */
-  order?: number
-}
 
 export interface TeamMember {
   id: number
