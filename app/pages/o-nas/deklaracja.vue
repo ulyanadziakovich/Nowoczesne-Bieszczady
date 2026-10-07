@@ -1,31 +1,32 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'onas', solidHeader: true })
-useHead({ title: 'Deklaracja członkowska — O nas — Nowoczesne Bieszczady' })
-
-const content = usePageContent()
+const page = await usePageTexts('strona-o-nas')
+await usePageTitle(() => page.t('deklaracjaTitle'))
+const fileUrl = computed(() => page.file('deklaracjaFile'))
+const step3 = computed(() => page.t('deklaracjaStep3').split('{email}'))
 const { data: settings } = await useCmsSingle<SiteSettings>('site-settings')
 </script>
 
 <template>
   <div>
-    <h2>Deklaracja członkowska</h2>
-    <p>{{ content.body('deklaracja-intro') }}</p>
-
-    <button type="button" class="btn btn-amber is-disabled" disabled>Formularz wkrótce dostępny</button>
+    <h2>{{ page.t('deklaracjaTitle') }}</h2>
+    <RichText :html="page.html('deklaracjaText')" :lead="false" />
+    <a v-if="fileUrl" :href="fileUrl" class="btn btn-amber" target="_blank" rel="noopener">{{ page.t('deklaracjaDownload') }}</a>
+    <button v-else type="button" class="btn btn-amber is-disabled" disabled>{{ page.t('deklaracjaSoon') }}</button>
 
     <div class="steps">
       <div class="step">
         <span class="num">1</span>
-        <p>Pobierz i wypełnij formularz deklaracji.</p>
+        <p>{{ page.t('deklaracjaStep1') }}</p>
       </div>
       <div class="step">
         <span class="num">2</span>
-        <p>Podpisz dokument odręcznie lub elektronicznie.</p>
+        <p>{{ page.t('deklaracjaStep2') }}</p>
       </div>
       <div class="step">
         <span class="num">3</span>
         <p>
-          Prześlij skan na <a :href="`mailto:${settings?.email}`">{{ settings?.email }}</a> lub dostarcz osobiście.
+          {{ step3[0] }}<a v-if="step3.length > 1" :href="`mailto:${settings?.email}`">{{ settings?.email }}</a>{{ step3.slice(1).join('') }}
         </p>
       </div>
     </div>

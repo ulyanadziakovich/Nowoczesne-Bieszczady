@@ -6,6 +6,7 @@ defineProps<{ point: DreamMapPoint }>()
 
 const { categoryColor, categoryName } = useDreamMapCategories()
 const { hasVoted, voteFor } = useDreamMapPoints()
+const page = usePageTextsSync('dream-map-settings')
 </script>
 
 <template>
@@ -40,10 +41,10 @@ const { hasVoted, voteFor } = useDreamMapPoints()
 
     <h3>{{ point.title }}</h3>
 
-    <p class="field-label">Wyzwanie</p>
+    <p class="field-label">{{ page.t('challengeLabel') }}</p>
     <p class="field-text">{{ point.challenge }}</p>
 
-    <p class="field-label">Propozycja rozwiązania</p>
+    <p class="field-label">{{ page.t('solutionLabel') }}</p>
     <p class="field-text">{{ point.solution }}</p>
   </article>
 </template>

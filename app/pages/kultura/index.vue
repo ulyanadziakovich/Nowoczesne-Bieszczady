@@ -1,6 +1,5 @@
 <script setup lang="ts">
 definePageMeta({ solidHeader: true })
-useHead({ title: 'Kultura i wydarzenia — Nowoczesne Bieszczady' })
 
 const { data: editionsData } = await useCmsCollection<FestivalEdition>('festival-editions', { order: 'year:desc' })
 const festivalEditions = computed(() => byCmsOrder(editionsData.value?.records ?? []))
@@ -14,14 +13,21 @@ const contests = computed(() =>
   ),
 )
 
-const content = usePageContent()
+const page = await usePageTexts('strona-kultura')
+await usePageTitle(() => page.t('pageTitle'))
 
-const heroStats = computed(() => [`${festivalEditions.value.length} edycji festiwalu`, `${contests.value.length} cykliczne konkursy`, 'Wydarzenia co roku'])
+const heroStats = computed(() =>
+  [
+    page.t('statEditions', { liczba: festivalEditions.value.length }),
+    page.t('statContests', { liczba: contests.value.length }),
+    page.t('statExtra'),
+  ].filter(Boolean),
+)
 
 const cultureStats = computed(() => [
-  { label: 'Edycji festiwalu', value: String(festivalEditions.value.length) },
-  ...content.pairs('kultura-stats'),
-  { label: 'Konkursy cykliczne', value: String(contests.value.length) },
+  { label: page.t('barEditionsLabel'), value: String(festivalEditions.value.length) },
+  ...page.pairs('stats'),
+  { label: page.t('barContestsLabel'), value: String(contests.value.length) },
 ])
 
 function descriptionParagraphs(text: string) {
@@ -37,30 +43,15 @@ function formatParagraph(text: string) {
 }
 
 // Dokumenty i ramka z informacjami są w samym konkursie w CMS (pola „Dokumenty
-// do pobrania” i „Najważniejsze informacje”). Starsze bloki z „Tekstów na stronach”
-// zostają jako zapas dla konkursu fotograficznego, dopóki konkurs ich nie ma.
-const photoContestDocuments = computed(() =>
-  [
-    { key: 'konkurs-fotograficzny-karta' },
-    { key: 'konkurs-fotograficzny-oswiadczenie' },
-    { key: 'konkurs-fotograficzny-regulamin' },
-  ]
-    .map((d) => ({ title: content.title(d.key), url: resolveCmsUrl(content.image(d.key)) }))
-    .filter((d) => d.url),
-)
-
-const photoContestFacts = computed(() => content.pairs('konkurs-fotograficzny-fakty'))
-
+// do pobrania” i „Najważniejsze informacje”).
 function contestDocuments(contest: Contest) {
-  const own = (contest.documents ?? [])
+  return (contest.documents ?? [])
     .filter((d) => d.file?.filename)
     .map((d) => ({ title: d.label, url: resolveCmsUrl(`/uploads/${d.file!.directory}${d.file!.filename}`) }))
-  return own.length ? own : isPhotoContest(contest) ? photoContestDocuments.value : []
 }
 
 function contestFacts(contest: Contest) {
-  const own = (contest.facts ?? []).filter((f) => f.label && f.value)
-  return own.length ? own : isPhotoContest(contest) ? photoContestFacts.value : []
+  return (contest.facts ?? []).filter((f) => f.label && f.value)
 }
 
 const FACT_STYLE: Record<string, { color: string; icon: string }> = {
@@ -74,22 +65,19 @@ function factStyle(label: string) {
   return FACT_STYLE[label] ?? { color: 'var(--alpine)', icon: 'landscape' }
 }
 
-function isPhotoContest(contest: Contest) {
-  return contest.title.toLowerCase().includes('fotograficzny')
-}
-
-const announcementText =
-  'Z dumą zapraszamy na Festiwal „Granie Bez Granic” — nowe wydarzenie, którego jesteśmy organizatorem. Połączenie koncertów, astronomii i ekologii, w sercu Ustrzyk Dolnych, tam gdzie niebo naprawdę jest ciemne.'
+// Do czasu wgrania plakatu w CMS — dotychczasowy plik zapowiedzi.
+const announcementImage = computed(
+  () => page.image('announcementImage') ?? resolveCmsUrl('/uploads/festival-editions/granie-bez-granic-2026-zapowiedz.jpg'),
+)
 </script>
 
 <template>
   <div>
     <PageHero
       variant="light"
-      kicker="Kultura"
-      :title="content.title('kultura-hero-description', 'Kultura i wydarzenia')"
-      :description="content.body('kultura-hero-description')"
-      :description-html="content.html('kultura-hero-description')"
+      :kicker="page.t('heroKicker')"
+      :title="page.t('heroTitle')"
+      :description-html="page.html('heroDescription')"
       :stats="heroStats"
     />
 
@@ -107,38 +95,38 @@ const announcementText =
     <section class="section section-alt">
       <div class="container">
         <div class="section-head">
-          <span class="kicker">Festiwal Granie Bez Granic</span>
-          <h2 class="section-title">Archiwum edycji</h2>
-          <p class="lead">Muzyczne wydarzenie łączące kultury i pokolenia — zobacz relacje z poprzednich edycji festiwalu.</p>
+          <span class="kicker">{{ page.t('festivalKicker') }}</span>
+          <h2 class="section-title">{{ page.t('festivalTitle') }}</h2>
+          <p class="lead">{{ page.t('festivalLead') }}</p>
         </div>
 
         <div class="grid-3">
           <NuxtLink v-for="edition in festivalEditions" :key="edition.id" :to="`/kultura/edycje/${edition.slug}`" class="edition-card card-surface">
             <div class="edition-image-wrap">
               <img :src="resolveCmsUrl(edition.image?.src)" :alt="edition.title" />
-              <span v-if="edition.featured" class="featured-badge">Najnowsza</span>
+              <span v-if="edition.featured" class="featured-badge">{{ page.t('editionNewest') }}</span>
             </div>
             <div class="edition-body">
               <span class="year">{{ edition.year }}</span>
               <h3>{{ edition.title }}</h3>
               <p>{{ edition.description }}</p>
-              <span class="link">Zobacz opis i galerię →</span>
+              <span class="link">{{ page.t('editionLink') }}</span>
             </div>
           </NuxtLink>
 
           <!-- Not an edition — a standalone announcement for the upcoming
                festival, shown alongside them in the same grid/card style. -->
-          <article class="edition-card card-surface announcement-card">
+          <article v-if="announcementImage" class="edition-card card-surface announcement-card">
             <div class="edition-image-wrap announcement-image-wrap">
               <img
-                :src="resolveCmsUrl('/uploads/festival-editions/granie-bez-granic-2026-zapowiedz.jpg')"
-                alt="Zapowiedź: Festiwal Granie Bez Granic, 12–13 lipca, Bieszczadzkie Centrum Dziedzictwa Kulturowego „Fanto”"
+                :src="announcementImage"
+                :alt="page.imageAlt('announcementImage', page.t('announcementBadge'))"
                 class="announcement-image"
               />
-              <span class="featured-badge">Zapowiedź</span>
+              <span v-if="page.t('announcementBadge')" class="featured-badge">{{ page.t('announcementBadge') }}</span>
             </div>
             <div class="edition-body">
-              <p class="announcement-text">{{ announcementText }}</p>
+              <p class="announcement-text">{{ page.t('announcementText') }}</p>
             </div>
           </article>
         </div>
@@ -150,11 +138,11 @@ const announcementText =
             </svg>
           </div>
           <div class="note-text">
-            <span class="kicker">Nadchodząca edycja</span>
-            <h3>{{ content.title('kultura-upcoming') }}</h3>
-            <p>{{ content.body('kultura-upcoming') }}</p>
+            <span class="kicker">{{ page.t('upcomingKicker') }}</span>
+            <h3>{{ page.t('upcomingTitle') }}</h3>
+            <p>{{ page.t('upcomingText') }}</p>
           </div>
-          <NuxtLink to="/aktualnosci" class="btn btn-amber">Śledź aktualności</NuxtLink>
+          <NuxtLink to="/aktualnosci" class="btn btn-amber">{{ page.t('upcomingButton') }}</NuxtLink>
         </div>
       </div>
     </section>
@@ -162,8 +150,8 @@ const announcementText =
     <section class="section">
       <div class="container">
         <div class="section-head">
-          <span class="kicker">Konkursy</span>
-          <h2 class="section-title">Konkursy fotograficzne i malarskie</h2>
+          <span class="kicker">{{ page.t('contestsKicker') }}</span>
+          <h2 class="section-title">{{ page.t('contestsTitle') }}</h2>
         </div>
 
         <div
@@ -216,7 +204,7 @@ const announcementText =
             <p v-if="contest.fundingNote" class="funding-note">{{ contest.fundingNote }}</p>
 
             <div v-if="contestDocuments(contest).length" class="documents">
-              <p class="documents-label">Dokumenty do pobrania</p>
+              <p class="documents-label">{{ page.t('documentsTitle') }}</p>
               <div v-for="doc in contestDocuments(contest)" :key="doc.url" class="document-row">
                 <span class="document-name">
                   <svg class="document-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -226,13 +214,13 @@ const announcementText =
                   {{ doc.title }}
                 </span>
                 <div class="document-actions">
-                  <a :href="doc.url" target="_blank" rel="noopener" class="doc-btn">Podgląd</a>
-                  <a :href="doc.url" download class="doc-btn doc-btn-solid">Pobierz</a>
+                  <a :href="doc.url" target="_blank" rel="noopener" class="doc-btn">{{ page.t('documentPreview') }}</a>
+                  <a :href="doc.url" download class="doc-btn doc-btn-solid">{{ page.t('documentDownload') }}</a>
                 </div>
               </div>
             </div>
 
-            <NuxtLink to="/aktualnosci" class="link">Śledź aktualności →</NuxtLink>
+            <NuxtLink to="/aktualnosci" class="link">{{ page.t('contestsLink') }}</NuxtLink>
           </div>
         </div>
       </div>

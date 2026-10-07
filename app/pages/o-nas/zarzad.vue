@@ -1,16 +1,17 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'onas', solidHeader: true })
-useHead({ title: 'Zarząd i Zespół — O nas — Nowoczesne Bieszczady' })
+const page = await usePageTexts('strona-o-nas')
+await usePageTitle(() => page.t('zarzadTitle'))
 
 const { data } = await useCmsCollection<TeamMember>('team', { order: 'order' })
 const teamMembers = computed(() => data.value?.records ?? [])
-const content = usePageContent()
+
 </script>
 
 <template>
   <div>
-    <h2>Zarząd i Zespół</h2>
-    <p>{{ content.body('zarzad-intro') }}</p>
+    <h2>{{ page.t('zarzadTitle') }}</h2>
+    <RichText :html="page.html('zarzadText')" :lead="false" />
 
     <ul class="team">
       <li v-for="member in teamMembers" :key="member.id" class="member-row">

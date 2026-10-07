@@ -1,24 +1,18 @@
 <script setup lang="ts">
 const route = useRoute()
+const page = await usePageTexts('strona-aktualnosci')
+const common = await usePageTexts('site-settings')
 const { data } = await useCmsCollection<NewsPost>('news', { order: 'id:desc' })
 const post = computed(() => data.value?.records.find((p) => p.slug === route.params.slug))
 
 if (!post.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Nie znaleziono wpisu' })
+  throw createError({ statusCode: 404, statusMessage: page.t('notFound') })
 }
 
-useHead({ title: `${post.value.title} — Aktualności — Nowoczesne Bieszczady` })
+useHead({ title: () => [post.value?.title, page.t('pageTitle'), common.t('siteName')].filter(Boolean).join(' — ') })
 
 const bodyParagraphs = computed(() => (post.value?.body || '').split(/\n\s*\n/).filter(Boolean))
 const gallery = computed(() => (post.value?.gallery || '').split('\n').map((s) => s.trim()).filter(Boolean))
-
-function photoWord(n: number) {
-  const last = n % 10
-  const lastTwo = n % 100
-  if (n === 1) return 'zdjęcie'
-  if (last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14)) return 'zdjęcia'
-  return 'zdjęć'
-}
 
 // Plain text field, so this is the only formatting it supports:
 // **word** → bold, and lines starting with "● " get a styled accent dot
@@ -55,13 +49,13 @@ function formatParagraph(text: string) {
 
           <section v-if="gallery.length" class="article-gallery">
             <div class="gallery-head">
-              <h2>Galeria</h2>
-              <span class="gallery-count">{{ gallery.length }} {{ photoWord(gallery.length) }}</span>
+              <h2>{{ page.t('galleryTitle') }}</h2>
+              <span class="gallery-count">{{ page.plural('photos', gallery.length) }}</span>
             </div>
             <GalleryLightbox :images="gallery" :alt-prefix="post.title" layout="mosaic" />
           </section>
 
-          <NuxtLink to="/aktualnosci" class="back-link">← Wróć do aktualności</NuxtLink>
+          <NuxtLink to="/aktualnosci" class="back-link">{{ page.t('backLink') }}</NuxtLink>
         </div>
       </div>
     </section>

@@ -8,6 +8,10 @@ defineProps<{
   freeEntry?: boolean
   moreHref?: string
   ticketsHref?: string
+  /** Napisy z formularza strony w CMS. */
+  freeLabel?: string
+  moreLabel?: string
+  ticketsLabel?: string
 }>()
 </script>
 
@@ -15,7 +19,7 @@ defineProps<{
   <article class="card">
     <div class="image-wrap">
       <img :src="image" :alt="title" class="image" />
-      <span v-if="freeEntry" class="badge">Wstęp wolny</span>
+      <span v-if="freeEntry && freeLabel" class="badge">{{ freeLabel }}</span>
     </div>
 
     <div class="body">
@@ -43,8 +47,8 @@ defineProps<{
       </ul>
 
       <div class="actions">
-        <a :href="moreHref || '#'" class="btn btn-outline">Więcej</a>
-        <a v-if="!freeEntry" :href="ticketsHref || '#'" class="btn btn-solid">Bilety</a>
+        <a :href="moreHref || '#'" class="btn btn-outline">{{ moreLabel }}</a>
+        <a v-if="!freeEntry" :href="ticketsHref || '#'" class="btn btn-solid">{{ ticketsLabel }}</a>
       </div>
     </div>
   </article>

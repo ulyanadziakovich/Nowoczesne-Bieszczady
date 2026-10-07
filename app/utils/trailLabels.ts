@@ -1,21 +1,8 @@
-// UI vocabulary for trail data coming from the CMS — not content itself,
-// just how raw field values (stored as plain strings) are labeled/rendered.
+// Typy danych tras z CMS. Nazwy poziomów trudności i rowerów są w CMS
+// („Elementy wspólne i kontakt”) — patrz useTrailLabels().
 
 export type TrailDifficulty = 'latwa' | 'srednia' | 'trudna'
 export type TrailBikeType = 'mtb' | 'gravel' | 'e-bike' | 'szosa'
-
-export const difficultyLabels: Record<TrailDifficulty, string> = {
-  latwa: 'Łatwa',
-  srednia: 'Średnia',
-  trudna: 'Trudna',
-}
-
-export const bikeTypeLabels: Record<TrailBikeType, string> = {
-  mtb: 'MTB',
-  gravel: 'Gravel',
-  'e-bike': 'E-bike',
-  szosa: 'Szosa',
-}
 
 export interface Trail {
   id: number

@@ -1,16 +1,17 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'onas', solidHeader: true })
-useHead({ title: 'Cele Stowarzyszenia — O nas — Nowoczesne Bieszczady' })
+const page = await usePageTexts('strona-o-nas')
+await usePageTitle(() => page.t('celeTitle'))
 
 const { data } = await useCmsCollection<Goal>('goals', { order: 'order' })
 const goals = computed(() => data.value?.records ?? [])
-const content = usePageContent()
+
 </script>
 
 <template>
   <div>
-    <h2>Cele Stowarzyszenia</h2>
-    <p>{{ content.body('cele-intro') }}</p>
+    <h2>{{ page.t('celeTitle') }}</h2>
+    <RichText :html="page.html('celeText')" :lead="false" />
 
     <div class="goals">
       <div v-for="goal in goals" :key="goal.id" class="goal-card card-surface">

@@ -1,24 +1,13 @@
 <script setup lang="ts">
-const props = withDefaults(
-  defineProps<{
-    kicker?: string
-    title?: string
-    paragraph1?: string
-    paragraph2?: string
-    tagline?: string
-    image?: string
-  }>(),
-  {
-    kicker: 'Stowarzyszenie',
-    title: 'Krótko o nas',
-    paragraph1:
-      'Stowarzyszenie Nowoczesne Bieszczady powstało w 2016 roku w Ustrzykach Dolnych. Prowadzimy działalność doradczą, edukacyjną i kulturalną — wspieramy ekonomię społeczną, edukację demokracji lokalnej, aktywność kulturalną oraz rozwój Ustrzyk Dolnych i Powiatu Bieszczadzkiego.',
-    paragraph2:
-      'Nasi członkowie to przedsiębiorcy, nauczyciele, pracownicy samorządowi i specjaliści różnych branż. Stawiamy na profesjonalizm i zaangażowanie.',
-    tagline: '„SKUTECZNI DLA WAS”',
-    image: '/images/bieszczady.avif',
-  },
-)
+// Wszystkie teksty i zdjęcie przychodzą z formularza „Strona: Główna” w CMS.
+const props = defineProps<{
+  kicker?: string
+  title?: string
+  paragraph1?: string
+  paragraph2?: string
+  tagline?: string
+  image?: string
+}>()
 
 // Tekst z CMS jest dowolnej długości — dzielimy go na czytelne bloki zamiast
 // jednej ściany tekstu. Treść się nie zmienia, rozpoznajemy tylko strukturę:

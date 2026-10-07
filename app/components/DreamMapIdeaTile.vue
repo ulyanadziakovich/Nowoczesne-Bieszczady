@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Kafelek „Zgłoś swój pomysł” — zawsze ostatni w siatce postulatów.
 // Kliknięcie otwiera formularz w okienku.
-const content = usePageContent()
+const page = usePageTextsSync('dream-map-settings')
 const open = ref(false)
 
 function onKeydown(e: KeyboardEvent) {
@@ -26,10 +26,10 @@ onUnmounted(() => {
         <path d="M12 5v14M5 12h14" />
       </svg>
     </span>
-    <span class="idea-kicker">{{ content.title('dream-map-form-kicker', 'Twój głos') }}</span>
-    <span class="idea-title">{{ content.title('dream-map-form-intro', 'Zgłoś swój pomysł') }}</span>
-    <span class="idea-text">{{ content.body('dream-map-form-intro', 'Masz pomysł, jak zmienić Ustrzyki Dolne na lepsze? Opisz go — przeczytamy każde zgłoszenie.') }}</span>
-    <span class="idea-cta">Zgłoś pomysł →</span>
+    <span class="idea-kicker">{{ page.t('ideaKicker') }}</span>
+    <span class="idea-title">{{ page.t('ideaTitle') }}</span>
+    <span class="idea-text">{{ page.t('ideaText') }}</span>
+    <span class="idea-cta">{{ page.t('ideaTileLink') }}</span>
   </button>
 
   <Teleport to="body">

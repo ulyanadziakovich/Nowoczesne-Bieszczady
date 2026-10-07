@@ -4,6 +4,7 @@ const props = withDefaults(defineProps<{ images: string[]; altPrefix: string; la
 })
 
 const openIndex = ref<number | null>(null)
+const common = usePageTextsSync('site-settings')
 
 // Mozaika: na komputerze widać 5 pierwszych zdjęć (reszta pod licznikiem „+N”
 // na piątym kafelku), na telefonie wszystkie zdjęcia w przewijanym pasku.
@@ -84,15 +85,15 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
       <template v-if="isMoreTile(i)">
         <span class="mosaic-more">
           <span class="mosaic-more-count">+{{ hiddenCount }}</span>
-          <span class="mosaic-more-label">Zobacz wszystkie</span>
+          <span class="mosaic-more-label">{{ common.t('galleryShowAll') }}</span>
         </span>
       </template>
     </button>
   </div>
   <div v-if="layout === 'mosaic' && images.length > 1" class="mosaic-footer" :class="{ 'mosaic-footer-mobile-only': hiddenCount === 0 && !expanded }">
-    <p v-if="!expanded" class="mosaic-swipe-hint">Przesuń, aby zobaczyć więcej →</p>
+    <p v-if="!expanded" class="mosaic-swipe-hint">{{ common.t('gallerySwipe') }}</p>
     <button type="button" class="mosaic-toggle" @click="toggleExpanded">
-      {{ expanded ? 'Zwiń galerię' : `Pokaż wszystkie zdjęcia (${images.length})` }}
+      {{ expanded ? common.t('galleryCollapse') : common.t('galleryExpand', { liczba: images.length }) }}
     </button>
   </div>
 

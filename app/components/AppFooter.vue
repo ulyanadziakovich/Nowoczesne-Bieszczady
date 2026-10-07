@@ -4,6 +4,7 @@
 const { footerLinks: links } = await useNavigation()
 
 const { data: settings } = await useCmsSingle<SiteSettings>('site-settings')
+const common = await usePageTexts('site-settings')
 const { data: documentsData } = await useCmsCollection<{ id: number; label: string; fileUrl: string }>('documents', { order: 'order' })
 const documents = computed(() => documentsData.value?.records ?? [])
 </script>
@@ -13,10 +14,10 @@ const documents = computed(() => documentsData.value?.records ?? [])
     <div class="top">
       <div class="brand">
         <NuxtLink to="/" class="logo-badge">
-          <img :src="resolveCmsUrl(settings?.logo?.src)" alt="Nowoczesne Bieszczady" />
+          <img :src="resolveCmsUrl(settings?.logo?.src)" :alt="settings?.logo?.alt || ''" />
         </NuxtLink>
         <div>
-          <p class="name">NOWOCZESNE BIESZCZADY</p>
+          <p class="name">{{ common.t('footerTitle') }}</p>
           <p class="tagline">{{ settings?.footerTagline }}</p>
         </div>
       </div>
@@ -26,7 +27,7 @@ const documents = computed(() => documentsData.value?.records ?? [])
       </nav>
 
       <div v-if="documents.length" class="downloads">
-        <p class="downloads-title">Do pobrania</p>
+        <p class="downloads-title">{{ common.t('footerDownloads') }}</p>
         <a v-for="doc in documents" :key="doc.id" :href="doc.fileUrl" target="_blank" rel="noopener" class="download-item">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
@@ -53,7 +54,7 @@ const documents = computed(() => documentsData.value?.records ?? [])
     </div>
 
     <div class="bottom">
-      <p>© {{ new Date().getFullYear() }} Nowoczesne Bieszczady. Wszystkie prawa zastrzeżone.</p>
+      <p>{{ common.t('footerCopyright', { rok: new Date().getFullYear() }) }}</p>
       <a v-if="settings?.facebookUrl" :href="settings.facebookUrl" target="_blank" rel="noopener" class="social" aria-label="Facebook">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
           <path d="M14 8h-2c-.5 0-1 .5-1 1v2h3l-.5 3H11v7H8v-7H6v-3h2V9c0-2 1.5-4 4-4h2z" />

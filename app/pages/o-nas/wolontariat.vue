@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'onas', solidHeader: true })
-useHead({ title: 'Wolontariat — O nas — Nowoczesne Bieszczady' })
+const page = await usePageTexts('strona-o-nas')
 
 // Cała treść podstrony z jednej zakładki CMS „Wolontariat”: tytuł, opis i dokumenty.
 interface VolunteeringPage {
@@ -10,9 +10,10 @@ interface VolunteeringPage {
 }
 
 const { data } = await useCmsSingle<VolunteeringPage>('volunteering')
-const title = computed(() => data.value?.title || 'Wolontariat')
+const title = computed(() => data.value?.title ?? '')
+await usePageTitle(() => title.value)
 const paragraphs = computed(() =>
-  (data.value?.description || 'Wkrótce zamieścimy tutaj informacje o wolontariacie w Stowarzyszeniu Nowoczesne Bieszczady.')
+  (data.value?.description || page.t('wolontariatEmpty'))
     .split(/\n\s*\n/)
     .filter(Boolean),
 )
@@ -34,7 +35,7 @@ function fileUrl(file: CmsFile) {
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /></svg>
         </span>
         <span class="title">{{ doc.label }}</span>
-        <a :href="fileUrl(doc.file!)" class="btn btn-outline" target="_blank" rel="noopener">Pobierz / zobacz</a>
+        <a :href="fileUrl(doc.file!)" class="btn btn-outline" target="_blank" rel="noopener">{{ page.t('wolontariatOpen') }}</a>
       </li>
     </ul>
   </div>

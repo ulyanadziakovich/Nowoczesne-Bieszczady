@@ -2,15 +2,18 @@
 definePageMeta({ solidHeader: true })
 
 const route = useRoute()
+const page = await usePageTexts('strona-trasa')
+const common = await usePageTexts('site-settings')
+const labels = useTrailLabels()
 const { data: trailsData } = await useCmsCollection<Trail>('trails')
 // Ukryta trasa (nieaktywna w CMS) zachowuje się jak nieistniejąca — 404.
 const trail = computed(() => trailsData.value?.records.find((t) => t.slug === route.params.slug && isCmsActive(t)))
 
 if (!trail.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Nie znaleziono trasy' })
+  throw createError({ statusCode: 404, statusMessage: page.t('notFound') })
 }
 
-useHead({ title: `${trail.value.title} — Nowoczesne Bieszczady` })
+useHead({ title: () => [trail.value?.title, common.t('siteName')].filter(Boolean).join(' — ') })
 
 const bikeTypes = computed(() => (trail.value ? trailBikeTypes(trail.value) : []))
 const descriptionBlocks = computed(() => parseTrailDescription(trail.value?.description))
@@ -47,18 +50,18 @@ function surfaceKm(percent: number) {
 const infoRows = computed(() => {
   const t = trail.value
   if (!t) return []
-  const rows: { label: string; value: string }[] = [{ label: 'Nazwa trasy', value: t.title }]
-  if (t.startFinish) rows.push({ label: 'Punkt startu/mety', value: t.startFinish })
-  if (t.routeCharacter) rows.push({ label: 'Charakter trasy', value: t.routeCharacter })
-  rows.push({ label: 'Długość z GPX', value: `${t.lengthKm} km` })
-  rows.push({ label: 'Przewyższenia z GPX', value: `+${t.elevationM} m / -${t.descentM ?? t.elevationM} m` })
+  const rows: { label: string; value: string }[] = [{ label: page.t('rowName'), value: t.title }]
+  if (t.startFinish) rows.push({ label: page.t('rowStart'), value: t.startFinish })
+  if (t.routeCharacter) rows.push({ label: page.t('rowCharacter'), value: t.routeCharacter })
+  rows.push({ label: page.t('rowLength'), value: `${t.lengthKm} km` })
+  rows.push({ label: page.t('rowElevation'), value: `+${t.elevationM} m / -${t.descentM ?? t.elevationM} m` })
   if (t.elevationMinM != null && t.elevationMaxM != null) {
-    rows.push({ label: 'Zakres wysokości', value: `${t.elevationMinM}–${t.elevationMaxM} m n.p.m.` })
+    rows.push({ label: page.t('rowRange'), value: `${t.elevationMinM}–${t.elevationMaxM} ${page.t('rowRangeUnit')}` })
   }
-  rows.push({ label: 'Szacowany czas przejazdu', value: t.durationHours })
-  rows.push({ label: 'Poziom trudności', value: difficultyLabels[t.difficulty] })
-  if (t.recommendedBike) rows.push({ label: 'Rekomendowany rower', value: t.recommendedBike })
-  if (t.surfaceDescription) rows.push({ label: 'Nawierzchnia', value: t.surfaceDescription })
+  rows.push({ label: page.t('rowTime'), value: t.durationHours })
+  rows.push({ label: page.t('rowDifficulty'), value: labels.difficulty.value[t.difficulty] })
+  if (t.recommendedBike) rows.push({ label: page.t('rowBike'), value: t.recommendedBike })
+  if (t.surfaceDescription) rows.push({ label: page.t('rowSurface'), value: t.surfaceDescription })
   return rows
 })
 
@@ -94,23 +97,23 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
 
 <template>
   <div v-if="trail">
-    <PageHero variant="light" :kicker="difficultyLabels[trail.difficulty]" :title="trail.title" :description="trail.teaser" />
+    <PageHero variant="light" :kicker="labels.difficulty.value[trail.difficulty]" :title="trail.title" :description="trail.teaser" />
 
     <section class="section">
       <div class="container layout">
         <div class="main">
           <div class="gpx-banner card-surface">
             <div class="gpx-banner-text">
-              <h3>Pobierz nawigację GPX</h3>
-              <p>Plik do wgrania na nawigację rowerową lub zegarek GPS.</p>
+              <h3>{{ page.t('gpxTitle') }}</h3>
+              <p>{{ page.t('gpxText') }}</p>
             </div>
-            <a v-if="trail.gpxAvailable && trail.gpxFile" :href="trail.gpxFile" download class="btn btn-amber gpx-btn">Pobierz plik GPX</a>
-            <button v-else class="btn btn-amber gpx-btn is-disabled" disabled>GPX wkrótce dostępny</button>
+            <a v-if="trail.gpxAvailable && trail.gpxFile" :href="trail.gpxFile" download class="btn btn-amber gpx-btn">{{ page.t('gpxButton') }}</a>
+            <button v-else class="btn btn-amber gpx-btn is-disabled" disabled>{{ page.t('gpxSoon') }}</button>
           </div>
 
           <GalleryLightbox v-if="gallery.length" class="gallery-top" :images="gallery" :alt-prefix="trail.title" layout="mosaic" />
 
-          <h2 class="section-title small first">Podstawowe informacje</h2>
+          <h2 class="section-title small first">{{ page.t('infoTitle') }}</h2>
           <div class="info-table card-surface">
             <div v-for="row in infoRows" :key="row.label" class="info-row">
               <span class="info-label">{{ row.label }}</span>
@@ -119,10 +122,10 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
           </div>
 
           <div class="bikes">
-            <span v-for="type in bikeTypes" :key="type" class="bike-tag">{{ bikeTypeLabels[type] }}</span>
+            <span v-for="type in bikeTypes" :key="type" class="bike-tag">{{ labels.bike.value[type] }}</span>
           </div>
 
-          <h2 class="section-title small">Profil wysokościowy</h2>
+          <h2 class="section-title small">{{ page.t('elevationTitle') }}</h2>
           <div class="elevation card-surface">
             <img v-if="trail.elevationProfileImage" :src="resolveCmsUrl(trail.elevationProfileImage.src)" :alt="`Profil wysokościowy — ${trail.title}`" class="elevation-image" />
             <template v-else>
@@ -136,18 +139,18 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
                   </linearGradient>
                 </defs>
               </svg>
-              <p class="elevation-note">Wykres poglądowy — pełne dane wysokościowe dostępne w pliku GPX.</p>
+              <p class="elevation-note">{{ page.t('elevationNote') }}</p>
             </template>
           </div>
 
           <template v-if="trail.routeMapImage">
-            <h2 class="section-title small">Mapa przebiegu trasy</h2>
+            <h2 class="section-title small">{{ page.t('mapTitle') }}</h2>
             <div class="route-map card-surface">
-              <img :src="resolveCmsUrl(trail.routeMapImage.src)" :alt="`Mapa przebiegu trasy — ${trail.title}`" />
+              <img :src="resolveCmsUrl(trail.routeMapImage.src)" :alt="`${page.t('mapTitle')} — ${trail.title}`" />
             </div>
           </template>
 
-          <h2 class="section-title small">Opis trasy</h2>
+          <h2 class="section-title small">{{ page.t('descriptionTitle') }}</h2>
           <template v-for="(block, i) in descriptionBlocks" :key="i">
             <h3 v-if="block.type === 'heading'" class="desc-heading">{{ block.text }}</h3>
             <p v-else-if="block.type === 'paragraph'" class="lead paragraph">{{ block.text }}</p>
@@ -169,14 +172,14 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
             </ol>
           </template>
           <p v-if="trail.routeOverview" class="route-overview">
-            <strong>Przebieg trasy:</strong> {{ trail.routeOverview }}
+            <strong>{{ page.t('overviewLabel') }}</strong> {{ trail.routeOverview }}
           </p>
 
           <template v-if="waypointRows.length">
-            <h2 class="section-title small">Najważniejsze punkty na trasie</h2>
+            <h2 class="section-title small">{{ page.t('waypointsTitle') }}</h2>
             <div class="waypoints-table card-surface">
               <div class="wp-row wp-head">
-                <span>Km</span><span>Punkt / miejscowość</span><span>Znaczenie</span>
+                <span>{{ page.t('waypointsKm') }}</span><span>{{ page.t('waypointsPoint') }}</span><span>{{ page.t('waypointsMeaning') }}</span>
               </div>
               <div v-for="(row, i) in waypointRows" :key="i" class="wp-row">
                 <span class="wp-km">{{ row.km }}</span>
@@ -186,7 +189,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
             </div>
           </template>
 
-          <h2 class="section-title small">Co warto zobaczyć</h2>
+          <h2 class="section-title small">{{ page.t('highlightsTitle') }}</h2>
           <ul class="highlights">
             <li v-for="item in highlights" :key="item">
               <span class="hl-icon" aria-hidden="true">
@@ -196,7 +199,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
             </li>
           </ul>
 
-          <h2 class="section-title small">Miejsca odpoczynku i gastronomia</h2>
+          <h2 class="section-title small">{{ page.t('stopsTitle') }}</h2>
           <ul class="list">
             <li v-for="item in stops" :key="item">{{ item }}</li>
           </ul>
@@ -206,7 +209,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
               <span class="values-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19c0-8 6-14 15-14 0 9-6 15-14 15" /><path d="M5 19c3-4 6-6 9-7" /></svg>
               </span>
-              <h2 class="values-title">Walory przyrodnicze</h2>
+              <h2 class="values-title">{{ page.t('natureTitle') }}</h2>
             </div>
             <p v-for="(p, i) in naturalValuesParagraphs" :key="i" class="values-p">
               <strong v-if="splitLeadLabel(p).label">{{ splitLeadLabel(p).label }}: </strong>{{ splitLeadLabel(p).rest }}
@@ -218,7 +221,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
               <span class="values-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v3M10.5 3.5h3" /><path d="M8 10l4-4 4 4" /><path d="M7 21V10h10v11" /><path d="M4 21h16" /><path d="M10.5 21v-4h3v4" /></svg>
               </span>
-              <h2 class="values-title">Walory historyczne i kulturowe</h2>
+              <h2 class="values-title">{{ page.t('cultureTitle') }}</h2>
             </div>
             <p v-for="(p, i) in culturalValuesParagraphs" :key="i" class="values-p">
               <strong v-if="splitLeadLabel(p).label">{{ splitLeadLabel(p).label }}: </strong>{{ splitLeadLabel(p).rest }}
@@ -226,21 +229,21 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
           </section>
 
           <template v-if="hasSurfaceBreakdown">
-            <h2 class="section-title small">Nawierzchnia</h2>
+            <h2 class="section-title small">{{ page.t('surfaceTitle') }}</h2>
             <div class="surface-bar">
               <span class="asfalt" :style="{ width: trail.surfaceAsfalt + '%' }" />
               <span class="szuter" :style="{ width: trail.surfaceSzuter + '%' }" />
               <span class="teren" :style="{ width: trail.surfaceTeren + '%' }" />
             </div>
             <ul class="surface-legend">
-              <li><i class="asfalt" />Asfalt — {{ surfaceKm(trail.surfaceAsfalt) }} km</li>
-              <li><i class="szuter" />Szuter — {{ surfaceKm(trail.surfaceSzuter) }} km</li>
-              <li><i class="teren" />Teren — {{ surfaceKm(trail.surfaceTeren) }} km</li>
+              <li><i class="asfalt" />{{ page.t('surfaceAsphalt') }} — {{ surfaceKm(trail.surfaceAsfalt) }} km</li>
+              <li><i class="szuter" />{{ page.t('surfaceGravel') }} — {{ surfaceKm(trail.surfaceSzuter) }} km</li>
+              <li><i class="teren" />{{ page.t('surfaceTerrain') }} — {{ surfaceKm(trail.surfaceTeren) }} km</li>
             </ul>
           </template>
 
           <template v-if="touristInfoParagraphs.length">
-            <h2 class="section-title small">Informacje turystyczne i audytowe</h2>
+            <h2 class="section-title small">{{ page.t('touristTitle') }}</h2>
             <p v-for="(p, i) in touristInfoParagraphs" :key="i" class="lead paragraph">
               <strong v-if="splitLeadLabel(p).label" class="lead-label">{{ splitLeadLabel(p).label }}: </strong>{{ splitLeadLabel(p).rest }}
             </p>
@@ -253,7 +256,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
               </svg>
             </div>
             <div>
-              <span class="kicker">Rekomendacja końcowa</span>
+              <span class="kicker">{{ page.t('recommendationTitle') }}</span>
               <p>{{ trail.finalRecommendation }}</p>
             </div>
           </div>
@@ -261,7 +264,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
 
         <aside class="sidebar">
           <div class="sidebar-card card-surface">
-            <h3>Bezpieczeństwo</h3>
+            <h3>{{ page.t('safetyTitle') }}</h3>
             <ul class="safety-list">
               <li v-for="tip in safety" :key="tip">
                 <strong v-if="splitLeadLabel(tip).label" class="lead-label">{{ splitLeadLabel(tip).label }}: </strong>{{ splitLeadLabel(tip).rest }}
@@ -271,7 +274,7 @@ const elevationArea = computed(() => `0,100 ${elevationPoints.value} 100,100`)
 
           <p v-if="trail.auditNotes" class="audit-notes">{{ trail.auditNotes }}</p>
 
-          <NuxtLink to="/szlaki" class="back-link">← Wróć do wszystkich tras</NuxtLink>
+          <NuxtLink to="/szlaki" class="back-link">{{ page.t('backLink') }}</NuxtLink>
         </aside>
       </div>
     </section>

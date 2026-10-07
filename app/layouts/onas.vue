@@ -1,27 +1,18 @@
 <script setup lang="ts">
-const content = usePageContent()
-
-const items = [
-  { label: 'Kim jesteśmy / Misja', to: '/o-nas/misja' },
-  { label: 'Cele Stowarzyszenia', to: '/o-nas/cele' },
-  { label: 'Statut Stowarzyszenia', to: '/o-nas/statut' },
-  { label: 'Deklaracja członkowska', to: '/o-nas/deklaracja' },
-  { label: 'Zarząd i Zespół', to: '/o-nas/zarzad' },
-  { label: 'Sprawozdania', to: '/o-nas/sprawozdania' },
-  { label: 'Partnerzy i Grantodawcy', to: '/o-nas/partnerzy' },
-  { label: 'Wolontariat', to: '/o-nas/wolontariat' },
-]
+const page = await usePageTexts('strona-o-nas')
+// Boczne menu = podpozycje „O nas” z „Menu strony” w CMS (nazwy i kolejność stamtąd).
+const { childrenOf } = await useNavigation()
+const items = computed(() => childrenOf('o-nas'))
 </script>
 
 <template>
   <div>
     <PageHero
       variant="light"
-      kicker="Stowarzyszenie"
-      :title="content.title('onas-hero-description', 'O nas')"
-      :description="content.body('onas-hero-description')"
-      :description-html="content.html('onas-hero-description')"
-      :stats="content.lines('onas-stats')"
+      :kicker="page.t('heroKicker')"
+      :title="page.t('heroTitle')"
+      :description-html="page.html('heroDescription')"
+      :stats="page.lines('stats')"
     />
 
     <section class="section">

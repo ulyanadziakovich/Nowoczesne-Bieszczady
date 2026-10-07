@@ -3,18 +3,28 @@ const props = defineProps<{
   image?: string
   title: string
   description: string
-  moreHref: string
+    moreHref: string
+  /** Z kafelka w CMS: etykiety (jedna w linii) i napis na przycisku. */
+  tags?: string | null
+  ctaLabel?: string | null
 }>()
 
-const TILE_META: Record<string, { tags: string[]; cta: string }> = {
+// TYMCZASOWO, do wypełnienia nowych pól w CMS po wdrożeniu (wtedy do usunięcia):
+// dotychczasowe etykiety i napisy, używane tylko gdy CMS nie ma jeszcze tych pól.
+const LEGACY_META: Record<string, { tags: string[]; cta: string }> = {
   '/szlaki': { tags: ['Pliki GPX', 'Filtry trudności'], cta: 'Zobacz trasy' },
   '/ustrzyki-2036': { tags: ['18 postulatów', 'Mapa marzeń'], cta: 'Zobacz mapę marzeń' },
   '/korona-gor': { tags: ['Szczyty', 'Kalendarz rajdów'], cta: 'Zobacz szczyty' },
   '/inicjatywy': { tags: ['Warsztaty', 'Debaty społeczne'], cta: 'Zobacz inicjatywy' },
 }
-const DEFAULT_META = { tags: [] as string[], cta: 'Zobacz więcej' }
 
-const meta = computed(() => TILE_META[props.moreHref] ?? DEFAULT_META)
+const meta = computed(() => {
+  const legacy = LEGACY_META[props.moreHref]
+  return {
+    tags: props.tags == null ? (legacy?.tags ?? []) : props.tags.split('\n').map((t) => t.trim()).filter(Boolean),
+    cta: props.ctaLabel == null ? (legacy?.cta ?? '') : props.ctaLabel,
+  }
+})
 </script>
 
 <template>

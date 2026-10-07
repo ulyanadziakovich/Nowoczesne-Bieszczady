@@ -14,7 +14,8 @@ const {
 
 const { points, highlightedId, hasVoted, voteFor } = useDreamMapPoints()
 
-const { data: settings } = await useCmsSingle<{ heroImage?: CmsImage | null }>('dream-map-settings')
+const page = await usePageTexts('dream-map-settings')
+const settings = page.data
 const heroBackgroundImage = computed(
   () =>
     `linear-gradient(180deg, rgba(4, 7, 14, 0.72) 0%, rgba(4, 7, 14, 0.15) 30%, rgba(4, 7, 14, 0.2) 58%, rgba(4, 7, 14, 0.8) 100%), ` +
@@ -341,10 +342,10 @@ onUnmounted(() => {
     </div>
 
     <header class="sky-header">
-      <h1>Cyfrowa Mapa <span>Marzeń</span></h1>
-      <p>Ustrzyki Dolne 2036 — Warsztat Przyszłości</p>
+      <h1>{{ page.t('skyTitle') }} <span>{{ page.t('skyTitleAccent') }}</span></h1>
+      <p>{{ page.t('skySubtitle') }}</p>
       <div class="header-actions">
-        <button type="button" class="hdr-btn" @click="infoOpen = true">O projekcie</button>
+        <button type="button" class="hdr-btn" @click="infoOpen = true">{{ page.t('skyInfoButton') }}</button>
       </div>
     </header>
 
@@ -389,9 +390,9 @@ onUnmounted(() => {
             </button>
           </div>
           <h2>{{ selected.title }}</h2>
-          <p class="modal-label">Wyzwanie</p>
+          <p class="modal-label">{{ page.t('challengeLabel') }}</p>
           <p class="modal-text">{{ selected.challenge }}</p>
-          <p class="modal-label">Propozycja rozwiązania</p>
+          <p class="modal-label">{{ page.t('solutionLabel') }}</p>
           <p class="modal-text">{{ selected.solution }}</p>
         </div>
       </div>
@@ -426,9 +427,9 @@ onUnmounted(() => {
             </button>
           </div>
           <h2>{{ selected.title }}</h2>
-          <p class="modal-label">Wyzwanie</p>
+          <p class="modal-label">{{ page.t('challengeLabel') }}</p>
           <p class="modal-text">{{ selected.challenge }}</p>
-          <p class="modal-label">Propozycja rozwiązania</p>
+          <p class="modal-label">{{ page.t('solutionLabel') }}</p>
           <p class="modal-text">{{ selected.solution }}</p>
         </div>
       </div>
@@ -438,18 +439,11 @@ onUnmounted(() => {
     <div class="info-overlay" :class="{ visible: infoOpen }" @click.self="infoOpen = false">
       <div class="info-box">
         <button type="button" class="info-close" aria-label="Zamknij" @click="infoOpen = false">×</button>
-        <h2>O projekcie</h2>
-        <p>
-          Bieszczady to jedno z najciemniejszych miejsc na mapie Polski. Mieszkańcy Ustrzyk Dolnych spojrzeli w to niebo i
-          rozłożyli na nim swoje marzenia o mieście za dekadę.
-        </p>
-        <p>
-          Każda gwiazda to postulat zgłoszony podczas warsztatów „Ustrzyki 2036: Warsztat Przyszłości”. Gwiazdozbiory
-          łączą postulaty w kategorie tematyczne — kliknij gwiazdę, by poznać szczegóły.
-        </p>
+        <h2>{{ page.t('skyInfoTitle') }}</h2>
+        <RichText class="info-text" :html="page.html('skyInfoText')" tone="dark" :lead="false" />
         <div class="info-credit">
-          <strong>Stowarzyszenie Nowoczesne Bieszczady</strong><br />
-          Projekt „Ustrzyki 2036: Warsztat Przyszłości” • 3 warsztaty kreatywne • {{ points.length }} postulatów mieszkańców
+          <strong>{{ page.t('skyInfoAuthor') }}</strong><br />
+          {{ page.t('skyInfoFooter', { liczba: points.length }) }}
         </div>
       </div>
     </div>
@@ -464,7 +458,7 @@ onUnmounted(() => {
         :style="{ '--cat-color': '#ffd89b', borderColor: 'rgba(255, 255, 255, 0.25)', color: '#f0ead6' }"
         @click="activeFilter = 'all'"
       >
-        <span class="dot" style="background: #f0ead6" />Wszystkie
+        <span class="dot" style="background: #f0ead6" />{{ page.t('filterAll') }}
       </button>
       <button
         v-for="cat in CATEGORIES"
@@ -478,7 +472,7 @@ onUnmounted(() => {
         <span class="dot" :style="{ background: categoryColor(cat) }" />{{ categoryName(cat) }}
       </button>
 
-      <span class="filter-strip-stat">{{ points.length }} postulatów</span>
+      <span class="filter-strip-stat">{{ page.t('filterCount', { liczba: points.length }) }}</span>
     </div>
   </nav>
   </div>

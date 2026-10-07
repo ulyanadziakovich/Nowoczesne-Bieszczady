@@ -1,11 +1,12 @@
 <script setup lang="ts">
 definePageMeta({ solidHeader: true })
-useHead({ title: 'Nasze szlaki rowerowe — Nowoczesne Bieszczady' })
 
 const { data: trailsData } = await useCmsCollection<Trail>('trails')
 // Trasy w kolejności z CMS (przeciąganie w panelu), bez ukrytych („Aktywna” odznaczona).
 const trails = computed(() => byCmsOrder(trailsData.value?.records ?? []).filter(isCmsActive))
-const content = usePageContent()
+const page = await usePageTexts('strona-szlaki')
+const labels = useTrailLabels()
+await usePageTitle(() => page.t('pageTitle'))
 
 /** Upper bound of the length filter. Kept above the longest audited route so
  * the slider starts wide open and no trail is hidden until the visitor
@@ -16,15 +17,15 @@ const difficultyFilter = ref<TrailDifficulty | 'all'>('all')
 const bikeFilter = ref<TrailBikeType | 'all'>('all')
 const maxLength = ref(SLIDER_MAX)
 
-const difficultyOptions = [
-  { value: 'all' as const, label: 'Wszystkie' },
-  ...(Object.entries(difficultyLabels) as [TrailDifficulty, string][]).map(([value, label]) => ({ value, label })),
-]
+const difficultyOptions = computed(() => [
+  { value: 'all' as const, label: page.t('filterAll') },
+  ...(Object.entries(labels.difficulty.value) as [TrailDifficulty, string][]).map(([value, label]) => ({ value, label })),
+])
 
-const bikeOptions = [
-  { value: 'all' as const, label: 'Wszystkie' },
-  ...(Object.entries(bikeTypeLabels) as [TrailBikeType, string][]).map(([value, label]) => ({ value, label })),
-]
+const bikeOptions = computed(() => [
+  { value: 'all' as const, label: page.t('filterAll') },
+  ...(Object.entries(labels.bike.value) as [TrailBikeType, string][]).map(([value, label]) => ({ value, label })),
+])
 
 const filtered = computed(() =>
   trails.value.filter((trail) => {
@@ -45,7 +46,11 @@ const sliderStyle = computed(() => ({
 const heroStats = computed(() => {
   const lengths = trails.value.map((t) => t.lengthKm)
   if (!lengths.length) return []
-  return [`${trails.value.length} zaudytowane trasy`, `${Math.min(...lengths)}–${Math.max(...lengths)} km długości`, '3 poziomy trudności']
+  return [
+    page.plural('statTrails', trails.value.length),
+    page.t('statLength', { min: Math.min(...lengths), max: Math.max(...lengths) }),
+    page.t('statLevels'),
+  ].filter(Boolean)
 })
 
 function dotClass(difficulty: TrailDifficulty) {
@@ -56,7 +61,7 @@ const difficultyGroups = computed(() =>
   (['latwa', 'srednia', 'trudna'] as TrailDifficulty[])
     .map((difficulty) => ({
       difficulty,
-      label: difficultyLabels[difficulty],
+      label: labels.difficulty.value[difficulty],
       trails: trails.value.filter((t) => t.difficulty === difficulty),
     }))
     .filter((group) => group.trails.length > 0),
@@ -73,19 +78,18 @@ function resetFilters() {
   <div>
     <PageHero
       variant="light"
-      kicker="Turystyka rowerowa"
-      :title="content.title('szlaki-hero-description', 'Nasze szlaki rowerowe')"
-      :description="content.body('szlaki-hero-description')"
-      :description-html="content.html('szlaki-hero-description')"
+      :kicker="page.t('heroKicker')"
+      :title="page.t('heroTitle')"
+      :description-html="page.html('heroDescription')"
       :stats="heroStats"
     />
 
     <section class="section map-section">
       <div class="container">
         <div class="section-head">
-          <span class="kicker">Wszystkie trasy</span>
-          <h2 class="section-title">Mapa szlaków</h2>
-          <p class="lead">Wszystkie zaudytowane trasy na jednej mapie. Kliknij ślad, aby przejść do jego opisu.</p>
+          <span class="kicker">{{ page.t('mapKicker') }}</span>
+          <h2 class="section-title">{{ page.t('mapTitle') }}</h2>
+          <p class="lead">{{ page.t('mapLead') }}</p>
         </div>
 
         <ClientOnly>
@@ -102,7 +106,7 @@ function resetFilters() {
         <div class="desktop-filtered">
         <div class="filters">
           <div class="filter">
-            <span class="filter-label">Trudność</span>
+            <span class="filter-label">{{ page.t('filterDifficulty') }}</span>
             <div class="segmented">
               <button
                 v-for="option in difficultyOptions"
@@ -120,7 +124,7 @@ function resetFilters() {
           <span class="filter-divider" />
 
           <div class="filter">
-            <span class="filter-label">Typ roweru</span>
+            <span class="filter-label">{{ page.t('filterBike') }}</span>
             <div class="segmented">
               <button
                 v-for="option in bikeOptions"
@@ -137,7 +141,7 @@ function resetFilters() {
           <span class="filter-divider" />
 
           <div class="filter filter-range">
-            <label class="filter-label" for="length">Maks. długość <strong>{{ maxLength }} km</strong></label>
+            <label class="filter-label" for="length">{{ page.t('filterLength') }} <strong>{{ maxLength }} km</strong></label>
             <input id="length" v-model.number="maxLength" type="range" :min="sliderMin" :max="sliderMax" step="2" :style="sliderStyle" />
           </div>
 
@@ -145,11 +149,11 @@ function resetFilters() {
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5" />
             </svg>
-            Wyczyść
+            {{ page.t('filterReset') }}
           </button>
         </div>
 
-        <p class="results-count">Znaleziono <strong>{{ filtered.length }}</strong> {{ filtered.length === 1 ? 'trasę' : 'tras' }}</p>
+        <p class="results-count">{{ page.plural('results', filtered.length) }}</p>
 
         <TransitionGroup v-if="filtered.length" name="trail-fade" tag="div" class="grid-2">
           <TrailCard v-for="trail in filtered" :key="trail.slug" :trail="trail" />
@@ -159,8 +163,8 @@ function resetFilters() {
           <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" />
           </svg>
-          <p>Brak tras spełniających wybrane kryteria.</p>
-          <button class="link-btn" @click="resetFilters">Wyczyść filtry i pokaż wszystkie</button>
+          <p>{{ page.t('emptyText') }}</p>
+          <button class="link-btn" @click="resetFilters">{{ page.t('emptyReset') }}</button>
         </div>
         </div>
 
@@ -187,8 +191,8 @@ function resetFilters() {
             </svg>
           </div>
           <div>
-            <span class="kicker">{{ content.title('szlaki-project-note') }}</span>
-            <p class="lead">{{ content.body('szlaki-project-note') }}</p>
+            <span class="kicker">{{ page.t('noteKicker') }}</span>
+            <p class="lead">{{ page.t('noteText') }}</p>
           </div>
         </div>
       </div>

@@ -17,6 +17,8 @@ export interface OverviewTrail {
 }
 
 const props = defineProps<{ trails: OverviewTrail[] }>()
+const page = usePageTextsSync('strona-szlaki')
+const labels = useTrailLabels()
 
 /**
  * The difficulty palette lives in app.vue as --diff-easy/--diff-medium/--diff-hard, the single
@@ -316,23 +318,23 @@ onUnmounted(() => {
 
       <p v-if="status !== 'ready'" class="map-status" role="status" aria-live="polite">
         <span class="spinner" aria-hidden="true" />
-        Wczytywanie tras… {{ loadedCount }}/{{ mappable.length }}
+        {{ page.t('mapLoading', { liczba: loadedCount, wszystkie: mappable.length }) }}
       </p>
 
       <p v-if="status === 'ready' && !zoomUnlocked" class="map-hint" aria-hidden="true">
-        Kliknij mapę, aby przybliżać i przesuwać
+        {{ page.t('mapHint') }}
       </p>
     </div>
 
     <div class="map-footer">
       <ul class="legend">
-        <li v-for="(label, difficulty) in difficultyLabels" :key="difficulty">
+        <li v-for="(label, difficulty) in labels.difficulty.value" :key="difficulty">
           <i class="legend-dot" :class="`legend-dot-${difficulty}`" />
           {{ label }}
         </li>
       </ul>
       <p v-if="failedTitles.length" class="legend-error">
-        Nie udało się wczytać śladu: {{ failedTitles.join(', ') }}.
+        {{ page.t('mapError', { trasy: failedTitles.join(', ') }) }}
       </p>
     </div>
 
@@ -346,9 +348,9 @@ onUnmounted(() => {
         class="trail-popup"
       >
         <strong class="popup-title">{{ trail.title }}</strong>
-        <span class="popup-meta">{{ difficultyLabels[trail.difficulty] }} · {{ trail.lengthKm }} km</span>
+        <span class="popup-meta">{{ labels.difficulty.value[trail.difficulty] }} · {{ trail.lengthKm }} km</span>
         <NuxtLink :to="`/szlaki/${trail.slug}`" class="popup-link">
-          Zobacz trasę
+          {{ page.t('mapPopupLink') }}
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg>

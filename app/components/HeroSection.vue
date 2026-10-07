@@ -1,21 +1,13 @@
 <script setup lang="ts">
-withDefaults(
-  defineProps<{
-    image?: string
-    kicker?: string
-    title?: string
-    subtitle?: string
-    cta?: string
-    ctaHref?: string
-  }>(),
-  {
-    kicker: 'Ustrzyki Dolne · Bieszczady',
-    title: 'NOWOCZESNE BIESZCZADY',
-    subtitle: 'Tworzymy wydarzenia, konkursy i inicjatywy, które budują tożsamość regionu.',
-    cta: 'Dowiedz się więcej',
-    ctaHref: '/o-nas/misja',
-  },
-)
+// Wszystkie teksty i zdjęcie przychodzą z formularza „Strona: Główna” w CMS.
+defineProps<{
+  image?: string
+  kicker?: string
+  title?: string
+  subtitle?: string
+  cta?: string
+  ctaHref?: string
+}>()
 </script>
 
 <template>

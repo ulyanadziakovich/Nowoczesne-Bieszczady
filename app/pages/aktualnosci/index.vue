@@ -1,21 +1,21 @@
 <script setup lang="ts">
 definePageMeta({ solidHeader: true })
-useHead({ title: 'Aktualności — Nowoczesne Bieszczady' })
 
 const { data } = await useCmsCollection<NewsPost>('news', { order: 'id:desc' })
 const newsPosts = computed(() => byCmsOrder(data.value?.records ?? []))
-const content = usePageContent()
+const page = await usePageTexts('strona-aktualnosci')
+const common = await usePageTexts('site-settings')
+await usePageTitle(() => page.t('pageTitle'))
 </script>
 
 <template>
   <div>
     <PageHero
       variant="light"
-      kicker="Blog"
-      :title="content.title('aktualnosci-hero-description', 'Aktualności')"
-      :description="content.body('aktualnosci-hero-description')"
-      :description-html="content.html('aktualnosci-hero-description')"
-      :stats="[`${newsPosts.length} opublikowane wpisy`, 'Aktualizowane na bieżąco']"
+      :kicker="page.t('heroKicker')"
+      :title="page.t('heroTitle')"
+      :description-html="page.html('heroDescription')"
+      :stats="[page.plural('statPosts', newsPosts.length), page.t('statExtra')].filter(Boolean)"
     />
 
     <section class="section">
@@ -27,7 +27,7 @@ const content = usePageContent()
               <span class="meta">{{ post.date }} · {{ post.category }}</span>
               <h3>{{ post.title }}</h3>
               <p>{{ post.excerpt }}</p>
-              <span class="link">Czytaj więcej →</span>
+              <span class="link">{{ common.t('readMore') }}</span>
             </div>
           </NuxtLink>
         </div>

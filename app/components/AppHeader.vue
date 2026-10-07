@@ -43,7 +43,7 @@ watch(menuOpen, (open) => {
 
     <div class="main-row">
       <NuxtLink to="/" class="logo-badge">
-        <img :src="resolveCmsUrl(settings?.logo?.src)" alt="Nowoczesne Bieszczady" />
+        <img :src="resolveCmsUrl(settings?.logo?.src)" :alt="settings?.logo?.alt || ''" />
       </NuxtLink>
 
       <div class="nav-group">
@@ -69,7 +69,7 @@ watch(menuOpen, (open) => {
         <div v-if="menuOpen" class="mobile-menu">
           <div class="mobile-menu-top">
             <NuxtLink to="/" class="logo-badge" @click="closeMenu">
-              <img :src="resolveCmsUrl(settings?.logo?.src)" alt="Nowoczesne Bieszczady" />
+              <img :src="resolveCmsUrl(settings?.logo?.src)" :alt="settings?.logo?.alt || ''" />
             </NuxtLink>
             <button class="close-btn" aria-label="Zamknij menu" @click="closeMenu">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -113,17 +113,17 @@ watch(menuOpen, (open) => {
           </nav>
 
           <div class="mobile-menu-footer">
-            <a href="mailto:biuro@nowoczesnebieszczady.pl">
+            <a v-if="settings?.email" :href="`mailto:${settings.email}`">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18v12H3z" /><path d="M3 7l9 6 9-6" /></svg>
-              biuro@nowoczesnebieszczady.pl
+              {{ settings.email }}
             </a>
-            <a href="tel:+48507068728">
+            <a v-if="settings?.phone" :href="`tel:${settings.phone.replace(/\s/g, '')}`">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h3l2 5-2.5 1.5a11 11 0 0 0 5 5L15 12l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2z" /></svg>
-              507 068 728
+              {{ settings.phone }}
             </a>
-            <a href="https://www.facebook.com/nowoczesne.bieszczady/?locale=pl_PL" target="_blank" rel="noopener">
+            <a v-if="settings?.facebookUrl" :href="settings.facebookUrl" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 8h-2a2 2 0 0 0-2 2v2H9v3h2v6h3v-6h2.2l.8-3H14v-1.5c0-.4.2-.8.8-.8H16V8z" /></svg>
-              Facebook
+              {{ settings.facebookLabel || 'Facebook' }}
             </a>
           </div>
         </div>

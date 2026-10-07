@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const { data } = useCmsCollection<NewsPost>('news', { order: 'id:desc' })
+const home = usePageTextsSync('home')
+const common = usePageTextsSync('site-settings')
 const posts = computed(() => byCmsOrder(data.value?.records ?? []).slice(0, 3))
 </script>
 
@@ -7,10 +9,10 @@ const posts = computed(() => byCmsOrder(data.value?.records ?? []).slice(0, 3))
   <section id="aktualnosci" class="events">
     <div class="section-head-row">
       <div>
-        <span class="kicker">Blog</span>
-        <h2>Najnowsze aktualności</h2>
+        <span class="kicker">{{ home.t('newsKicker') }}</span>
+        <h2>{{ home.t('newsTitle') }}</h2>
       </div>
-      <NuxtLink to="/aktualnosci" class="all-link">Zobacz wszystkie aktualności</NuxtLink>
+      <NuxtLink to="/aktualnosci" class="all-link">{{ home.t('newsAllLink') }}</NuxtLink>
     </div>
 
     <div class="grid">
@@ -20,7 +22,7 @@ const posts = computed(() => byCmsOrder(data.value?.records ?? []).slice(0, 3))
           <span class="meta">{{ post.date }} · {{ post.category }}</span>
           <h3>{{ post.title }}</h3>
           <p>{{ post.excerpt }}</p>
-          <span class="link">Czytaj więcej →</span>
+          <span class="link">{{ common.t('readMore') }}</span>
         </div>
       </NuxtLink>
     </div>

@@ -11,7 +11,9 @@ const tiles = computed(() => data.value?.records ?? [])
       :image="resolveCmsUrl(tile.image?.src)"
       :title="tile.title"
       :description="tile.back"
-      :more-href="tile.moreHref"
+            :more-href="tile.moreHref"
+      :tags="tile.tags"
+      :cta-label="tile.ctaLabel"
     />
   </section>
 </template>

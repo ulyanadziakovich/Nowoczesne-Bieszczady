@@ -1,8 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ solidHeader: true })
-useHead({ title: 'Kontakt — Nowoczesne Bieszczady' })
-
-const content = usePageContent()
+const page = await usePageTexts('strona-kontakt')
+await usePageTitle(() => page.t('pageTitle'))
 const { data: settings } = await useCmsSingle<SiteSettings>('site-settings')
 
 const form = reactive({ name: '', email: '', message: '' })
@@ -22,49 +21,48 @@ function submit() {
   <div>
     <PageHero
       variant="light"
-      kicker="Kontakt"
-      :title="content.title('kontakt-hero-description', 'Skontaktuj się z nami')"
-      :description="content.body('kontakt-hero-description')"
-      :description-html="content.html('kontakt-hero-description')"
-      :stats="content.lines('kontakt-stats')"
+      :kicker="page.t('heroKicker')"
+      :title="page.t('heroTitle')"
+      :description-html="page.html('heroDescription')"
+      :stats="page.lines('stats')"
     />
 
     <section class="section">
       <div class="container layout">
         <form class="form card-surface" @submit.prevent="submit">
-          <h2>Formularz kontaktowy</h2>
+          <h2>{{ page.t('formTitle') }}</h2>
 
-          <div v-if="sent" class="success">Dziękujemy! Twoja wiadomość została zapisana — odpowiemy najszybciej, jak to możliwe.</div>
+          <div v-if="sent" class="success">{{ page.t('formSuccess') }}</div>
 
           <label>
-            Imię i nazwisko
-            <input v-model="form.name" type="text" required placeholder="Jan Kowalski" />
+            {{ page.t('formName') }}
+            <input v-model="form.name" type="text" required :placeholder="page.t('formNamePlaceholder')" />
           </label>
 
           <label>
-            Adres e-mail
-            <input v-model="form.email" type="email" required placeholder="jan@przyklad.pl" />
+            {{ page.t('formEmail') }}
+            <input v-model="form.email" type="email" required :placeholder="page.t('formEmailPlaceholder')" />
           </label>
 
           <label>
-            Wiadomość
-            <textarea v-model="form.message" required rows="5" placeholder="W czym możemy pomóc?" />
+            {{ page.t('formMessage') }}
+            <textarea v-model="form.message" required rows="5" :placeholder="page.t('formMessagePlaceholder')" />
           </label>
 
-          <button type="submit" class="btn btn-amber">Wyślij wiadomość</button>
+          <button type="submit" class="btn btn-amber">{{ page.t('formSubmit') }}</button>
         </form>
 
         <aside class="info">
           <div class="info-card card-surface">
-            <h3>Stowarzyszenie Nowoczesne Bieszczady</h3>
+            <h3>{{ page.t('infoTitle') }}</h3>
             <p>{{ settings?.address }}</p>
             <a :href="`mailto:${settings?.email}`" class="contact-item">{{ settings?.email }}</a>
             <a :href="`tel:${settings?.phone?.replace(/\s/g, '')}`" class="contact-item">{{ settings?.phone }}</a>
           </div>
 
           <div v-if="settings?.facebookUrl" class="info-card card-surface">
-            <h3>Social media</h3>
-            <a :href="settings.facebookUrl" target="_blank" rel="noopener" class="contact-item">Facebook</a>
+            <h3>{{ page.t('socialTitle') }}</h3>
+            <a :href="settings.facebookUrl" target="_blank" rel="noopener" class="contact-item">{{ settings.facebookLabel || 'Facebook' }}</a>
           </div>
         </aside>
       </div>

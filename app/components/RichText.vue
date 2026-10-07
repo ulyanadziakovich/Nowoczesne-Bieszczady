@@ -205,6 +205,38 @@ const firstParagraph = computed(() => blocks.value.findIndex((b) => b.type === '
   margin: 0;
 }
 
+/* Lista, w której każdy punkt to sam link (np. wypożyczalnie) → kafelki ze strzałką. */
+.rich-html :deep(ul:has(> li > p > a:only-child):not(:has(> li > p > :not(a)))) {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.rich-html :deep(ul:has(> li > p > a:only-child):not(:has(> li > p > :not(a))) a) {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid #e6e2d8;
+  border-radius: 12px;
+  background: #fff;
+  color: #151d1c;
+  text-decoration: none;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.rich-html :deep(ul:has(> li > p > a:only-child):not(:has(> li > p > :not(a))) a)::after {
+  content: '→';
+  color: #a9541f;
+  font-weight: 700;
+}
+
+.rich-html :deep(ul:has(> li > p > a:only-child):not(:has(> li > p > :not(a))) a:hover) {
+  transform: translateX(3px);
+  border-color: #a9541f;
+}
+
 .rich-html :deep(blockquote) {
   margin: 1.4rem 0;
   padding: 0.2rem 0 0.2rem 1.2rem;

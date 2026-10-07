@@ -1,16 +1,17 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'onas', solidHeader: true })
-useHead({ title: 'Partnerzy i Grantodawcy — O nas — Nowoczesne Bieszczady' })
+const page = await usePageTexts('strona-o-nas')
+await usePageTitle(() => page.t('partnerzyTitle'))
 
 const { data } = await useCmsCollection<Partner>('partners', { order: 'order' })
 const partners = computed(() => data.value?.records ?? [])
-const content = usePageContent()
+
 </script>
 
 <template>
   <div>
-    <h2>Partnerzy i Grantodawcy</h2>
-    <p>{{ content.body('partnerzy-intro') }}</p>
+    <h2>{{ page.t('partnerzyTitle') }}</h2>
+    <RichText :html="page.html('partnerzyText')" :lead="false" />
 
     <div class="partners">
       <div v-for="partner in partners" :key="partner.id" class="partner-badge">

@@ -3,13 +3,16 @@ const props = defineProps<{ trail: Trail }>()
 
 const dotClass = computed(() => `dot dot-${props.trail.difficulty === 'latwa' ? 'easy' : props.trail.difficulty === 'srednia' ? 'medium' : 'hard'}`)
 const bikeTypes = computed(() => trailBikeTypes(props.trail))
+const page = usePageTextsSync('strona-szlaki')
+const common = usePageTextsSync('site-settings')
+const labels = useTrailLabels()
 </script>
 
 <template>
   <NuxtLink :to="`/szlaki/${trail.slug}`" class="trail-card">
     <div class="image-wrap">
       <img :src="resolveCmsUrl(trail.image?.src)" :alt="trail.title" />
-      <span class="badge-pill"><i :class="dotClass" />{{ difficultyLabels[trail.difficulty] }}</span>
+      <span class="badge-pill"><i :class="dotClass" />{{ labels.difficulty.value[trail.difficulty] }}</span>
     </div>
 
     <div class="body">
@@ -19,7 +22,7 @@ const bikeTypes = computed(() => trailBikeTypes(props.trail))
       <p class="meta-line">
         <span>{{ trail.lengthKm }} km</span>
         <span class="sep">·</span>
-        <span>{{ trail.elevationM }} m przewyższeń</span>
+        <span>{{ common.t('cardElevation', { liczba: trail.elevationM }) }}</span>
         <span class="sep">·</span>
         <span class="time">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -30,11 +33,11 @@ const bikeTypes = computed(() => trailBikeTypes(props.trail))
       </p>
 
       <div class="bikes">
-        <span v-for="type in bikeTypes" :key="type" class="bike-tag">{{ bikeTypeLabels[type] }}</span>
+        <span v-for="type in bikeTypes" :key="type" class="bike-tag">{{ labels.bike.value[type] }}</span>
       </div>
 
       <span class="cta-link">
-        Zobacz trasę i pobierz GPX
+        {{ page.t('cardCta') }}
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>

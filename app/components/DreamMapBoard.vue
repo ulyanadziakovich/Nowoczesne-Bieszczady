@@ -4,6 +4,7 @@ import { useDreamMapCategories } from '~/composables/useDreamMapCategories'
 
 const { orderedCategories, categoryColor, categoryName } = useDreamMapCategories()
 const { points, highlightedId } = useDreamMapPoints()
+const page = usePageTextsSync('dream-map-settings')
 
 // Derived from the CMS data, so a category added there shows up here too.
 const CATEGORIES = computed(() => orderedCategories(points.value))
@@ -55,12 +56,9 @@ const grouped = computed(() =>
   <section class="section section-alt">
     <div class="container">
       <div class="section-head">
-        <span class="kicker">{{ points.length }} postulatów mieszkańców</span>
-        <h2 class="section-title">Wszystkie punkty mapy marzeń</h2>
-        <p class="lead">
-          Pełna lista wniosków i rekomendacji z warsztatów „Ustrzyki 2036” — wyzwanie i proponowane rozwiązanie przy
-          każdym punkcie.
-        </p>
+        <span class="kicker">{{ page.t('boardCount', { liczba: points.length }) }}</span>
+        <h2 class="section-title">{{ page.t('boardTitle') }}</h2>
+        <p class="lead">{{ page.t('boardLead') }}</p>
       </div>
 
       <!-- Desktop: filterable single grid -->
@@ -73,7 +71,7 @@ const grouped = computed(() =>
             :style="activeFilter === 'all' ? { background: 'var(--ink)', borderColor: 'var(--ink)' } : {}"
             @click="activeFilter = 'all'"
           >
-            Wszystkie
+            {{ page.t('filterAll') }}
           </button>
           <button
             v-for="cat in CATEGORIES"

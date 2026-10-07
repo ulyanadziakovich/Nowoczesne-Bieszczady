@@ -1,41 +1,41 @@
 <script setup lang="ts">
 definePageMeta({ solidHeader: true })
-useHead({ title: 'Inicjatywy społeczne i edukacja — Nowoczesne Bieszczady' })
-
-const heroStats = ['Warsztaty podcastowe', 'Cykliczne debaty', 'Otwarte dla mieszkańców']
-
+const page = await usePageTexts('strona-inicjatywy')
+await usePageTitle(() => page.t('pageTitle'))
+// Zdjęcia: z formularza strony, a do czasu wgrania — dotychczasowe z „Tekstów na stronach”.
 const content = usePageContent()
+const eterImage = computed(() => page.image('eterImage') ?? resolveCmsUrl(content.image('inicjatywy-eterze')))
+const burzaImage = computed(() => page.image('burzaImage') ?? resolveCmsUrl(content.image('inicjatywy-burza')))
 </script>
 
 <template>
   <div>
     <PageHero
       variant="light"
-      kicker="Edukacja i społeczność"
-      :title="content.title('inicjatywy-hero-description', 'Inicjatywy społeczne i edukacja')"
-      :description="content.body('inicjatywy-hero-description')"
-      :description-html="content.html('inicjatywy-hero-description')"
-      :stats="heroStats"
+      :kicker="page.t('heroKicker')"
+      :title="page.t('heroTitle')"
+      :description-html="page.html('heroDescription')"
+      :stats="page.lines('stats')"
     />
 
     <section class="section">
       <div class="container two-col">
         <div>
-          <span class="kicker">Projekt warsztatowy</span>
-          <h2 class="section-title">{{ content.title('inicjatywy-eterze') }}</h2>
-          <p v-for="(paragraph, i) in content.paragraphs('inicjatywy-eterze')" :key="i" class="lead paragraph">{{ paragraph }}</p>
+          <span class="kicker">{{ page.t('eterKicker') }}</span>
+          <h2 class="section-title">{{ page.t('eterTitle') }}</h2>
+          <RichText class="section-text" :html="page.html('eterText')" :lead="false" />
         </div>
-        <img :src="resolveCmsUrl(content.image('inicjatywy-eterze'))" alt="Bieszczady w eterze" class="side-image" />
+        <img v-if="eterImage" :src="eterImage" :alt="page.imageAlt('eterImage', page.t('eterTitle'))" class="side-image" />
       </div>
     </section>
 
     <section class="section section-alt">
       <div class="container two-col reverse">
-        <img :src="resolveCmsUrl(content.image('inicjatywy-burza'))" alt="Bieszczadzka Burza Mózgów" class="side-image" />
+        <img v-if="burzaImage" :src="burzaImage" :alt="page.imageAlt('burzaImage', page.t('burzaTitle'))" class="side-image" />
         <div>
-          <span class="kicker">Debaty społeczne</span>
-          <h2 class="section-title">{{ content.title('inicjatywy-burza') }}</h2>
-          <p v-for="(paragraph, i) in content.paragraphs('inicjatywy-burza')" :key="i" class="lead paragraph">{{ paragraph }}</p>
+          <span class="kicker">{{ page.t('burzaKicker') }}</span>
+          <h2 class="section-title">{{ page.t('burzaTitle') }}</h2>
+          <RichText class="section-text" :html="page.html('burzaText')" :lead="false" />
         </div>
       </div>
     </section>
@@ -50,14 +50,11 @@ const content = usePageContent()
             </svg>
           </div>
           <div class="note-text">
-            <span class="kicker">Bądź na bieżąco</span>
-            <h3>Relacje ze spotkań i warsztatów</h3>
-            <p>
-              Zdjęcia, podsumowania i najświeższe wieści z „Bieszczad w eterze”, „Bieszczadzkiej Burzy Mózgów” i innych
-              naszych inicjatyw publikujemy na bieżąco w Aktualnościach.
-            </p>
+            <span class="kicker">{{ page.t('noteKicker') }}</span>
+            <h3>{{ page.t('noteTitle') }}</h3>
+            <p>{{ page.t('noteText') }}</p>
           </div>
-          <NuxtLink to="/aktualnosci" class="btn btn-amber">Zobacz aktualności</NuxtLink>
+          <NuxtLink to="/aktualnosci" class="btn btn-amber">{{ page.t('noteButton') }}</NuxtLink>
         </div>
       </div>
     </section>

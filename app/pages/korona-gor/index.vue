@@ -1,6 +1,5 @@
 <script setup lang="ts">
 definePageMeta({ solidHeader: true })
-useHead({ title: 'Korona Ustrzyckich Gór — Nowoczesne Bieszczady' })
 
 const { data: peaksData } = await useCmsCollection<Peak>('peaks', { order: 'order' })
 const peaks = computed(() => peaksData.value?.records ?? [])
@@ -8,20 +7,20 @@ const peaks = computed(() => peaksData.value?.records ?? [])
 const { data: eventsData } = await useCmsCollection<EventItem>('events')
 const sportEvents = computed(() => byCmsOrder(eventsData.value?.records ?? []).filter((e) => e.tag === 'sport'))
 
-const content = usePageContent()
+const page = await usePageTexts('strona-korona')
+await usePageTitle(() => page.t('pageTitle'))
 
-const routeStats = computed(() => [{ label: 'Szczytów w pętli', value: String(peaks.value.length) }, ...content.pairs('korona-gor-stats')])
-const heroStats = computed(() => [`${peaks.value.length} szczytów w pętli`, ...content.pairs('korona-gor-stats').map((p) => p.value)])
+const routeStats = computed(() => [{ label: page.t('barPeaksLabel'), value: String(peaks.value.length) }, ...page.pairs('stats')])
+const heroStats = computed(() => [page.t('statPeaks', { liczba: peaks.value.length }), ...page.pairs('stats').map((p) => p.value)].filter(Boolean))
 </script>
 
 <template>
   <div>
     <PageHero
       variant="light"
-      kicker="Turystyka górska"
-      :title="content.title('korona-gor-hero-description', 'Korona Ustrzyckich Gór')"
-      :description="content.body('korona-gor-hero-description')"
-      :description-html="content.html('korona-gor-hero-description')"
+      :kicker="page.t('heroKicker')"
+      :title="page.t('heroTitle')"
+      :description-html="page.html('heroDescription')"
       :stats="heroStats"
     />
 
@@ -39,9 +38,9 @@ const heroStats = computed(() => [`${peaks.value.length} szczytów w pętli`, ..
     <section class="section section-alt">
       <div class="container">
         <div class="section-head">
-          <span class="kicker">Pięć szczytów, jedna pętla</span>
-          <h2 class="section-title">Szczyty do zdobycia</h2>
-          <p class="lead">{{ content.body('korona-gor-intro') }}</p>
+          <span class="kicker">{{ page.t('peaksKicker') }}</span>
+          <h2 class="section-title">{{ page.t('peaksTitle') }}</h2>
+          <p class="lead">{{ page.t('peaksLead') }}</p>
         </div>
 
         <div class="timeline">
@@ -50,14 +49,14 @@ const heroStats = computed(() => [`${peaks.value.length} szczytów w pętli`, ..
               <span class="node">{{ i + 1 }}</span>
             </div>
             <div class="node-card">
-              <span class="elevation">{{ peak.elevation }} m n.p.m.</span>
+              <span class="elevation">{{ page.t('peakElevation', { liczba: peak.elevation }) }}</span>
               <h3>{{ peak.name }}</h3>
               <p>{{ peak.note }}</p>
               <span v-if="peak.tower" class="tower-badge">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8">
                   <path d="M8 21h8M9 21l1-14M15 21l-1-14M7 7h10L12 3 7 7zM8.5 11h7M9 15h6" />
                 </svg>
-                Wieża widokowa
+                {{ page.t('peakTower') }}
               </span>
             </div>
           </div>
@@ -68,8 +67,8 @@ const heroStats = computed(() => [`${peaks.value.length} szczytów w pętli`, ..
     <section class="section">
       <div class="container">
         <div class="section-head">
-          <span class="kicker">Wydarzenia sportowe</span>
-          <h2 class="section-title">Rajdy i mecze terenowe</h2>
+          <span class="kicker">{{ page.t('eventsKicker') }}</span>
+          <h2 class="section-title">{{ page.t('eventsTitle') }}</h2>
         </div>
 
         <div class="grid-2">
@@ -84,6 +83,9 @@ const heroStats = computed(() => [`${peaks.value.length} szczytów w pętli`, ..
             :free-entry="event.freeEntry"
             more-href="/aktualnosci"
             :tickets-href="event.ticketsHref"
+            :free-label="page.t('eventFree')"
+            :more-label="page.t('eventMore')"
+            :tickets-label="page.t('eventTickets')"
           />
         </div>
       </div>

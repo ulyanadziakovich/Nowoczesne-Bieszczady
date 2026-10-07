@@ -1,11 +1,14 @@
 <script setup lang="ts">
-useHead({ title: 'Ustrzyki 2036: Warsztat Przyszłości — Nowoczesne Bieszczady' })
+
 
 // Same key/collection as DreamMapSky.vue — Nuxt dedupes this to one fetch,
 // so the SSR fallback below can show the real CMS photo too, not a blank one.
-const { data: heroSettings } = await useCmsSingle<{ heroImage?: CmsImage | null; aboutImage?: CmsImage | null }>(
-  'dream-map-settings',
-)
+const page = await usePageTexts('dream-map-settings')
+const heroSettings = page.data
+await usePageTitle(() => page.t('pageTitle'))
+// Logotypy: z formularza strony; do czasu wgrania — dotychczasowe pliki (etap 2).
+const fundingLogo1 = computed(() => page.image('fundingLogo1') ?? '/img/finansowanie-niw.png')
+const fundingLogo2 = computed(() => page.image('fundingLogo2') ?? '/img/finansowanie-procarpathia.png')
 const fallbackBackgroundImage = computed(
   () =>
     `linear-gradient(180deg, rgba(4, 7, 14, 0.72) 0%, rgba(4, 7, 14, 0.15) 30%, rgba(4, 7, 14, 0.2) 58%, rgba(4, 7, 14, 0.8) 100%), ` +
@@ -27,48 +30,23 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
     <section class="section">
       <div class="container">
         <div class="section-head">
-          <span class="kicker">Ustrzyki 2036: Warsztat Przyszłości</span>
-          <h2 class="section-title">Skąd wzięła się ta mapa</h2>
+          <span class="kicker">{{ page.t('aboutKicker') }}</span>
+          <h2 class="section-title">{{ page.t('aboutTitle') }}</h2>
         </div>
 
         <div v-if="aboutImageUrl" class="about-image-wrap">
-          <img :src="aboutImageUrl" alt="Warsztat „Ustrzyki 2036” — mieszkańcy pracują nad mapą przyszłości miasta" class="about-image" />
+          <img :src="aboutImageUrl" :alt="page.imageAlt('aboutImage', page.t('aboutTitle'))" class="about-image" />
         </div>
 
         <div class="about">
           <div class="about-text">
-            <p class="lead">
-              Inicjatywa „Ustrzyki 2036: Warsztat Przyszłości” to autorski projekt realizowany przez Stowarzyszenie
-              Nowoczesne Bieszczady we współpracy z lokalnymi partnerami: Centrum Koordynacji i Wspierania Aktywności
-              Społeczno-Gospodarczej w Stefkowej oraz Powiatowym Urzędem Pracy w Ustrzykach Dolnych.
-            </p>
-            <p>
-              Główną intencją projektu było odejście od tradycyjnych, często biernych formuł konsultacji społecznych
-              na rzecz stworzenia przestrzeni realnego, żywego i twórczego współdecydowania. Chcieliśmy dać
-              mieszkańcom narzędzie do kształtowania przestrzeni publicznej oraz budowania poczucia sprawstwa —
-              udowadniając, że głos każdego z nas ma znaczenie.
-            </p>
-            <p>
-              Prezentowana Cyfrowa Mapa Marzeń jest bezpośrednim owocem procesu konsultacji społecznych i pracy
-              warsztatowej. Przy jednym stole usiedli przedstawiciele bardzo różnych środowisk — od seniorów
-              dzielących się mądrością życiową, przez lokalnych liderów i członków organizacji pozarządowych, aż po
-              młodzież z Młodzieżowej Rady Gminy.
-            </p>
-            <p>
-              Niniejsza mapa nie jest katalogiem roszczeń ani formą krytyki dotychczasowych działań. Jest głosem
-              troski, dojrzałej odpowiedzialności oraz autentycznej miłości do naszej małej ojczyzny. Traktujemy
-              wypracowane postulaty jako partnerskie zaproszenie do dialogu.
-            </p>
-            <p class="funding-note">
-              Inicjatywa jest współfinansowana ze środków otrzymanych od Narodowego Instytutu Wolności — Centrum
-              Rozwoju Społeczeństwa Obywatelskiego w ramach Rządowego Programu Fundusz Inicjatyw Obywatelskich
-              NOWEFIO na lata 2021–2030, za pośrednictwem Stowarzyszenia „Pro Carpathia”.
-            </p>
+            <RichText class="about-rich" :html="page.html('aboutText')" />
+            <p class="funding-note">{{ page.t('fundingNote') }}</p>
             <div class="funding-logos">
               <img
                 class="funding-logo funding-logo-niw"
-                src="/img/finansowanie-niw.png"
-                alt="Komitet do Spraw Pożytku Publicznego, Narodowy Instytut Wolności — Centrum Rozwoju Społeczeństwa Obywatelskiego, Rządowy Program Fundusz Inicjatyw Obywatelskich NOWEFIO na lata 2021-2030"
+                :src="fundingLogo1"
+                :alt="page.imageAlt('fundingLogo1', '')"
                 width="476"
                 height="56"
                 loading="lazy"
@@ -76,8 +54,8 @@ const aboutImageUrl = computed(() => resolveCmsUrl(heroSettings.value?.aboutImag
               />
               <img
                 class="funding-logo funding-logo-procarpathia"
-                src="/img/finansowanie-procarpathia.png"
-                alt="Stowarzyszenie Pro Carpathia"
+                :src="fundingLogo2"
+                :alt="page.imageAlt('fundingLogo2', '')"
                 width="900"
                 height="306"
                 loading="lazy"

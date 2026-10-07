@@ -1,23 +1,25 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'onas', solidHeader: true })
-useHead({ title: 'Statut Stowarzyszenia — O nas — Nowoczesne Bieszczady' })
-
+const page = await usePageTexts('strona-o-nas')
+await usePageTitle(() => page.t('statutTitle'))
+// Strony statutu i plik PDF: do czasu wgrania w formularzu — z „Tekstów na stronach” (etap 2).
 const content = usePageContent()
+const pdfUrl = computed(() => page.file('statutFile') ?? content.image('statut-intro'))
 const pages = computed(() => (content.body('statut-galeria') || '').split('\n').map((s) => s.trim()).filter(Boolean))
 </script>
 
 <template>
   <div>
-    <h2>Statut Stowarzyszenia</h2>
-    <p>{{ content.body('statut-intro') }}</p>
+    <h2>{{ page.t('statutTitle') }}</h2>
+    <RichText :html="page.html('statutText')" :lead="false" />
 
     <div class="actions">
-      <a :href="content.image('statut-intro')" class="btn btn-amber" download>Pobierz Statut (PDF)</a>
-      <a :href="content.image('statut-intro')" target="_blank" rel="noopener" class="btn btn-outline">Otwórz w nowej karcie</a>
+      <a :href="pdfUrl" class="btn btn-amber" download>{{ page.t('statutDownload') }}</a>
+      <a :href="pdfUrl" target="_blank" rel="noopener" class="btn btn-outline">{{ page.t('statutOpen') }}</a>
     </div>
 
-    <p v-if="pages.length" class="pages-hint">Kliknij stronę, żeby ją powiększyć.</p>
-    <GalleryLightbox :images="pages" alt-prefix="Statut Stowarzyszenia" layout="scroll" />
+    <p v-if="pages.length" class="pages-hint">{{ page.t('statutHint') }}</p>
+    <GalleryLightbox :images="pages" :alt-prefix="page.t('statutTitle')" layout="scroll" />
   </div>
 </template>
 

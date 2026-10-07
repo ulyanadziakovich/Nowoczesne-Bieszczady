@@ -11,7 +11,6 @@ withDefaults(
     stats?: string[]
   }>(),
   {
-    image: '/images/bieszczady.avif',
     variant: 'photo',
   },
 )

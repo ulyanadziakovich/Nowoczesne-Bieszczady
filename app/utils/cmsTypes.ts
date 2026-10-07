@@ -21,6 +21,7 @@ export interface SiteSettings {
   phone: string
   address: string
   facebookUrl?: string
+  facebookLabel?: string
   footerTagline?: string
 }
 
@@ -126,7 +127,10 @@ export interface FlagshipTile {
   description: string
   back: string
   image: CmsImage | null
-  moreHref: string
+    moreHref: string
+  /** Etykiety na kafelku — jedna w linii. */
+  tags?: string | null
+  ctaLabel?: string | null
   order?: number
 }
 

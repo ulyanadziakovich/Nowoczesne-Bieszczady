@@ -2,7 +2,7 @@
 // Formularz „Zgłoś swój pomysł” — zgłoszenia trafiają do CMS (kolekcja
 // „Zgłoszone pomysły”) i, gdy skonfigurowano wysyłkę, na e-mail stowarzyszenia.
 // Wszystkie teksty formularza można zmienić w CMS (treści strony, klucze dream-map-form-*).
-const content = usePageContent()
+const page = usePageTextsSync('dream-map-settings')
 // compact = jedna kolumna, bez własnego tła (wewnątrz okienka z kafelka)
 defineProps<{ compact?: boolean }>()
 
@@ -25,42 +25,42 @@ async function submit() {
 <template>
   <section class="idea-form-wrap" :class="{ compact }">
     <div class="idea-intro">
-      <span class="kicker">{{ content.title('dream-map-form-kicker', 'Twój głos') }}</span>
-      <h2>{{ content.title('dream-map-form-intro', 'Zgłoś swój pomysł') }}</h2>
-      <p>{{ content.body('dream-map-form-intro', 'Masz pomysł, jak zmienić Ustrzyki Dolne na lepsze? Opisz go — przeczytamy każde zgłoszenie.') }}</p>
+      <span class="kicker">{{ page.t('ideaKicker') }}</span>
+      <h2>{{ page.t('ideaTitle') }}</h2>
+      <p>{{ page.t('ideaText') }}</p>
     </div>
 
     <div v-if="status === 'sent'" class="idea-success" role="status">
-      <strong>{{ content.title('dream-map-form-success', 'Dziękujemy!') }}</strong>
-      <p>{{ content.body('dream-map-form-success', 'Twój pomysł do nas dotarł. Skontaktujemy się, jeśli będziemy mieli pytania.') }}</p>
-      <button type="button" class="btn btn-outline" @click="status = 'idle'">Zgłoś kolejny pomysł</button>
+      <strong>{{ page.t('ideaSuccessTitle') }}</strong>
+      <p>{{ page.t('ideaSuccessText') }}</p>
+      <button type="button" class="btn btn-outline" @click="status = 'idle'">{{ page.t('ideaAgain') }}</button>
     </div>
 
     <form v-else class="idea-form" @submit.prevent="submit">
       <label>
-        <span>1. Tytuł pomysłu</span>
+        <span>{{ page.t('ideaField1') }}</span>
         <input v-model="form.title" type="text" required maxlength="150" />
       </label>
       <label>
-        <span>2. Opis problemu do rozwiązania</span>
+        <span>{{ page.t('ideaField2') }}</span>
         <textarea v-model="form.problem" rows="4" required maxlength="3000" />
       </label>
       <label>
-        <span>3. Propozycja rozwiązania / Twój pomysł</span>
+        <span>{{ page.t('ideaField3') }}</span>
         <textarea v-model="form.solution" rows="4" required maxlength="3000" />
       </label>
       <label>
-        <span>4. Kontakt (e-mail lub telefon)</span>
+        <span>{{ page.t('ideaField4') }}</span>
         <input v-model="form.contact" type="text" required maxlength="200" autocomplete="email" />
       </label>
       <!-- pole-pułapka na boty, niewidoczne dla ludzi -->
       <input v-model="form.website" class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
       <p v-if="status === 'error'" class="idea-error" role="alert">
-        Nie udało się wysłać zgłoszenia. Spróbuj ponownie za chwilę.
+        {{ page.t('ideaError') }}
       </p>
       <button type="submit" class="btn btn-amber" :disabled="status === 'sending'">
-        {{ status === 'sending' ? 'Wysyłanie…' : 'Wyślij pomysł' }}
+        {{ status === 'sending' ? page.t('ideaSending') : page.t('ideaSubmit') }}
       </button>
     </form>
   </section>
