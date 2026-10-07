@@ -86,6 +86,7 @@ const documents = computed(() =>
 
 .brand {
   display: flex;
+  align-self: flex-start;
   align-items: center;
   gap: 0.9rem;
   max-width: 280px;
