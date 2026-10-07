@@ -261,6 +261,8 @@ export const pageTextDefaults = {
     "sprawozdaniaSoon": "PDF wkrótce",
     "partnerzyTitle": "Partnerzy i Grantodawcy",
     "partnerzyText": "<p>Nasze projekty realizujemy dzięki współpracy i wsparciu finansowemu poniższych instytucji i organizacji.</p>",
+    "wolontariatTitle": "Wolontariat",
+    "wolontariatText": "",
     "wolontariatEmpty": "Wkrótce zamieścimy tutaj informacje o wolontariacie w Stowarzyszeniu Nowoczesne Bieszczady.",
     "wolontariatOpen": "Pobierz / zobacz"
   },

@@ -2,22 +2,30 @@
 definePageMeta({ layout: 'onas', solidHeader: true })
 const page = await usePageTexts('strona-o-nas')
 
-// Cała treść podstrony z jednej zakładki CMS „Wolontariat”: tytuł, opis i dokumenty.
+// Treść z formularza „Strona: O nas” (zakładka „Wolontariat”): tytuł, opis, dokumenty.
+// Do czasu przeniesienia danych — z dawnego formularza „Wolontariat”.
 interface VolunteeringPage {
   title?: string
   description?: string
   documents?: { label: string; file: CmsFile | null }[]
 }
+type Doc = { label: string; file: CmsFile | null }
 
 const { data } = await useCmsSingle<VolunteeringPage>('volunteering')
-const title = computed(() => data.value?.title ?? '')
+const hasNewFields = computed(() => page.data.value?.wolontariatTitle !== undefined)
+const title = computed(() => (hasNewFields.value ? page.t('wolontariatTitle') : (data.value?.title ?? '')))
 await usePageTitle(() => title.value)
+
+const html = computed(() => page.html('wolontariatText'))
 const paragraphs = computed(() =>
   (data.value?.description || page.t('wolontariatEmpty'))
     .split(/\n\s*\n/)
     .filter(Boolean),
 )
-const documents = computed(() => (data.value?.documents ?? []).filter((d) => d.file?.filename))
+const documents = computed(() => {
+  const own = (page.data.value?.wolontariatDocs ?? []) as Doc[]
+  return (own.length ? own : (data.value?.documents ?? [])).filter((d) => d.file?.filename)
+})
 
 function fileUrl(file: CmsFile) {
   return resolveCmsUrl(`/uploads/${file.directory}${file.filename}`)
@@ -27,7 +35,8 @@ function fileUrl(file: CmsFile) {
 <template>
   <div>
     <h2>{{ title }}</h2>
-    <p v-for="(p, i) in paragraphs" :key="i">{{ p }}</p>
+    <RichText v-if="html" :html="html" :lead="false" />
+    <p v-for="(p, i) in paragraphs" v-else :key="i">{{ p }}</p>
 
     <ul v-if="documents.length" class="docs-list">
       <li v-for="(doc, i) in documents" :key="i">
