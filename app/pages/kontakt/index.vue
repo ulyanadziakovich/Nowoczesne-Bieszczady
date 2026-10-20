@@ -5,16 +5,19 @@ usePageTheme(page)
 await usePageTitle(() => page.t('pageTitle'))
 const { data: settings } = await useCmsSingle<SiteSettings>('site-settings')
 
-const form = reactive({ name: '', email: '', message: '' })
-const sent = ref(false)
+const form = reactive({ name: '', email: '', message: '', website: '' })
+const status = ref<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
-function submit() {
-  // Formularz działa na razie wyłącznie po stronie klienta — do podpięcia realnego wysyłania
-  // (np. przez endpoint /api/kontakt) w kolejnym etapie.
-  sent.value = true
-  form.name = ''
-  form.email = ''
-  form.message = ''
+async function submit() {
+  if (status.value === 'sending') return
+  status.value = 'sending'
+  try {
+    await $fetch('/api/kontakt', { method: 'POST', body: { ...form } })
+    status.value = 'sent'
+    Object.assign(form, { name: '', email: '', message: '', website: '' })
+  } catch {
+    status.value = 'error'
+  }
 }
 </script>
 
@@ -88,7 +91,7 @@ function submit() {
         <form class="contact-form" @submit.prevent="submit">
           <h2 class="form-title">{{ page.t('formTitle') }}</h2>
 
-          <div v-if="sent" class="success" role="status">
+          <div v-if="status === 'sent'" class="success" role="status">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7" /></svg>
             <span>{{ page.t('formSuccess') }}</span>
           </div>
@@ -96,22 +99,26 @@ function submit() {
           <div class="field-row">
             <label class="field">
               <span>{{ page.t('formName') }}</span>
-              <input v-model="form.name" type="text" required autocomplete="name" :placeholder="page.t('formNamePlaceholder')" />
+              <input v-model="form.name" type="text" required maxlength="120" autocomplete="name" :placeholder="page.t('formNamePlaceholder')" />
             </label>
             <label class="field">
               <span>{{ page.t('formEmail') }}</span>
-              <input v-model="form.email" type="email" required autocomplete="email" :placeholder="page.t('formEmailPlaceholder')" />
+              <input v-model="form.email" type="email" required maxlength="200" autocomplete="email" :placeholder="page.t('formEmailPlaceholder')" />
             </label>
           </div>
 
           <label class="field">
             <span>{{ page.t('formMessage') }}</span>
-            <textarea v-model="form.message" required rows="6" :placeholder="page.t('formMessagePlaceholder')" />
+            <textarea v-model="form.message" required rows="6" maxlength="5000" :placeholder="page.t('formMessagePlaceholder')" />
           </label>
+          <!-- pole-pułapka na boty, niewidoczne dla ludzi -->
+          <input v-model="form.website" class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <p v-if="status === 'error'" class="error" role="alert">{{ page.t('formError') }}</p>
 
           <div class="form-footer">
             <p class="form-note">{{ page.t('formNote') }}</p>
-            <button type="submit" class="submit">
+            <button type="submit" class="submit" :disabled="status === 'sending'">
               {{ page.t('formSubmit') }}
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </button>
@@ -313,6 +320,27 @@ a.channel:hover {
 .submit:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 26px rgba(168, 85, 31, 0.3);
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+  box-shadow: none;
+}
+
+.hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.error {
+  margin: 0;
+  color: #ad0000;
+  font-size: 0.9rem;
 }
 
 .success {

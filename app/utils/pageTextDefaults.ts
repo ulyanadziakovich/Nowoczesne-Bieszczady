@@ -24,7 +24,7 @@ export const pageTextDefaults = {
     "themeAccent": ""
   },
   "site-settings": {
-    "email": "biuro@nowoczesnebieszczady.pl",
+    "email": "biuro@nowoczesnebieszczady.com",
     "phone": "507 068 728",
     "address": "Ustrzyki Dolne, woj. podkarpackie",
     "facebookUrl": "https://www.facebook.com/nowoczesne.bieszczady/?locale=pl_PL",
@@ -283,6 +283,7 @@ export const pageTextDefaults = {
     "formMessage": "Wiadomość",
     "formMessagePlaceholder": "W czym możemy pomóc?",
     "formSubmit": "Wyślij wiadomość",
+    "formError": "Nie udało się wysłać wiadomości. Spróbuj ponownie lub napisz bezpośrednio na adres e-mail.",
     "infoTitle": "Stowarzyszenie Nowoczesne Bieszczady",
     "socialTitle": "Social media",
     "infoText": "Najszybciej skontaktujesz się z nami mailowo lub telefonicznie. Chętnie porozmawiamy o współpracy, projektach i wydarzeniach.",
